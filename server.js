@@ -40,16 +40,16 @@ wss.on('connection', function(ws) {
 
       getEmailsAndUpdateClients();
       var id = setInterval(getEmailsAndUpdateClients, 5000);
-
+      return id;
     }
 
-    newClient();
+    var clientId = newClient();
 
     
     console.log('websocket connection open');
 
     ws.on('close', function() {
         console.log('websocket connection close');
-        clearInterval(id);
+        clearInterval(clientId);
     });
 });
