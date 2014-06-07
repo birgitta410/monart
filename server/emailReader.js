@@ -2,7 +2,21 @@ var yaml_config = require('node-yaml-config');
 var ContextIO = require('contextio');
 var _ = require('lodash');
 
-var config = yaml_config.load(__dirname + '/contextio.yml');
+var config;
+
+try {
+	config = yaml_config.load(__dirname + '/contextio.yml');
+} catch(err) {
+	console.log('could not read yml, trying Heroku vars');
+	config = {
+		default: {
+		  contextIo: {
+		    key: proc.env.CONTEXT_KEY,
+		    secret: proc.env.CONTEXT_SECRET
+		  }
+    	}
+	};
+}
 
 var ctxioClient = new ContextIO.Client({
 	key: config.contextIo.key,
