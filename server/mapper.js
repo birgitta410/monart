@@ -4,14 +4,16 @@ var http = require('http');
 
 var emailReader = require('./emailReader.js');
 
+var EMAIL_DOMAIN;
+emailReader.getAccountInfo(function(accountInfo) {
+	var email = accountInfo.email_addresses[0];
+	EMAIL_DOMAIN = email.substring(email.indexOf('@') + 1);
+	console.log('DOMAIN', EMAIL_DOMAIN);
+});
+
 exports.readEmail = function(callWhenDone) {
 	emailReader.readEmail(mapEmailDataToRectangles, callWhenDone);	
 };
-
-
-// alle 10 Sekunden context.io fragen
-// query mit date_after = das letzte Mal als ich gefragt habe
-
 
 function mapEmailDataToRectangles(messages, callback) {
 
@@ -28,17 +30,17 @@ function mapEmailDataToRectangles(messages, callback) {
 		return moment().diff(moment(message.date, 'X'), 'days') > 1;
 	});
 
-	function isFromThoughtworks(message) {
-		return message.addresses.from.email.indexOf('thoughtworks') > -1;
+	function isFromSameDomain(message) {
+		return message.addresses.from.email.indexOf(EMAIL_DOMAIN) > -1;
 	}
 
 	console.log('Got emails from', _.map(messages, function(message) {
 		return message.addresses.from.email + ', ' + message.date;
 	}));
 
-	var countInternalToday = _.countBy(messagesToday, isFromThoughtworks);
-	var countInternalYesterday = _.countBy(messagesYesterday, isFromThoughtworks);
-	var countInternalOld = _.countBy(messagesOld, isFromThoughtworks);
+	var countInternalToday = _.countBy(messagesToday, isFromSameDomain);
+	var countInternalYesterday = _.countBy(messagesYesterday, isFromSameDomain);
+	var countInternalOld = _.countBy(messagesOld, isFromSameDomain);
 
 	callback(_.compact([ 
 		createNumberOfMessagesRect(countInternalToday.true || 0, "blue", 2), 
