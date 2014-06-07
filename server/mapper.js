@@ -1,7 +1,10 @@
 var _ = require('lodash');
 var moment = require('moment');
+var http = require('http');
 
-var myMail = 'bboeckel@thoughtworks.com';
+var emailReader = require('./emailReader.js');
+emailReader.readEmail();
+
 var contextIoData = {
 	messages: [
 		{
@@ -28,22 +31,22 @@ exports.mapEmailData = function() {
 	}
 
 	var countInternal = _.countBy(contextIoData.messages, isFromThoughtworks);
-	var internalMessagesCounter = countInternal.true;
-	var externalMessagesCounter = countInternal.false;
+	var internalMessages = countInternal.true;
+	var externalMessages = countInternal.false;
 
 	var internalMessagesRect = { color: "blue" };
-	if(internalMessagesCounter < 5) {
+	if(internalMessages < 5) {
 		internalMessagesRect.size = "small";
-	} else if(internalMessagesCounter < 15) {
+	} else if(internalMessages < 15) {
 		internalMessagesRect.size = "medium";
 	} else {
 		internalMessagesRect.size = "large";
 	}
 
 	var externalMessagesRect = { color: "red" };
-	if(externalMessagesCounter < 5) {
+	if(externalMessages < 5) {
 		externalMessagesRect.size = "small";
-	} else if(internalMessagesCounter < 15) {
+	} else if(externalMessages < 15) {
 		externalMessagesRect.size = "medium";
 	} else {
 		externalMessagesRect.size = "large";

@@ -9,7 +9,9 @@
     "ws": "0.4.x",
     "express": "3.x",
     "lodash": "~2.4.1",
-    "moment": "~2.6.0"
+    "moment": "~2.6.0",
+    "contextio": "~0.4.0",
+    "node-yaml-config": "0.0.2"
   },
   "devDependencies": {
     "karma": "~0.12.16",
