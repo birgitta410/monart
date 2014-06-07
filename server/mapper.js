@@ -51,9 +51,9 @@ function mapEmailDataToRectangles(messages, callback) {
 };
 
 function createNumberOfMessagesRect(count, color, column) {
-	if (count === 0) {
-		return undefined;
-	}
+	// if (count === 0) {
+	// 	return undefined;
+	// }
 	var rect = { color: color, column: column };
 	if(count < 5) {
 		rect.size = "small";
