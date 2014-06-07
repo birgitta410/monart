@@ -4,60 +4,73 @@ var http = require('http');
 
 var emailReader = require('./emailReader.js');
 
+var EMAIL_DOMAIN;
+emailReader.getAccountInfo(function(accountInfo) {
+	var email = accountInfo.email_addresses[0];
+	EMAIL_DOMAIN = email.substring(email.indexOf('@') + 1);
+});
+
 exports.readEmail = function(callWhenDone) {
 	emailReader.readEmail(mapEmailDataToRectangles, callWhenDone);	
 };
 
-
-// alle 10 Sekunden context.io fragen
-// query mit date_after = das letzte Mal als ich gefragt habe
-
-
 function mapEmailDataToRectangles(messages, callback) {
 
-	// addresses.from.email
-	// addresses.from.name
+	var unreadMessages = _.filter(messages, function(message) {
+		return _.contains(message.flags, '\\Seen');
+	});
+	console.log('Got UNREAD emails from', _.map(unreadMessages, function(message) {
+		return message.addresses.from.email + ', ' + message.date;
+	}));
+	
 
-	var messagesToday = _.filter(messages, function(message) {
+	var messagesToday = _.filter(unreadMessages, function(message) {
 		return moment().diff(moment(message.date, 'X'), 'days') === 0;
 	});
-	var messagesYesterday = _.filter(messages, function(message) {
+	var messagesYesterday = _.filter(unreadMessages, function(message) {
 		return moment().diff(moment(message.date, 'X'), 'days') === 1;
 	});
-	var messagesOld = _.filter(messages, function(message) {
+	var messagesOld = _.filter(unreadMessages, function(message) {
 		return moment().diff(moment(message.date, 'X'), 'days') > 1;
 	});
 
-	function isFromThoughtworks(message) {
-		return message.addresses.from.email.indexOf('thoughtworks') > -1;
+	function isFromSameDomain(message) {
+		return message.addresses.from.email.indexOf(EMAIL_DOMAIN) > -1;
 	}
 
-	console.log('Got emails from', _.map(messages, function(message) {
-		return message.addresses.from.email + ', ' + message.date;
-	}));
+	var countInternalToday = _.countBy(messagesToday, isFromSameDomain);
+	var countInternalYesterday = _.countBy(messagesYesterday, isFromSameDomain);
+	var countInternalOld = _.countBy(messagesOld, isFromSameDomain);
 
-	var countInternalToday = _.countBy(messagesToday, isFromThoughtworks);
-	var countInternalYesterday = _.countBy(messagesYesterday, isFromThoughtworks);
-	var countInternalOld = _.countBy(messagesOld, isFromThoughtworks);
+	var colorInternal = "blue";
+	var colorExternal = "red";
 
-	callback(_.compact([ 
-		createNumberOfMessagesRect(countInternalToday.true || 0, "blue", 2), 
-		createNumberOfMessagesRect(countInternalToday.false || 0, "red", 2),
-		createNumberOfMessagesRect(countInternalYesterday.true || 0, "blue", 1), 
-		createNumberOfMessagesRect(countInternalYesterday.false || 0, "red", 1),
-		//createNumberOfMessagesRect(countInternalOld.true || 0, "blue", 0), 
-		//createNumberOfMessagesRect(countInternalOld.false || 0, "red", 0) 
-	    // fake older messages for presentation
-	    createNumberOfMessagesRect(3 || 0, "blue", 0), 
-		createNumberOfMessagesRect(7 || 0, "red", 0) ]));
+	var rectangles = _.compact([ 
+		createRectangle(countInternalToday.true || 0, colorInternal, 2, ' unread internal mails from today'), 
+		createRectangle(countInternalToday.false || 0, colorExternal, 2, ' unread external mails older than yesterday'),
+		createRectangle(countInternalYesterday.true || 0, colorInternal, 1, ' unread internal mails from yesterday'), 
+		createRectangle(countInternalYesterday.false || 0, colorExternal, 1, ' unread external mails from yesterday'),
+		// createRectangle(countInternalOld.true || 0, colorInternal, 0, ' unread internal mails older than yesterday'), 
+		// createRectangle(countInternalOld.false || 0, colorExternal, 0, ' unread external mails older than yesterday') 
+		// fake older messages for presentation
+	    createRectangle(3, "blue", 0, ' unread internal mails older than yesterday'), 
+		createRectangle(7, "red", 0, ' unread internal mails older than yesterday') 
+		]);
+
+	callback(rectangles);
 
 };
 
-function createNumberOfMessagesRect(count, color, column) {
-	if (count === 0) {
-		return undefined;
-	}
-	var rect = { color: color, column: column };
+function createRectangle(count, color, column, info) {
+	// if (count === 0) {
+	// 	return undefined;
+	// }
+	var rect = { 
+		color: color, 
+		column: column,
+		info: count + info
+	};
+
 	if(count < 5) {
 		rect.size = "small";
 	} else if(count < 15) {
