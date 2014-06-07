@@ -7,7 +7,7 @@ var el = document.getElementById("canvas1");
 var inst = document.getElementById('instructions');
 
 var random = [];
-for (i=0;i<6;i++) {
+for (i=0;i<30;i++) {
   random.push(Math.random());
   console.log(random[i]);
 }
@@ -44,44 +44,64 @@ P.setup = function() {
      var set = {};
      switch (column.size) {
        case  'large':
-         set.height = (parseInt(random[0 % (i+1)]*  (9 - 6) + 6));    
-         set.width = (parseInt(random[1 % (i+1)] * (9 - 6) + 6));    
+         set.height = randomRange(0 % (i+1), 6,9); 
+         set.width = randomRange(1 % (i+1), 6,9);
          break;
        case 'medium':
-         set.height = (parseInt(random[2 % (i+1)] * (6 - 3) + 3));    
-         set.width = (parseInt(random[3 % (i+1)] * (6 - 3) + 3));    
+
+         set.height = randomRange(2 % (i+1), 3,6);
+         set.width = randomRange(3 % (i+1), 3,6); 
          break;
        case 'small':
-         set.height = (parseInt(random[4 % (i+1)]*  (4 - 1) + 1));    
-         set.width = (parseInt(random[5 % (i+1)] * (4 - 1) + 1));    
+         set.height = randomRange(4 % (i+1), 1,3);  
+         set.width = randomRange(5 % (i+1), 1,3);    
          break;
     }
      var min = column.column*10;
      var max = column.column*10 + (10-set.width);
-     set.x = (parseInt(random[5 % (i+1)] * (max - min) + min));
-     if (column.color == 'red') {
+
+     set.x = randomRange(5 % (i+1), min,max); 
+     if ((column.color == 'red' && column.column % 2 == 0) || (column.color == 'blue' && column.column  == 1)) {
        // TODO: flip order of red and blue
        var min = 0;
        var max = 15 - set.height;
-       set.y = (parseInt(random[5 % (i+1)] * (max - min) + min));
-       P.fill(255,0,0);
+       set.y = randomRange(5 % (i+1), min,max); 
+       
      }
      else {
        var min = 15;
        var max = 30 - set.height;
-       set.y = (parseInt(random[5 % (i+1)] * (max - min) + min));
-       P.fill(9,34,117);
+       set.y = randomRange(5 % (i+1), min,max); 
+       
      }
-    if (i == 0) {
-      console.log(set);
-  }
+
+     if (column.color == 'red') {
+        P.fill(255,0,0);
+    } else {
+        P.fill(9,34,117);
+    }
+
 
     P.rect(set.x*xUnit,set.y*yUnit,set.width*xUnit,set.height*yUnit);
   }
    
     P.stroke(0,0,0);
     P.strokeWeight(5);
-  // horizontal lines
+    P.noFill();
+    P.rect(0,0,absoluteWidth, absoluteHeight);
+
+    for(j=0;j<6;j++) {
+        
+            var x = randomRange(j%(i+1), 0,29);
+            var y = randomRange(j%(i+1), 0,29);
+            var width = randomRange(j%(i+1), 0,29-x);
+            var height = randomRange(j%(i+1), 0,29-y);
+            P.rect(x*xUnit, y*yUnit, width*xUnit, height*yUnit);
+       
+        
+    }
+
+ /* // horizontal lines
     P.line(0.1*absoluteWidth,0.2*absoluteHeight,0.9*absoluteWidth,0.2*absoluteHeight);
     P.line(0.1*absoluteWidth,0.4*absoluteHeight,0.9*absoluteWidth,0.4*absoluteHeight);
     P.line(0.1*absoluteWidth,0.6*absoluteHeight,0.9*absoluteWidth,0.6*absoluteHeight);
@@ -92,6 +112,11 @@ P.setup = function() {
     P.line(0.3*absoluteWidth,0,0.3*absoluteWidth,absoluteHeight);
     P.line(0.6 * absoluteWidth,0,0.6 * absoluteWidth,absoluteHeight);
     P.line(0.9*absoluteWidth,0,0.9*absoluteWidth,absoluteHeight);
+    */
+  }
+
+  function randomRange(index, min,max) {
+    return (parseInt(random[index]*  (max - min) + min));    
   }
 
   window.onresize = function() {
