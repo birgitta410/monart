@@ -56,8 +56,12 @@ P.setup = function() {
   
   // TODO: Change rectangle-constructors to relative parameters
   
-  // vars for heigth / width of rectangle
+  var absoluteWidth = P.width;
+  console.log(absoluteWidth);
 
+  // vars for heigth / width of rectangle
+  
+  
   var todayInternalWidth = 100;
   var todayInternalHeigth = 100;
   var todayExternalWidth = 100;
@@ -119,7 +123,7 @@ function setFullWindow() {
   el.style.left = 0 +"px";
   el.setAttribute("width", canvasWidth);
   el.setAttribute("height", canvasHeight);
-  size(canvasWidth, canvasHeight); // Processing
+  P.size(canvasWidth, canvasHeight); // Processing
 }
  
 // When user exits fullscreen via the 'Esc' key rather than by clicking

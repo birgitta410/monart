@@ -19,7 +19,7 @@ var canvas = document.getElementById("canvas1");
 var processingInstance = new Processing(canvas, sketchProc);
 
 var i = 0;
-
+/*
 while (i < 500) {
 setTimeout(function() {
   incrementor();
@@ -28,3 +28,4 @@ setTimeout(function() {
 },50*i);
 i++;
 }
+*/
