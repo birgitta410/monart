@@ -45,8 +45,11 @@ function mapEmailDataToRectangles(messages, callback) {
 		createNumberOfMessagesRect(countInternalToday.false || 0, "red", 2),
 		createNumberOfMessagesRect(countInternalYesterday.true || 0, "blue", 1), 
 		createNumberOfMessagesRect(countInternalYesterday.false || 0, "red", 1),
-		createNumberOfMessagesRect(countInternalOld.true || 0, "blue", 0), 
-		createNumberOfMessagesRect(countInternalOld.false || 0, "red", 0) ]));
+		//createNumberOfMessagesRect(countInternalOld.true || 0, "blue", 0), 
+		//createNumberOfMessagesRect(countInternalOld.false || 0, "red", 0) 
+	    // fake older messages for presentation
+	    createNumberOfMessagesRect(3 || 0, "blue", 0), 
+		createNumberOfMessagesRect(7 || 0, "red", 0) ]));
 
 };
 
