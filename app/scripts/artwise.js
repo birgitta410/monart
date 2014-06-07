@@ -1,7 +1,12 @@
 
-// TODO: Find a way of passing parameters
-// global var managed by server
 // TODO: make canvas full-screen
+// TODO: invent mapping from data to canvas
+
+// defintions
+// map1 -> color of rectangles
+//  either green(internal) or red(external)
+// map2 -> # of rectangles
+//  
 
 
 function sketchProc(P) {
@@ -10,10 +15,10 @@ console.log('executing...')
     P.size(300,300);
     P.background(255);
     P.smooth();
-}
+  }  
 
  P.draw = function() {
-    P.stroke(artwise.map1,0,0);
+    P.stroke(0,0,0);
     P.strokeWeight(5);
 // Lineas Horizontales
     P.line(0,60,300,60)   ;
@@ -34,11 +39,6 @@ console.log('executing...')
     P.rect(100,120,60,80);
     P.fill(45,45,140);
     P.rect(260,120,100,80); 
-}
+  }
 
 }
-/*
-var canvas = document.getElementById("canvas1");
-// attaching the sketchProc function to the canvas
-var processingInstance = new Processing(canvas, sketchProc);
-*/
