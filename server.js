@@ -11,17 +11,17 @@ server.listen(port);
 
 console.log('http server listening on %d', port);
 
+var mapper = require('./server/mapper.js');
+
 var wss = new WebSocketServer({server: server});
 console.log('websocket server created');
+
 wss.on('connection', function(ws) {
     var id = setInterval(function() {
-        ws.send(JSON.stringify(
-        {
-          rects: [
-            { column: 1, row: 1, color: "red", size: "small"},
-            { column: 1, row: 1, color: "red", size: "small"}
-          ]
-        }), function() {  });
+
+        var currentData = mapper.mapEmailData();
+
+        ws.send(JSON.stringify(currentData), function() {  });
     }, 1000);
 
     console.log('websocket connection open');
