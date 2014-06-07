@@ -45,13 +45,17 @@ P.setup = function() {
   
    for (i=0;i<artwise.data.length;i++) {
      var column = artwise.data[i];
-     console.log(column);
-     P.fill(column.color);
      var set = {};
      set.width = 1/3*absoluteWidth;
      set.x = column.column/3*absoluteWidth;
-     set.y = (column.color == 'red')? 0.5*absoluteHeight : 0;
-
+     if (column.color == 'red') {
+       set.y = 0.5*absoluteHeight;
+       P.fill(255,0,0);
+     }
+     else {
+       set.y = 0;
+       P.fill(9,34,117);
+     }
       
    
      switch (column.size) {
@@ -82,7 +86,6 @@ P.setup = function() {
     P.line(0.3*absoluteWidth,0,0.3*absoluteWidth,absoluteHeight);
     P.line(0.6 * absoluteWidth,0,0.6 * absoluteWidth,absoluteHeight);
     P.line(0.9*absoluteWidth,0,0.9*absoluteWidth,absoluteHeight);
-  
   }
 
   window.onresize = function() {
