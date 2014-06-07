@@ -14,6 +14,8 @@ exports.readEmail = function(callWhenDone) {
 	emailReader.readEmail(mapEmailDataToRectangles, callWhenDone);	
 };
 
+var LAST_RECTANGLES = [];
+
 function mapEmailDataToRectangles(messages, callback) {
 
 	var unreadMessages = _.filter(messages, function(message) {
@@ -46,18 +48,38 @@ function mapEmailDataToRectangles(messages, callback) {
 	var colorExternal = "red";
 
 	var rectangles = _.compact([ 
-		createRectangle(countInternalToday.true || 0, colorInternal, 2, ' unread internal mails from today'), 
-		createRectangle(countInternalToday.false || 0, colorExternal, 2, ' unread external mails older than yesterday'),
-		createRectangle(countInternalYesterday.true || 0, colorInternal, 1, ' unread internal mails from yesterday'), 
-		createRectangle(countInternalYesterday.false || 0, colorExternal, 1, ' unread external mails from yesterday'),
+		// createRectangle(countInternalToday.true || 0, colorInternal, 2, ' unread internal mails from today'), 
+		// createRectangle(countInternalToday.false || 0, colorExternal, 2, ' unread external mails older than yesterday'),
+		// createRectangle(countInternalYesterday.true || 0, colorInternal, 1, ' unread internal mails from yesterday'), 
+		// createRectangle(countInternalYesterday.false || 0, colorExternal, 1, ' unread external mails from yesterday'),
 		// createRectangle(countInternalOld.true || 0, colorInternal, 0, ' unread internal mails older than yesterday'), 
 		// createRectangle(countInternalOld.false || 0, colorExternal, 0, ' unread external mails older than yesterday') 
-		// fake older messages for presentation
-	    createRectangle(3, "blue", 0, ' unread internal mails older than yesterday'), 
+		
+		// fake messages for presentation
+		createRectangle(5, colorInternal, 2, ' unread internal mails from today'), 
+		createRectangle(1, colorExternal, 2, ' unread external mails older than yesterday'),
+		createRectangle(3, colorInternal, 1, ' unread internal mails from yesterday'), 
+		createRectangle(8, colorExternal, 1, ' unread external mails from yesterday'),
+	    createRectangle(16, "blue", 0, ' unread internal mails older than yesterday'), 
 		createRectangle(7, "red", 0, ' unread internal mails older than yesterday') 
 		]);
 
-	callback(rectangles);
+
+	var changes = ! _.every(rectangles, function(newRect) {
+		var found = false;
+		_.each(LAST_RECTANGLES, function(oldRect) {
+			if(newRect.color === oldRect.color
+				&& newRect.column === newRect.column
+				&& newRect.size === newRect.size) {
+				found = true;
+			}
+		});
+		return found;
+	});
+
+	LAST_RECTANGLES = rectangles;
+
+	callback(rectangles, changes);
 
 };
 

@@ -17,14 +17,18 @@ var wss = new WebSocketServer({server: server});
 console.log('websocket server created');
 
 wss.on('connection', function(ws) {
-    var id = setInterval(function() {
 
-        var currentData = mapper.readEmail(function(emailData) {
-          ws.send(JSON.stringify(emailData), function() {  });  
+    function getEmailsAndUpdateClients() {
+      var currentData = mapper.readEmail(function(emailData, changes) {
+          if(changes) {
+            console.log('CHANGES!');
+            ws.send(JSON.stringify(emailData), function() {  });    
+          }
         });
+    }
 
-        
-    }, 5000);
+    getEmailsAndUpdateClients();
+    var id = setInterval(getEmailsAndUpdateClients, 5000);
 
     console.log('websocket connection open');
 
