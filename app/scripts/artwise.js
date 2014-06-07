@@ -13,7 +13,7 @@
 
 
 function Mondrian() {
-  console.log('drawin Mondrian')
+  console.log('drawing Mondrian')
 
   P.setup = function() {
     P.size(300,300);
@@ -38,10 +38,10 @@ function Mondrian() {
  
   // rectangles
     // rectangle for internal email today
-    P.fill(230,120,20);  // color is green
+    P.fill(50,205,50);  // color is green
     P.rect(40,60,60,60); // position should be in rightmost column
     // rectangle for external email today
-    P.fill(20,89,45);  
+    P.fill(178,34,34);  // color is red 
     P.rect(100,120,60,80);
     // rectangle for internal email yesterday
     P.fill(45,45,140);
