@@ -28,27 +28,22 @@ function mapEmailDataToRectangles(messages, callback) {
 
 	var countInternal = _.countBy(messages, isFromThoughtworks);
 
-	var internalMessages = countInternal.true || 0;
-	var externalMessages = countInternal.false || 0;
-	
-	var internalMessagesRect = { color: "blue" };
-	if(internalMessages < 5) {
-		internalMessagesRect.size = "small";
-	} else if(internalMessages < 15) {
-		internalMessagesRect.size = "medium";
-	} else {
-		internalMessagesRect.size = "large";
-	}
-
-	var externalMessagesRect = { color: "red" };
-	if(externalMessages < 5) {
-		externalMessagesRect.size = "small";
-	} else if(externalMessages < 15) {
-		externalMessagesRect.size = "medium";
-	} else {
-		externalMessagesRect.size = "large";
-	}
-
-	callback([ internalMessagesRect, externalMessagesRect ]);
+	callback([ 
+		createNumberOfMessagesRect(countInternal.true || 0, "blue"), 
+		createNumberOfMessagesRect(countInternal.false || 0, "red") ]);
 
 };
+
+function createNumberOfMessagesRect(count, color) {
+	
+	var rect = { color: color };
+	if(count < 5) {
+		rect.size = "small";
+	} else if(count < 15) {
+		rect.size = "medium";
+	} else {
+		rect.size = "large";
+	}
+
+	return rect;
+}
