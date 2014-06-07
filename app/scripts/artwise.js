@@ -36,37 +36,44 @@ P.setup = function() {
     P.background(255);
     var absoluteWidth = P.width;
     var absoluteHeight = P.height;
-    var xUnit = 0.05 * absoluteWidth;
-    var yUnit = 0.05 * absoluteHeight;
+    var xUnit = 1/30 * absoluteWidth;
+    var yUnit = 1/30 * absoluteHeight;
   
    for (i=0;i<artwise.data.length;i++) {
      var column = artwise.data[i];
      var set = {};
      switch (column.size) {
        case  'large':
-         set.height = (parseInt(random[0 % (i+1)] * (8 - 6) + 6))*yUnit;    
-         set.width = (parseInt(random[1 % (i+1)] * (8 - 6) + 6))*xUnit;    
+         set.height = (parseInt(random[0 % (i+1)]*  (9 - 6) + 6));    
+         set.width = (parseInt(random[1 % (i+1)] * (9 - 6) + 6));    
          break;
        case 'medium':
-         set.height = (parseInt(random[2 % i+1] * (6 - 3) + 3))*yUnit;    
-         set.width = (parseInt(random[3 % (i+1)] * (6 - 3) + 3))*xUnit;    
+         set.height = (parseInt(random[2 % i+1] * (6 - 3) + 3));    
+         set.width = (parseInt(random[3 % (i+1)] * (6 - 3) + 3));    
          break;
        case 'small':
-         set.height = (parseInt(random[4 % (i+1)] * (4 - 1) + 1))*yUnit;    
-         set.width = (parseInt(random[5 % (i+1)] * (4 - 1) + 1))*xUnit;    
+         set.height = (parseInt(random[4 % (i+1)]*  (4 - 1) + 1));    
+         set.width = (parseInt(random[5 % (i+1)] * (4 - 1) + 1));    
          break;
     }
-     set.x = column.column/3*xUnit;
+     var min = column.column*10;
+     var max = column.column*10 + (10-set.width);
+     set.x = (parseInt(random[5 % (i+1)] * (max - min) + min));
      if (column.color == 'red') {
-       set.y = 0.5*absoluteHeight;
+       // TODO: flip order of red and blue
+       var min = 0;
+       var max = 15 - set.height;
+       set.y = (parseInt(random[5 % (i+1)] * (max - min) + min));
        P.fill(255,0,0);
      }
      else {
-       set.y = 0;
+       var min = 15;
+       var max = 30 - set.height;
+       set.y = (parseInt(random[5 % (i+1)] * (max - min) + min));
        P.fill(9,34,117);
      }
 
-    P.rect(set.x,set.y,set.width,set.height);
+    P.rect(set.x*xUnit,set.y*yUnit,set.width*xUnit,set.height*yUnit);
   }
    
     P.stroke(0,0,0);
