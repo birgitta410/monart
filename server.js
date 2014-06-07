@@ -16,29 +16,36 @@ var mapper = require('./server/mapper.js');
 var wss = new WebSocketServer({server: server});
 console.log('websocket server created');
 
+
 wss.on('connection', function(ws) {
 
-    var numberOfUpdatesMade = 0;
+    function newClient() {
+      var numberOfUpdatesMade = 0;
 
-    function getEmailsAndUpdateClients() {
-      numberOfUpdatesMade = numberOfUpdatesMade + 1;
+      function getEmailsAndUpdateClients() {
+        numberOfUpdatesMade ++;
 
-      if (numberOfUpdatesMade < 20) {
-        console.log('checking for updates');
+        if (numberOfUpdatesMade < 20) {
+        console.log('checking for updates (' + numberOfUpdatesMade + ')');
         var currentData = mapper.readEmail(function(emailData, changes) {
-            if(changes) {
+            if(changes || numberOfUpdatesMade === 1) {
               console.log('CHANGES!');
               ws.send(JSON.stringify(emailData), function() {  });    
             } else {
               console.log('no changes');
             }
           });
+        }
       }
+
+      getEmailsAndUpdateClients();
+      var id = setInterval(getEmailsAndUpdateClients, 5000);
+
     }
 
-    getEmailsAndUpdateClients();
-    var id = setInterval(getEmailsAndUpdateClients, 5000);
+    newClient();
 
+    
     console.log('websocket connection open');
 
     ws.on('close', function() {
