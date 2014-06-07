@@ -1,9 +1,19 @@
 console.log('artwise is so cool!');
 
+var host = location.origin.replace(/^http/, 'ws')
+var ws = new WebSocket(host);
+
 //global variables that update mondrian
 
-var artwise = {};
-artwise.map1 = 0;
+artwise = {};
+
+artwise.data = [];
+
+ws.onmessage = function (event) {
+  artwise.data = JSON.parse(event.data);
+  console.log(artwise.data);
+};
+
 
 
 function incrementor() {
