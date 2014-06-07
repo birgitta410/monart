@@ -1,4 +1,3 @@
-// TODO: make canvas full-screen
 // TODO: invent mapping from data to canvas
 
 // defintions
@@ -40,53 +39,53 @@ P.setup = function() {
 } 
 
   P.draw = function() {
+  
     var absoluteWidth = P.width;
-    var absoluteHeigth = P.height;
+    var absoluteHeight = P.height;
+  
+   for (i=0;i<artwise.data.length;i++) {
+     var column = artwise.data[i];
+     var set = {};
+     set.width = 1/3*absoluteWidth;
+     set.x = column.column/3*absoluteWidth;
+     if (column.color == 'red') {
+       set.y = 0.5*absoluteHeight;
+       P.fill(255,0,0);
+     }
+     else {
+       set.y = 0;
+       P.fill(9,34,117);
+     }
+      
+   
+     switch (column.size) {
+       case  'large':
+         set.height = 0.4*absoluteHeight;    
+         break;
+       case 'medium':
+         set.height = 0.2*absoluteHeight;    
+         break;
+       case 'small':
+         set.height = 0.1*absoluteHeight;    
+         break;
+    }
+
+    P.rect(set.x,set.y,set.width,set.height);
+  }
+   
     P.stroke(0,0,0);
     P.strokeWeight(5);
   // horizontal lines
-    P.line(0.1*absoluteWidth,0.2*absoluteHeigth,0.9*absoluteWidth,0.2*absoluteHeigth);
-    P.line(0.1*absoluteWidth,0.4*absoluteHeigth,0.9*absoluteWidth,0.4*absoluteHeigth);
-    P.line(0.1*absoluteWidth,0.6*absoluteHeigth,0.9*absoluteWidth,0.6*absoluteHeigth);
-    P.line(0.1*absoluteWidth,0.8*absoluteHeigth,0.9*absoluteWidth,0.8*absoluteHeigth);
+    P.line(0.1*absoluteWidth,0.2*absoluteHeight,0.9*absoluteWidth,0.2*absoluteHeight);
+    P.line(0.1*absoluteWidth,0.4*absoluteHeight,0.9*absoluteWidth,0.4*absoluteHeight);
+    P.line(0.1*absoluteWidth,0.6*absoluteHeight,0.9*absoluteWidth,0.6*absoluteHeight);
+    P.line(0.1*absoluteWidth,0.8*absoluteHeight,0.9*absoluteWidth,0.8*absoluteHeight);
  
   //vertical lines
-    P.line(0.2*absoluteWidth,0,0.2*absoluteWidth,absoluteHeigth);
-    P.line(0.3*absoluteWidth,0,0.3*absoluteWidth,absoluteHeigth);
-    P.line(0.6 * absoluteWidth,0,0.6 * absoluteWidth,absoluteHeigth);
-    P.line(0.9*absoluteWidth,0,0.9*absoluteWidth,absoluteHeigth);
-  
-  // TODO: Change rectangle-constructors to relative parameters
-  
-  // vars for height / width of rectangle
-  
-  var absoluteWidth = P.width;
-  var absoluteHeigth = P.height;
-  
-  
-  var todayInternalWidth = 0.2 * absoluteWidth;
-  var todayInternalHeigth = 0.2 * absoluteHeigth;
-  var todayExternalWidth = 0.2 * absoluteWidth;
-  var todayExternalHeigth = 0.2 * absoluteHeigth;
-  
-  var yesterdayInternalWidth = 0.2 * absoluteWidth;
-  var yesterdayInternalHeigth = 0.2 * absoluteHeigth;
-  var yesterdayExternalWidth = 0.2 * absoluteWidth;
-  var yesterdayExternalHeigth = 0.2 * absoluteHeigth;
-
-  // rectangles
-    // rectangle for internal email today
-    P.fill(50,205,50);  // color is green
-    P.rect(0.7*absoluteWidth,0,todayInternalWidth,todayInternalHeigth); // position should be in rightmost column
-    // rectangle for external email today
-    P.fill(178,34,34);  // color is red 
-    P.rect(0.7*absoluteWidth,0.7*absoluteHeigth,todayExternalWidth,todayExternalHeigth); // position should be in rightmost column
-    // rectangle for internal email yesterday
-    P.fill(50,205,50); // color is green
-    P.rect(0.4*absoluteWidth,0.2*absoluteHeigth,yesterdayInternalWidth,yesterdayInternalHeigth);// position should be in middle column
-    // rectangle for external email yesterday
-    P.fill(178,34,34); // color is red
-    P.rect(0.4*absoluteWidth,0.6*absoluteHeigth,yesterdayExternalWidth,yesterdayExternalHeigth);// position should be in middle column
+    P.line(0.2*absoluteWidth,0,0.2*absoluteWidth,absoluteHeight);
+    P.line(0.3*absoluteWidth,0,0.3*absoluteWidth,absoluteHeight);
+    P.line(0.6 * absoluteWidth,0,0.6 * absoluteWidth,absoluteHeight);
+    P.line(0.9*absoluteWidth,0,0.9*absoluteWidth,absoluteHeight);
   }
 
   window.onresize = function() {
