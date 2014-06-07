@@ -8,7 +8,6 @@ var EMAIL_DOMAIN;
 emailReader.getAccountInfo(function(accountInfo) {
 	var email = accountInfo.email_addresses[0];
 	EMAIL_DOMAIN = email.substring(email.indexOf('@') + 1);
-	console.log('DOMAIN', EMAIL_DOMAIN);
 });
 
 exports.readEmail = function(callWhenDone) {
@@ -17,16 +16,21 @@ exports.readEmail = function(callWhenDone) {
 
 function mapEmailDataToRectangles(messages, callback) {
 
-	// addresses.from.email
-	// addresses.from.name
+	var unreadMessages = _.filter(messages, function(message) {
+		return _.contains(message.flags, '\\Seen');
+	});
+	console.log('Got UNREAD emails from', _.map(unreadMessages, function(message) {
+		return message.addresses.from.email + ', ' + message.date;
+	}));
+	
 
-	var messagesToday = _.filter(messages, function(message) {
+	var messagesToday = _.filter(unreadMessages, function(message) {
 		return moment().diff(moment(message.date, 'X'), 'days') === 0;
 	});
-	var messagesYesterday = _.filter(messages, function(message) {
+	var messagesYesterday = _.filter(unreadMessages, function(message) {
 		return moment().diff(moment(message.date, 'X'), 'days') === 1;
 	});
-	var messagesOld = _.filter(messages, function(message) {
+	var messagesOld = _.filter(unreadMessages, function(message) {
 		return moment().diff(moment(message.date, 'X'), 'days') > 1;
 	});
 
@@ -34,25 +38,24 @@ function mapEmailDataToRectangles(messages, callback) {
 		return message.addresses.from.email.indexOf(EMAIL_DOMAIN) > -1;
 	}
 
-	console.log('Got emails from', _.map(messages, function(message) {
-		return message.addresses.from.email + ', ' + message.date;
-	}));
-
 	var countInternalToday = _.countBy(messagesToday, isFromSameDomain);
 	var countInternalYesterday = _.countBy(messagesYesterday, isFromSameDomain);
 	var countInternalOld = _.countBy(messagesOld, isFromSameDomain);
 
+	var colorInternal = "blue";
+	var colorExternal = "red";
 	callback(_.compact([ 
-		createNumberOfMessagesRect(countInternalToday.true || 0, "blue", 2), 
-		createNumberOfMessagesRect(countInternalToday.false || 0, "red", 2),
-		createNumberOfMessagesRect(countInternalYesterday.true || 0, "blue", 1), 
-		createNumberOfMessagesRect(countInternalYesterday.false || 0, "red", 1),
-		createNumberOfMessagesRect(countInternalOld.true || 0, "blue", 0), 
-		createNumberOfMessagesRect(countInternalOld.false || 0, "red", 0) ]));
+		createRectangle(countInternalToday.true || 0, colorInternal, 2), 
+		createRectangle(countInternalToday.false || 0, colorExternal, 2),
+		createRectangle(countInternalYesterday.true || 0, colorInternal, 1), 
+		createRectangle(countInternalYesterday.false || 0, colorExternal, 1),
+		createRectangle(countInternalOld.true || 0, colorInternal, 0), 
+		createRectangle(countInternalOld.false || 0, colorExternal, 0) ]));
 
 };
 
-function createNumberOfMessagesRect(count, color, column) {
+function createRectangle(count, color, column) {
+	// Still sending 0-values for now, so we have more to show
 	// if (count === 0) {
 	// 	return undefined;
 	// }
