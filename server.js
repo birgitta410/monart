@@ -15,7 +15,13 @@ var wss = new WebSocketServer({server: server});
 console.log('websocket server created');
 wss.on('connection', function(ws) {
     var id = setInterval(function() {
-        ws.send(JSON.stringify('Its ' + new Date()), function() {  });
+        ws.send(JSON.stringify(
+        {
+          rects: [
+            { column: 1, row: 1, color: "red", size: "small"},
+            { column: 1, row: 1, color: "red", size: "small"}
+          ]
+        }), function() {  });
     }, 1000);
 
     console.log('websocket connection open');
