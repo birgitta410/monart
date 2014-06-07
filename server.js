@@ -19,10 +19,13 @@ console.log('websocket server created');
 wss.on('connection', function(ws) {
 
     function getEmailsAndUpdateClients() {
+      console.log('checking for updates');
       var currentData = mapper.readEmail(function(emailData, changes) {
           if(changes) {
             console.log('CHANGES!');
             ws.send(JSON.stringify(emailData), function() {  });    
+          } else {
+            console.log('no changes');
           }
         });
     }
