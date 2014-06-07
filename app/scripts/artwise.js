@@ -57,15 +57,14 @@ P.setup = function() {
   // TODO: Change rectangle-constructors to relative parameters
   
   var absoluteWidth = P.width;
-  console.log(absoluteWidth);
+  var absoluteHeigth = P.width;
 
   // vars for heigth / width of rectangle
   
-  
-  var todayInternalWidth = 100;
-  var todayInternalHeigth = 100;
-  var todayExternalWidth = 100;
-  var todayExternalHeigth = 100;
+  var todayInternalWidth = 0.3 * absoluteWidth;
+  var todayInternalHeigth = 0.3 * absoluteHeigth;
+  var todayExternalWidth = 0.3 * absoluteWidth;
+  var todayExternalHeigth = 0.3 * absoluteHeigth;
   
   var yesterdayInternalWidth = 100;
   var yesterdayInternalHeigth = 100;
