@@ -48,7 +48,7 @@ P.setup = function() {
          set.width = (parseInt(random[1 % (i+1)] * (9 - 6) + 6));    
          break;
        case 'medium':
-         set.height = (parseInt(random[2 % i+1] * (6 - 3) + 3));    
+         set.height = (parseInt(random[2 % (i+1)] * (6 - 3) + 3));    
          set.width = (parseInt(random[3 % (i+1)] * (6 - 3) + 3));    
          break;
        case 'small':
@@ -72,6 +72,9 @@ P.setup = function() {
        set.y = (parseInt(random[5 % (i+1)] * (max - min) + min));
        P.fill(9,34,117);
      }
+    if (i == 0) {
+      console.log(set);
+  }
 
     P.rect(set.x*xUnit,set.y*yUnit,set.width*xUnit,set.height*yUnit);
   }
