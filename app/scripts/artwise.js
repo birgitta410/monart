@@ -96,7 +96,7 @@ P.setup = function() {
   } else {
     setFullWindow();
   }
-  stroke(255); waitress=millis();
+  P.stroke(255); waitress=P.millis();
 }
  
 function setPreFullscreen() {
