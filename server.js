@@ -24,7 +24,7 @@ wss.on('connection', function(ws) {
         });
 
         
-    }, 1000);
+    }, 5000);
 
     console.log('websocket connection open');
 
