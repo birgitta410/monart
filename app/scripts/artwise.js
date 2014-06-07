@@ -1,3 +1,9 @@
+
+// TODO: Find a way of passing parameters
+// global var managed by server
+// TODO: make canvas full-screen
+
+
 function sketchProc(P) {
 console.log('executing...')
  P.setup = function() {
@@ -7,7 +13,7 @@ console.log('executing...')
 }
 
  P.draw = function() {
-    P.stroke(0,0,0);
+    P.stroke(artwise.map1,0,0);
     P.strokeWeight(5);
 // Lineas Horizontales
     P.line(0,60,300,60)   ;
@@ -31,7 +37,8 @@ console.log('executing...')
 }
 
 }
-
+/*
 var canvas = document.getElementById("canvas1");
 // attaching the sketchProc function to the canvas
 var processingInstance = new Processing(canvas, sketchProc);
+*/
