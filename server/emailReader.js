@@ -11,8 +11,8 @@ try {
 	config = {
 		default: {
 		  contextIo: {
-		    key: proc.env.CONTEXT_KEY,
-		    secret: proc.env.CONTEXT_SECRET
+		    key: process.env.CONTEXT_KEY,
+		    secret: process.env.CONTEXT_SECRET
 		  }
     	}
 	};
