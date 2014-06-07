@@ -1,9 +1,9 @@
 void setup(){
-    size(800,300);
+    size(300,300);
     background(255);
     smooth();
 }
- 
+
 void draw(){
     stroke(0,0,0);
     strokeWeight(5);
@@ -25,6 +25,8 @@ void draw(){
     fill(20,89,45);
     rect(100,120,60,80);
     fill(45,45,140);
-    rect(260,120,100,80);
- 
+    rect(260,120,100,80); 
 }
+
+
+
