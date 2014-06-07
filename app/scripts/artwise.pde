@@ -13,13 +13,13 @@ void draw(){
     line(0,200,300,200);
     line(0,260,300,260);
  
-//Lineas verticales
+//vertical lines
     line(40,0,40,300);
     line(100,0,100,300);
     line(160,0,160,300);
     line(260,0,260,300);
  
-//Rellenos
+//vertical lines
     fill(230,120,20);
     rect(40,60,60,60);
     fill(20,89,45);
