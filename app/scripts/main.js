@@ -1,1 +1,1 @@
-console.log('\'Allo \'Allo!');
+console.log('artwise is so cool!');
