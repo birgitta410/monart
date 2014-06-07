@@ -40,23 +40,25 @@ P.setup = function() {
 } 
 
   P.draw = function() {
+    var absoluteWidth = P.width;
+    var absoluteHeigth = P.height;
     P.stroke(0,0,0);
     P.strokeWeight(5);
   // horizontal lines
-    P.line(0,60,300,60);
-    P.line(0,120,300,120);
-    P.line(0,200,300,200);
-    P.line(0,260,300,260);
+    P.line(0.1*absoluteWidth,0.2*absoluteHeigth,0.9*absoluteWidth,0.2*absoluteHeigth);
+    P.line(0.1*absoluteWidth,0.4*absoluteHeigth,0.9*absoluteWidth,0.4*absoluteHeigth);
+    P.line(0.1*absoluteWidth,0.6*absoluteHeigth,0.9*absoluteWidth,0.6*absoluteHeigth);
+    P.line(0.1*absoluteWidth,0.8*absoluteHeigth,0.9*absoluteWidth,0.8*absoluteHeigth);
  
   //vertical lines
-    P.line(40,0,40,300);
-    P.line(100,0,100,300);
-    P.line(160,0,160,300);
-    P.line(260,0,260,300);
+    P.line(0.2*absoluteWidth,0,0.2*absoluteWidth,absoluteHeigth);
+    P.line(0.3*absoluteWidth,0,0.3*absoluteWidth,absoluteHeigth);
+    P.line(0.6 * absoluteWidth,0,0.6 * absoluteWidth,absoluteHeigth);
+    P.line(0.9*absoluteWidth,0,0.9*absoluteWidth,absoluteHeigth);
   
   // TODO: Change rectangle-constructors to relative parameters
   
-  // vars for heigth / width of rectangle
+  // vars for height / width of rectangle
   
   var absoluteWidth = P.width;
   var absoluteHeigth = P.height;
@@ -78,13 +80,13 @@ P.setup = function() {
     P.rect(0.7*absoluteWidth,0,todayInternalWidth,todayInternalHeigth); // position should be in rightmost column
     // rectangle for external email today
     P.fill(178,34,34);  // color is red 
-    P.rect(0.7*absoluteWidth,0.5*absoluteHeigth,todayExternalWidth,todayExternalHeigth); // position should be in rightmost column
+    P.rect(0.7*absoluteWidth,0.7*absoluteHeigth,todayExternalWidth,todayExternalHeigth); // position should be in rightmost column
     // rectangle for internal email yesterday
     P.fill(50,205,50); // color is green
-    P.rect(0.4*absoluteWidth,0,yesterdayInternalWidth,yesterdayInternalHeigth);// position should be in middle column
+    P.rect(0.4*absoluteWidth,0.2*absoluteHeigth,yesterdayInternalWidth,yesterdayInternalHeigth);// position should be in middle column
     // rectangle for external email yesterday
     P.fill(178,34,34); // color is red
-    P.rect(0.4*absoluteWidth,0.5*absoluteHeigth,yesterdayExternalWidth,yesterdayExternalHeigth);// position should be in middle column
+    P.rect(0.4*absoluteWidth,0.6*absoluteHeigth,yesterdayExternalWidth,yesterdayExternalHeigth);// position should be in middle column
   }
 
   window.onresize = function() {
