@@ -9,12 +9,10 @@ try {
 } catch(err) {
 	console.log('could not read yml, trying Heroku vars');
 	config = {
-		default: {
-		  contextIo: {
-		    key: process.env.CONTEXT_KEY,
-		    secret: process.env.CONTEXT_SECRET
-		  }
-    	}
+	  contextIo: {
+	    key: process.env.CONTEXT_KEY,
+	    secret: process.env.CONTEXT_SECRET
+	  }
 	};
 }
 
