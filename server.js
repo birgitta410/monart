@@ -19,10 +19,12 @@ console.log('websocket server created');
 wss.on('connection', function(ws) {
     var id = setInterval(function() {
 
-        var currentData = mapper.mapEmailData();
+        var currentData = mapper.readEmail(function(emailData) {
+          ws.send(JSON.stringify(emailData), function() {  });  
+        });
 
-        ws.send(JSON.stringify(currentData), function() {  });
-    }, 1000);
+        
+    }, 5000);
 
     console.log('websocket connection open');
 

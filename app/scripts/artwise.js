@@ -14,7 +14,7 @@
 function Mondrian(P) {
   console.log('drawing Mondrian')
 
-var OperaVersion = 19; // global, used to avoid a bug in older versions of
+  var OperaVersion = 19; // global, used to avoid a bug in older versions of
             // Opera that let you into fullscreen, but won't let you out
 var el = document.getElementById("canvas1");
 var inst = document.getElementById('instructions');
@@ -82,8 +82,6 @@ P.setup = function() {
    // P.fill(178,34,34); // color is red
    // P.rect(260,120,100,80);// position should be in middle column
   }
-
-
 
   window.onresize = function() {
   if ((document.fullscreenEnabled || 
