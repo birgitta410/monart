@@ -7,10 +7,17 @@ var el = document.getElementById("canvas1");
 var inst = document.getElementById('instructions');
 
 var random = [];
-for (i=0;i<30;i++) {
+for (i=0;i<6;i++) {
   random.push(Math.random());
-  console.log(random[i]);
+  
 }
+
+var randomIndexes = [];
+for (i=0;i<30;i++) {
+  randomIndexes.push(randomIndex());
+  
+}
+
 
 P.setup = function() {
   // Let Opera 19 go fullscreen, earlier versions go full window
@@ -29,15 +36,35 @@ P.setup = function() {
     setFullWindow();
   }
   P.background(255);
-  P.smooth();
+  P.smooth(8);
 } 
 
   P.draw = function() {
+    P.frameRate(30);
+    var speed = 120;
+    var count = P.frameCount%speed;
+    var count1 = (P.frameCount-1)%speed;
+    var breath = 1 - (.015 * Math.sin(count/speed * 2 * Math.PI));
+    var antibreath = 1 - (.015 * Math.cos(count/speed * 2 * Math.PI));
+    var breath1 = 1 - (.015 * Math.sin((count1)/speed * 2 * Math.PI));
+    var antibreath1 = 1 - (.015 * Math.cos((count1)/speed * 2 * Math.PI));
+
     P.background(255);
     var absoluteWidth = P.width;
     var absoluteHeight = P.height;
     var xUnit = 1/30 * absoluteWidth;
     var yUnit = 1/30 * absoluteHeight;
+
+    P.strokeWeight(5);
+
+    for(j=0;j<30;j++) {
+        var x = randomRange(randomIndexes[j+0 % 30], 0,29);
+        var y = randomRange(randomIndexes[j+1 % 30], 0,29);
+        var width = randomRange(randomIndexes[j+2 % 30], 1,29-x);
+        var height = randomRange(randomIndexes[j+3 % 30], 1,29-y);
+        P.rect(x*xUnit, y*yUnit, width*xUnit, height*yUnit);
+        
+    }
   
    for (i=0;i<artwise.data.length;i++) {
      var column = artwise.data[i];
@@ -81,25 +108,21 @@ P.setup = function() {
         P.fill(9,34,117);
     }
 
+    P.strokeWeight(7);
+    P.stroke(0,125);
 
-    P.rect(set.x*xUnit,set.y*yUnit,set.width*xUnit,set.height*yUnit);
+    P.rect(set.x*xUnit*antibreath1,set.y*yUnit *antibreath1,set.width*xUnit*breath1,set.height*yUnit*breath1);
+    P.strokeWeight(5);
+    P.stroke(0);
+    P.rect(set.x*xUnit*antibreath,set.y*yUnit *antibreath,set.width*xUnit*breath,set.height*yUnit*breath);
+// outside borderb
+    P.stroke(0,0,0);
+    P.strokeWeight(6);
+    P.noFill();
+    P.rect(3,3,absoluteWidth-6, absoluteHeight-6);
   }
    
-    P.stroke(0,0,0);
-    P.strokeWeight(5);
-    P.noFill();
-    P.rect(0,0,absoluteWidth, absoluteHeight);
-
-    for(j=0;j<6;j++) {
-        
-            var x = randomRange(j%(i+1), 0,29);
-            var y = randomRange(j%(i+1), 0,29);
-            var width = randomRange(j%(i+1), 0,29-x);
-            var height = randomRange(j%(i+1), 0,29-y);
-            P.rect(x*xUnit, y*yUnit, width*xUnit, height*yUnit);
-       
-        
-    }
+    
 
  /* // horizontal lines
     P.line(0.1*absoluteWidth,0.2*absoluteHeight,0.9*absoluteWidth,0.2*absoluteHeight);
@@ -117,6 +140,10 @@ P.setup = function() {
 
   function randomRange(index, min,max) {
     return (parseInt(random[index]*  (max - min) + min));    
+  }
+
+  function randomIndex() {
+    return parseInt(Math.random() * 5);
   }
 
   window.onresize = function() {
