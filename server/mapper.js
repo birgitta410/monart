@@ -3,55 +3,65 @@ var moment = require('moment');
 var http = require('http');
 
 var emailReader = require('./emailReader.js');
-emailReader.readEmail();
 
-var contextIoData = {
-	messages: [
-		{
-			read: false,
-			from: 'acolleague@thoughtworks.com',
-			date: moment(1402057473).format('YYYY-MM-DD')
-		},
-		{
-			read: false,
-			from: 'susanne@justsoftwareag.com',
-			date: moment(1402057473).format('YYYY-MM-DD')
-		}
-	]
+exports.readEmail = function(callWhenDone) {
+	emailReader.readEmail(mapEmailDataToRectangles, callWhenDone);	
 };
+
 
 // alle 10 Sekunden context.io fragen
 // query mit date_after = das letzte Mal als ich gefragt habe
 
 
-exports.mapEmailData = function() {
+function mapEmailDataToRectangles(messages, callback) {
+
+	// addresses.from.email
+	// addresses.from.name
+
+	var messagesToday = _.filter(messages, function(message) {
+		return moment().diff(moment(message.date, 'X'), 'days') === 0;
+	});
+	var messagesYesterday = _.filter(messages, function(message) {
+		return moment().diff(moment(message.date, 'X'), 'days') === 1;
+	});
+	var messagesOld = _.filter(messages, function(message) {
+		return moment().diff(moment(message.date, 'X'), 'days') > 1;
+	});
 
 	function isFromThoughtworks(message) {
-		return message.from.indexOf('thoughtworks.com') > -1;
+		return message.addresses.from.email.indexOf('thoughtworks') > -1;
 	}
 
-	var countInternal = _.countBy(contextIoData.messages, isFromThoughtworks);
-	var internalMessages = countInternal.true;
-	var externalMessages = countInternal.false;
+	console.log('Got emails from', _.map(messages, function(message) {
+		return message.addresses.from.email + ', ' + message.date;
+	}));
 
-	var internalMessagesRect = { color: "blue" };
-	if(internalMessages < 5) {
-		internalMessagesRect.size = "small";
-	} else if(internalMessages < 15) {
-		internalMessagesRect.size = "medium";
-	} else {
-		internalMessagesRect.size = "large";
-	}
+	var countInternalToday = _.countBy(messagesToday, isFromThoughtworks);
+	var countInternalYesterday = _.countBy(messagesYesterday, isFromThoughtworks);
+	var countInternalOld = _.countBy(messagesOld, isFromThoughtworks);
 
-	var externalMessagesRect = { color: "red" };
-	if(externalMessages < 5) {
-		externalMessagesRect.size = "small";
-	} else if(externalMessages < 15) {
-		externalMessagesRect.size = "medium";
-	} else {
-		externalMessagesRect.size = "large";
-	}
-
-	return [ internalMessagesRect, externalMessagesRect ];
+	callback(_.compact([ 
+		createNumberOfMessagesRect(countInternalToday.true || 0, "blue", 2), 
+		createNumberOfMessagesRect(countInternalToday.false || 0, "red", 2),
+		createNumberOfMessagesRect(countInternalYesterday.true || 0, "blue", 1), 
+		createNumberOfMessagesRect(countInternalYesterday.false || 0, "red", 1),
+		createNumberOfMessagesRect(countInternalOld.true || 0, "blue", 0), 
+		createNumberOfMessagesRect(countInternalOld.false || 0, "red", 0) ]));
 
 };
+
+function createNumberOfMessagesRect(count, color, column) {
+	if (count === 0) {
+		return undefined;
+	}
+	var rect = { color: color, column: column };
+	if(count < 5) {
+		rect.size = "small";
+	} else if(count < 15) {
+		rect.size = "medium";
+	} else {
+		rect.size = "large";
+	}
+
+	return rect;
+}
