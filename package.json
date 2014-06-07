@@ -24,6 +24,6 @@
     "npm": "1.2.x"
   },
   "scripts": {
-    "postinstall": "./.bin/bower install"
+    "postinstall": "bower install"
   }
 }
