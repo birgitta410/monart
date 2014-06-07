@@ -1,11 +1,13 @@
 artwise
 =======
 
+###TOOLS SETUP
+
 1.) Git Repo
 
 git clone https://github.com/susannekaiser/artwise.git
 
-2.) Install nodejs
+2.) Install nodejs on Linux
 
 sudo apt-get update
 sudo apt-get install python-software-properties python g++ make
@@ -14,34 +16,33 @@ sudo apt-get update
 sudo apt-get install nodejs
 
 
-
-3.) Setup project
+###SETUP PROJECT
+```
 cd artwise
 npm install
 npm install -g karma-cli
+```
 
-4.) Start server
-node server.js
+Start server
+`node server.js`
 
-5.) Start tests
-karma start
+Access application
+`localhost:5000/app/index.html'
 
+Start tests
+`karma start`
 
+###To run tests
+`npm install -g karma karma-cli`
+`karma start`
 
+###Add credentials for contextIO
+Create file `artwise/server/contextio.yml`
 
-
-Internal notes 
-==============
-
-* Install yo webapp generator
-
-sudo npm install -g yo
-npm install -g generator-webapp
-yo webapp
-
-* Websockets install
-
-git clone https://github.com/heroku-examples/node-ws-test.git
-npm install
-node server.js
-
+Content:
+```
+default:
+  contextIo:
+    key: xxx
+    secret: xxxx
+```
