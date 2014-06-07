@@ -19,7 +19,7 @@ void draw(){
     line(160,0,160,300);
     line(260,0,260,300);
  
-//vertical lines
+//horizontal lines
     fill(230,120,20);
     rect(40,60,60,60);
     fill(20,89,45);
