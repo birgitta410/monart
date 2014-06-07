@@ -1,15 +1,3 @@
-// TODO: invent mapping from data to canvas
-
-// defintions
-// map1 -> color of rectangles
-//  either blue(internal) or red(external)
-// map2 -> amount of space taken by each color
-//  small, normal, large
-// random function for number of boxes
-// columns = today, yesterday, etc.
-// row position not mapped yet
-
-
 function Mondrian(P) {
   console.log('drawing Mondrian')
 
@@ -17,7 +5,13 @@ function Mondrian(P) {
             // Opera that let you into fullscreen, but won't let you out
 var el = document.getElementById("canvas1");
 var inst = document.getElementById('instructions');
- 
+
+var random = [];
+for (i=0;i<6;i++) {
+  random.push(Math.random());
+  console.log(random[i]);
+}
+
 P.setup = function() {
   // Let Opera 19 go fullscreen, earlier versions go full window
   var browser = navigator.userAgent.toLowerCase();
@@ -39,15 +33,30 @@ P.setup = function() {
 } 
 
   P.draw = function() {
-  
+    P.background(255);
     var absoluteWidth = P.width;
     var absoluteHeight = P.height;
+    var xUnit = 0.05 * absoluteWidth;
+    var yUnit = 0.05 * absoluteHeight;
   
    for (i=0;i<artwise.data.length;i++) {
      var column = artwise.data[i];
      var set = {};
-     set.width = 1/3*absoluteWidth;
-     set.x = column.column/3*absoluteWidth;
+     switch (column.size) {
+       case  'large':
+         set.height = (parseInt(random[0 % (i+1)] * (8 - 6) + 6))*yUnit;    
+         set.width = (parseInt(random[1 % (i+1)] * (8 - 6) + 6))*xUnit;    
+         break;
+       case 'medium':
+         set.height = (parseInt(random[2 % i+1] * (6 - 3) + 3))*yUnit;    
+         set.width = (parseInt(random[3 % (i+1)] * (6 - 3) + 3))*xUnit;    
+         break;
+       case 'small':
+         set.height = (parseInt(random[4 % (i+1)] * (4 - 1) + 1))*yUnit;    
+         set.width = (parseInt(random[5 % (i+1)] * (4 - 1) + 1))*xUnit;    
+         break;
+    }
+     set.x = column.column/3*xUnit;
      if (column.color == 'red') {
        set.y = 0.5*absoluteHeight;
        P.fill(255,0,0);
@@ -56,19 +65,6 @@ P.setup = function() {
        set.y = 0;
        P.fill(9,34,117);
      }
-      
-   
-     switch (column.size) {
-       case  'large':
-         set.height = 0.4*absoluteHeight;    
-         break;
-       case 'medium':
-         set.height = 0.2*absoluteHeight;    
-         break;
-       case 'small':
-         set.height = 0.1*absoluteHeight;    
-         break;
-    }
 
     P.rect(set.x,set.y,set.width,set.height);
   }
