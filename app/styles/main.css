@@ -97,3 +97,7 @@ body {
 h1 {
     font-family: Rockwell, Georgia, "Times New Roman", serif;
 }
+
+.tooltip {
+  font-size: 1.8em;
+}

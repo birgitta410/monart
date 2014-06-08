@@ -29,6 +29,9 @@ for (i=0;i<30;i++) {
 
 
 P.setup = function() {
+  // anchor for tooltips
+  $("body").append("<div id = 'tooltip_anchor'></div>");
+  $("#tooltip_anchor").css({"position": "absolute","left":"0px","top":"0px"});
   // Let Opera 19 go fullscreen, earlier versions go full window
   var browser = navigator.userAgent.toLowerCase();
   if (browser.indexOf("opera") > -1) {
@@ -159,7 +162,10 @@ P.setup = function() {
   var y = P.mouseY - offset.top;
   for (i = 0; i<9; i++) {
     if (x > mousePos[i][0] && x < mousePos[i][2] && y > mousePos[i][1] && y < mousePos[i][5]) {
-      console.log(artwise.data[i]);
+     var centerX = (mousePos[i][0]+offset.left) + (((mousePos[i][2] + offset.left) -(mousePos[i][0]+offset.left))/2);
+     var centerY = (mousePos[i][1] + offset.top) + (((mousePos[i][5] + offset.top) -(mousePos[i][1]+offset.top))/2) ;
+     var tipText = artwise.data[i].info;
+     $('#tooltip_anchor').css({"position": "absolute","left":centerX +"px","top":centerY+"px"}).tooltip({"title":tipText}).tooltip("show");
     }
   }
 }  
