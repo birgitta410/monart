@@ -40,6 +40,10 @@ P.setup = function() {
 } 
 
   P.draw = function() {
+
+    //dont do anything until we have data
+
+    if (!artwise.data.length) return;
     P.frameRate(30);
     var speed = 120;
     var count = P.frameCount%speed;
