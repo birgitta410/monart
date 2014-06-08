@@ -31,6 +31,8 @@ function mapEmailDataToRectangles(messages, callback) {
 
 	// get labeled mails: in folder 'label'
 
+	// get labeled mails: in folder 'label'
+
 	var unreadMessages = _.filter(messages, function(message) {
 		return ! _.contains(message.flags, '\\Seen');
 	});
