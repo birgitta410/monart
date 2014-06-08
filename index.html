@@ -1,34 +1,10 @@
 <html>
   <head>
-    <style>
-      body {
-        font-family: "Helvetica Neue", helvetica, arial;
-        padding: 15px;
-      }
-
-      ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      ul li {
-        line-height: 1.4;
-      }
-    </style>
-
-    <script>
-      var host = location.origin.replace(/^http/, 'ws')
-      var ws = new WebSocket(host);
-      ws.onmessage = function (event) {
-        var li = document.createElement('li');
-        li.innerHTML = JSON.stringify(event.data);
-        document.querySelector('#pings').appendChild(li);
-      };
-    </script>
+    <meta http-equiv="refresh" content="0; url=/app" />
+    <link rel="stylesheet" href="app/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="app/styles/main.css">
   </head>
   <body>
-    <h1>Pings</h1>
-    <ul id='pings'></ul>
+    <h1 style="padding-left: 20px;">Redirecting...</h1>
   </body>
 </html>
