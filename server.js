@@ -25,7 +25,7 @@ wss.on('connection', function(ws) {
       function getEmailsAndUpdateClients() {
         numberOfUpdatesMade ++;
 
-        if (numberOfUpdatesMade < 20) {
+        if (numberOfUpdatesMade < 5) {
         console.log('checking for updates (' + numberOfUpdatesMade + ')');
         var currentData = mapper.readEmail(function(emailData, changes) {
             if(changes || numberOfUpdatesMade <= 2) {
