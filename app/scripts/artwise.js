@@ -7,6 +7,8 @@ var el = document.getElementById("canvas1");
 var inst = document.getElementById('instructions');
 
 var mousePos = [];
+var absoluteWidth = 0;
+var absoluteHeight = 0;
 
 for (i=0;i<9;i++) {
   mousePos.push([]);
@@ -66,8 +68,8 @@ P.setup = function() {
     var antibreath1 = 1 - (-1*.015 * Math.sin((count1)/speed * 2 * Math.PI));
 
     P.background(255);
-    var absoluteWidth = P.width;
-    var absoluteHeight = P.height;
+    absoluteWidth = P.width;
+    absoluteHeight = P.height;
     var xUnit = 1/30 * absoluteWidth;
     var yUnit = 1/30 * absoluteHeight;
 
@@ -165,7 +167,19 @@ P.setup = function() {
      var centerX = (mousePos[i][0]+offset.left) + (((mousePos[i][2] + offset.left) -(mousePos[i][0]+offset.left))/2);
      var centerY = (mousePos[i][1] + offset.top) + (((mousePos[i][5] + offset.top) -(mousePos[i][1]+offset.top))/2) ;
      var tipText = artwise.data[i].info;
-     $('#tooltip_anchor').css({"position": "absolute","left":centerX +"px","top":centerY+"px"}).tooltip({"title":tipText}).tooltip("show");
+     var position = "top";
+     console.log(centerY);
+     console.log(centerX);
+     if (centerY < (200)) {
+       position = "bottom";
+      }
+     else if (centerX < (200 + offset.left)) {
+       position = "right";
+      }
+     else if (centerX > (absoluteWidth - 200)) {
+       position = "left";
+      }
+     $('#tooltip_anchor').css({"position": "absolute","left":centerX +"px","top":centerY+"px"}).tooltip({"title":tipText,"placement":position}).tooltip("show");
     }
   }
 }  
