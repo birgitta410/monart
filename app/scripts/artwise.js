@@ -40,7 +40,7 @@ P.setup = function() {
 } 
 
   P.draw = function() {
-
+     
     //dont do anything until we have data
 
     if (!artwise.data.length) return;
@@ -59,6 +59,7 @@ P.setup = function() {
     var xUnit = 1/30 * absoluteWidth;
     var yUnit = 1/30 * absoluteHeight;
 
+    // background black rectangles
     P.strokeWeight(5);
 
     for(j=0;j<30;j++) {
@@ -92,18 +93,20 @@ P.setup = function() {
      var max = column.column*10 + (10-set.width);
 
      set.x = randomRange(5 % (i+1), min,max); 
-     if ((column.color == 'red' && column.column % 2 == 0) || (column.color == 'blue' && column.column  == 1)) {
-       // TODO: flip order of red and blue
+     if ((column.color == 'red' && column.column == 0) || (column.color == 'blue' && column.column  == 1) || (column.color == 'yellow' && column.column == 2)) {
        var min = 0;
-       var max = 15 - set.height;
+       var max = 10 - set.height;
        set.y = randomRange(5 % (i+1), min,max); 
-       
+     }
+     else if ((column.color == 'red' && column.column == 1) || (column.color == 'blue' && column.column  == 2) || (column.color == 'yellow' && column.column == 0)) {
+       var min = 10;
+       var max = 20 - set.height;
+       set.y = randomRange(5 % (i+1), min,max); 
      }
      else {
-       var min = 15;
+       var min = 20;
        var max = 30 - set.height;
        set.y = randomRange(5 % (i+1), min,max); 
-       
      }
 
      if (column.color == 'red') {
