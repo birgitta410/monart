@@ -5,6 +5,7 @@ function Mondrian(P) {
             // Opera that let you into fullscreen, but won't let you out
 var el = document.getElementById("canvas1");
 var inst = document.getElementById('instructions');
+var footer = document.getElementById('footer');
 
 var mousePos = [];
 var absoluteWidth = 0;
@@ -215,10 +216,12 @@ function setPreFullscreen() {
   el.style.position = "fixed";
   var divHeight = inst.offsetHeight;
   inst.style.display = 'block';
+  var footerHeight = footer.offsetHeight;
+  footer.style.display = 'block';
   var viewportWidth = window.innerWidth;
   var viewportHeight = window.innerHeight;
   var canvasWidth = viewportWidth*0.97;
-  var canvasHeight = (viewportHeight-divHeight)*0.9;
+  var canvasHeight = (viewportHeight-divHeight-footerHeight)*0.9;
   el.style.top = ((viewportHeight - divHeight - canvasHeight) / 2) + divHeight +"px";
   el.style.left = (viewportWidth - canvasWidth) / 2 +"px";
   el.setAttribute("width", canvasWidth);
@@ -229,6 +232,7 @@ function setPreFullscreen() {
 function setFullWindow() {
   el.style.position = "fixed";
   inst.style.display = 'none';
+  footer.style.display = 'none';
   var canvasWidth = document.documentElement.clientWidth;
   var canvasHeight = document.documentElement.clientHeight;
   el.style.top = 0 +"px";
