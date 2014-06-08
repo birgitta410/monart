@@ -162,8 +162,11 @@ P.setup = function() {
   var offset = $("#canvas1").offset();
   var x = P.mouseX - offset.left;
   var y = P.mouseY - offset.top;
+  var isActive = false;
   for (i = 0; i<9; i++) {
     if (x > mousePos[i][0] && x < mousePos[i][2] && y > mousePos[i][1] && y < mousePos[i][5]) {
+    isActive = true; 
+    $('#tooltip_anchor').tooltip("destroy");
      var centerX = (mousePos[i][0]+offset.left) + (((mousePos[i][2] + offset.left) -(mousePos[i][0]+offset.left))/2);
      var centerY = (mousePos[i][1] + offset.top) + (((mousePos[i][5] + offset.top) -(mousePos[i][1]+offset.top))/2) ;
      var tipText = artwise.data[i].info;
@@ -178,11 +181,14 @@ P.setup = function() {
       }
      else if (centerX > (absoluteWidth - 200)) {
        position = "left";
-      }
+      } 
      $('#tooltip_anchor').css({"position": "absolute","left":centerX +"px","top":centerY+"px"}).tooltip({"title":tipText,"placement":position}).tooltip("show");
-    }
+    } 
   }
-}  
+  if (isActive == false) {
+      $('#tooltip_anchor').tooltip("destroy");
+    }
+  }  
     
 
   function randomRange(index, min,max) {
