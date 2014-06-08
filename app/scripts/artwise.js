@@ -111,6 +111,9 @@ P.setup = function() {
 
      if (column.color == 'red') {
         P.fill(255,0,0);
+    }
+    else if (column.color == 'yellow') {
+        P.fill(255,212,71);
     } else {
         P.fill(9,34,117);
     }
