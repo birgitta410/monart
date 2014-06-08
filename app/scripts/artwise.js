@@ -49,9 +49,9 @@ P.setup = function() {
     var count = P.frameCount%speed;
     var count1 = (P.frameCount-1)%speed;
     var breath = 1 - (.015 * Math.sin(count/speed * 2 * Math.PI));
-    var antibreath = 1 - (.015 * Math.cos(count/speed * 2 * Math.PI));
+    var antibreath = 1 - (-1*.015 * Math.sin(count/speed * 2 * Math.PI));
     var breath1 = 1 - (.015 * Math.sin((count1)/speed * 2 * Math.PI));
-    var antibreath1 = 1 - (.015 * Math.cos((count1)/speed * 2 * Math.PI));
+    var antibreath1 = 1 - (-1*.015 * Math.sin((count1)/speed * 2 * Math.PI));
 
     P.background(255);
     var absoluteWidth = P.width;
