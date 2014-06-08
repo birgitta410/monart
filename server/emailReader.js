@@ -2,24 +2,28 @@ var yaml_config = require('node-yaml-config');
 var ContextIO = require('contextio');
 var _ = require('lodash');
 
-var config;
+var ctxioClient;
 
-try {
-	config = yaml_config.load(__dirname + '/contextio.yml');
-} catch(err) {
-	console.log('could not read yml, trying Heroku vars');
-	config = {
-	  contextIo: {
-	    key: process.env.CONTEXT_KEY,
-	    secret: process.env.CONTEXT_SECRET
-	  }
-	};
+exports.init = function() {
+	var config;
+
+	try {
+		config = yaml_config.load(__dirname + '/contextio.yml');
+	} catch(err) {
+		console.log('could not read yml, trying Heroku vars');
+		config = {
+		  contextIo: {
+		    key: process.env.CONTEXT_KEY,
+		    secret: process.env.CONTEXT_SECRET
+		  }
+		};
+	}
+
+	ctxioClient = new ContextIO.Client({
+		key: config.contextIo.key,
+		secret: config.contextIo.secret
+	});	
 }
-
-var ctxioClient = new ContextIO.Client({
-	key: config.contextIo.key,
-	secret: config.contextIo.secret
-});
 
 exports.readEmail = function(callback, callbackParameter) {
 
