@@ -144,6 +144,10 @@ P.setup = function() {
      set.x*xUnit*antibreath,
      set.y*yUnit *antibreath+set.height*yUnit*breath
   ];
+
+  P.stroke(255,0,0);
+  P.rect(mousePos[i][0],mousePos[i][1],5, 5);
+  P.rect(mousePos[i][2],mousePos[i][5],5, 5);
 // outside borderb
     P.stroke(0,0,0);
     P.strokeWeight(6);
@@ -156,7 +160,7 @@ P.setup = function() {
   var x = P.mouseX;
   var y = P.mouseY;
   for (i = 0; i<9; i++) {
-    if (x > mousePos[i][0] && x < mousePos[i][2] && y > mousePos[i][1] && y < mousePod[i][5]) {
+    if (x > mousePos[i][0] && x < mousePos[i][2] && y > mousePos[i][1] && y < mousePos[i][5]) {
       console.log(artwise.data[i]);
     }
   }
