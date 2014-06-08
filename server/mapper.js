@@ -1,6 +1,8 @@
 var _ = require('lodash');
 var moment = require('moment');
 var http = require('http');
+// emails with this label are displayed as a yellow rectangle
+var label = 'mondrian;'
 
 var emailReader = require('./emailReader.js');
 
@@ -22,13 +24,14 @@ var LAST_RECTANGLES = [];
 
 function mapEmailDataToRectangles(messages, callback) {
 
+	// get labeled mails: in folder 'label'
+
 	var unreadMessages = _.filter(messages, function(message) {
-		return _.contains(message.flags, '\\Seen');
+		return !_.contains(message.flags, '\\Seen');
 	});
 	console.log('Got UNREAD emails from', _.map(unreadMessages, function(message) {
 		return message.addresses.from.email + ', ' + message.date;
 	}));
-	
 
 	var messagesToday = _.filter(unreadMessages, function(message) {
 		return moment().diff(moment(message.date, 'X'), 'days') === 0;
@@ -52,18 +55,18 @@ function mapEmailDataToRectangles(messages, callback) {
 	var colorExternal = "red";
 
 	var rectangles = _.compact([ 
-		 createRectangle(countInternalToday.true || 0, colorInternal, 2, ' unread internal mails from today'), 
-		 createRectangle(countInternalToday.false || 0, colorExternal, 2, ' unread external mails older than yesterday'),
-		 createRectangle(countInternalYesterday.true || 0, colorInternal, 1, ' unread internal mails from yesterday'), 
-		 createRectangle(countInternalYesterday.false || 0, colorExternal, 1, ' unread external mails from yesterday'),
+		 //createRectangle(countInternalToday.true || 0, colorInternal, 2, ' unread internal mails from today'), 
+		 //createRectangle(countInternalToday.false || 0, colorExternal, 2, ' unread external mails older than yesterday'),
+		 //createRectangle(countInternalYesterday.true || 0, colorInternal, 1, ' unread internal mails from yesterday'), 
+		 //createRectangle(countInternalYesterday.false || 0, colorExternal, 1, ' unread external mails from yesterday'),
 		// createRectangle(countInternalOld.true || 0, colorInternal, 0, ' unread internal mails older than yesterday'), 
 		// createRectangle(countInternalOld.false || 0, colorExternal, 0, ' unread external mails older than yesterday') 
 		
 		// fake messages for presentation
-		//createRectangle(5, colorInternal, 2, ' unread internal mails from today'), 
-		//createRectangle(1, colorExternal, 2, ' unread external mails older than yesterday'),
-		//createRectangle(3, colorInternal, 1, ' unread internal mails from yesterday'), 
-		//createRectangle(8, colorExternal, 1, ' unread external mails from yesterday'),
+		createRectangle(5, colorInternal, 2, ' unread internal mails from today'), 
+		createRectangle(1, colorExternal, 2, ' unread external mails older than yesterday'),
+		createRectangle(3, colorInternal, 1, ' unread internal mails from yesterday'), 
+		createRectangle(8, colorExternal, 1, ' unread external mails from yesterday'),
 	    createRectangle(16, "blue", 0, ' unread internal mails older than yesterday'), 
 		createRectangle(7, "red", 0, ' unread internal mails older than yesterday'),
         createRectangle(17, "yellow", 2, ' labeled mails from today'),
