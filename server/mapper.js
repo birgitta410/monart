@@ -59,7 +59,6 @@ function mapEmailDataToRectangles(messages, callback) {
 	var colorInternal = "blue";
 	var colorExternal = "red";
 
-	console.log(countInternalYesterday);
 	var rectangles = _.compact([ 
 
 		 createRectangle(countInternalToday.true || 0, colorInternal, 2, ' unread internal mails from today'), 
@@ -75,22 +74,7 @@ function mapEmailDataToRectangles(messages, callback) {
 		  createRectangle(10, "yellow", 0, ' labeled mails older than yesterday')  
 		]);
 
-
-	var changes = ! _.every(rectangles, function(newRect) {
-		var found = false;
-		_.each(LAST_RECTANGLES, function(oldRect) {
-			if(newRect.color === oldRect.color
-				&& newRect.column === newRect.column
-				&& newRect.size === newRect.size) {
-				found = true;
-			}
-		});
-		return found;
-	});
-
-	LAST_RECTANGLES = rectangles;
-
-	callback(rectangles, changes);
+	callback(rectangles, true);
 
 };
 

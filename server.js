@@ -25,7 +25,7 @@ wss.on('connection', function(ws) {
       function getEmailsAndUpdateClients() {
         numberOfUpdatesMade ++;
 
-        if (numberOfUpdatesMade < 5) {
+        // if (numberOfUpdatesMade < 5) {
         console.log('checking for updates (' + numberOfUpdatesMade + ')');
         var currentData = mapper.readEmail(function(emailData, changes) {
             if(changes || numberOfUpdatesMade <= 2) {
@@ -35,7 +35,7 @@ wss.on('connection', function(ws) {
               console.log('no changes');
             }
           });
-        }
+        // }
       }
 
       getEmailsAndUpdateClients();
@@ -53,3 +53,21 @@ wss.on('connection', function(ws) {
         clearInterval(clientId);
     });
 });
+
+GLOBAL.TODAY_EXTERNAL = 20;
+GLOBAL.TODAY_INTERNAL = 20;
+
+app.get('/fake/today/external/:num',
+  function(req, res) {
+    console.log('faked it', req.params.num);
+    GLOBAL.TODAY_EXTERNAL = req.params.num;
+    res.send('Set external emails today to ' + req.params.num);
+  });
+
+app.get('/fake/today/internal/:num',
+  function(req, res) {
+    console.log('faked it', req.params.num);
+    GLOBAL.TODAY_INTERNAL = req.params.num;
+    res.send('Set internal emails today to ' + req.params.num);
+  });
+
