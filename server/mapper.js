@@ -6,8 +6,12 @@ var emailReader = require('./emailReader.js');
 
 var EMAIL_DOMAIN;
 emailReader.getAccountInfo(function(accountInfo) {
-	var email = accountInfo.email_addresses[0];
-	EMAIL_DOMAIN = email.substring(email.indexOf('@') + 1);
+	if (accountInfo !== undefined && accountInfo.email_addresses.length > 0) {
+		var email = accountInfo.email_addresses[0];
+		EMAIL_DOMAIN = email.substring(email.indexOf('@') + 1);
+	} else {
+		console.log('could not read account info!');
+	}
 });
 
 exports.readEmail = function(callWhenDone) {
