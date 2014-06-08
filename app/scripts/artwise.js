@@ -145,20 +145,18 @@ P.setup = function() {
      set.y*yUnit *antibreath+set.height*yUnit*breath
   ];
 
-  P.stroke(255,0,0);
-  P.rect(mousePos[i][0],mousePos[i][1],5, 5);
-  P.rect(mousePos[i][2],mousePos[i][5],5, 5);
 // outside borderb
     P.stroke(0,0,0);
     P.strokeWeight(6);
     P.noFill();
     P.rect(3,3,absoluteWidth-6, absoluteHeight-6);
   }
-  }
+}
 
   P.mouseMoved = function() {
-  var x = P.mouseX;
-  var y = P.mouseY;
+  var offset = $("#canvas1").offset();
+  var x = P.mouseX - offset.left;
+  var y = P.mouseY - offset.top;
   for (i = 0; i<9; i++) {
     if (x > mousePos[i][0] && x < mousePos[i][2] && y > mousePos[i][1] && y < mousePos[i][5]) {
       console.log(artwise.data[i]);
