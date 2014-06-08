@@ -6,6 +6,15 @@ function Mondrian(P) {
 var el = document.getElementById("canvas1");
 var inst = document.getElementById('instructions');
 
+var mousePos = [];
+
+for (i=0;i<9;i++) {
+  mousePos.push([]);
+  for (j=0;j<8;j++) {
+    mousePos[i].push(0);
+  }
+}
+
 var random = [];
 for (i=0;i<6;i++) {
   random.push(Math.random());
@@ -125,28 +134,34 @@ P.setup = function() {
     P.strokeWeight(5);
     P.stroke(0);
     P.rect(set.x*xUnit*antibreath,set.y*yUnit *antibreath,set.width*xUnit*breath,set.height*yUnit*breath);
+    mousePos[i] = [
+     set.x*xUnit*antibreath,
+     set.y*yUnit *antibreath,
+     set.x*xUnit*antibreath+set.width*xUnit*breath,
+     set.y*yUnit *antibreath,
+     set.x*xUnit*antibreath+set.width*xUnit*breath,
+     set.y*yUnit *antibreath+set.height*yUnit*breath,
+     set.x*xUnit*antibreath,
+     set.y*yUnit *antibreath+set.height*yUnit*breath
+  ];
 // outside borderb
     P.stroke(0,0,0);
     P.strokeWeight(6);
     P.noFill();
     P.rect(3,3,absoluteWidth-6, absoluteHeight-6);
   }
-   
-    
-
- /* // horizontal lines
-    P.line(0.1*absoluteWidth,0.2*absoluteHeight,0.9*absoluteWidth,0.2*absoluteHeight);
-    P.line(0.1*absoluteWidth,0.4*absoluteHeight,0.9*absoluteWidth,0.4*absoluteHeight);
-    P.line(0.1*absoluteWidth,0.6*absoluteHeight,0.9*absoluteWidth,0.6*absoluteHeight);
-    P.line(0.1*absoluteWidth,0.8*absoluteHeight,0.9*absoluteWidth,0.8*absoluteHeight);
- 
-  //vertical lines
-    P.line(0.2*absoluteWidth,0,0.2*absoluteWidth,absoluteHeight);
-    P.line(0.3*absoluteWidth,0,0.3*absoluteWidth,absoluteHeight);
-    P.line(0.6 * absoluteWidth,0,0.6 * absoluteWidth,absoluteHeight);
-    P.line(0.9*absoluteWidth,0,0.9*absoluteWidth,absoluteHeight);
-    */
   }
+
+  P.mouseMoved = function() {
+  var x = P.mouseX;
+  var y = P.mouseY;
+  for (i = 0; i<9; i++) {
+    if (x > mousePos[i][0] && x < mousePos[i][2] && y > mousePos[i][1] && y < mousePod[i][5]) {
+      console.log(artwise.data[i]);
+    }
+  }
+}  
+    
 
   function randomRange(index, min,max) {
     return (parseInt(random[index]*  (max - min) + min));    
