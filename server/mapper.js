@@ -23,7 +23,7 @@ var LAST_RECTANGLES = [];
 function mapEmailDataToRectangles(messages, callback) {
 
 	var unreadMessages = _.filter(messages, function(message) {
-		return _.contains(message.flags, '\\Seen');
+		return ! _.contains(message.flags, '\\Seen');
 	});
 	console.log('Got UNREAD emails from', _.map(unreadMessages, function(message) {
 		return message.addresses.from.email + ', ' + message.date;
