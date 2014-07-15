@@ -11,7 +11,7 @@ server.listen(port);
 
 console.log('http server listening on %d', port);
 
-var mapper = require('./server/mapper.js');
+var mapper = require('./server/mondrian/emailMapper.js');
 
 var wss = new WebSocketServer({server: server});
 console.log('websocket server created');

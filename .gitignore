@@ -1,5 +1,5 @@
 node_modules
-components
-bower_components
-server/contextio.yml
+server/sources/contextio.yml
 *.swp
+.idea
+*.iml
