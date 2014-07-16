@@ -23,7 +23,7 @@ exports.init = function() {
 		key: config.contextIo.key,
 		secret: config.contextIo.secret
 	});	
-}
+};
 
 exports.readEmail = function(callback, callbackParameter) {
 

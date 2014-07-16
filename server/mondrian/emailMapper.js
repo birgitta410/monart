@@ -2,9 +2,9 @@ var _ = require('lodash');
 var moment = require('moment');
 var http = require('http');
 // emails with this label are displayed as a yellow rectangle
-var label = 'mondrian;'
+var label = 'mondrian';
 
-var emailReader = require('../sources/fakeEmailReader.js');
+var emailReader = require('../sources/contextio/fakeEmailReader.js');
 
 emailReader.init();
 
@@ -22,8 +22,6 @@ emailReader.getAccountInfo(function(accountInfo) {
 exports.readEmail = function(callWhenDone) {
 	emailReader.readEmail(mapEmailDataToRectangles, callWhenDone);	
 };
-
-var LAST_RECTANGLES = [];
 
 function mapEmailDataToRectangles(messages, callback) {
 	
@@ -74,7 +72,7 @@ function mapEmailDataToRectangles(messages, callback) {
 
 	callback(rectangles, true);
 
-};
+}
 
 function createRectangle(count, color, column, info) {
 	// if (count === 0) {
