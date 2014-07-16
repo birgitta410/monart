@@ -18,7 +18,7 @@ Start tests
 
 
 ###Add credentials for contextIO email reader
-Create file `server/sources/contextio.yml`
+Create file `server/sources/email/contextio.yml`
 
 Content:
 ```
