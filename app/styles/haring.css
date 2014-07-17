@@ -9,6 +9,14 @@
 
 .haring-border img {
   max-height: 140px;
+  max-width: 190px;
+}
+
+.haring-border .less-important {
+  max-height: 100px;
+  max-width: 100px;
+  margin-top: 30px;
+  background-color: #ccc;
 }
 
 .green {
