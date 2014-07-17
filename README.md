@@ -4,7 +4,7 @@ artwise
 ###SETUP PROJECT
 ```
 npm install
-npm install -g karma-cli
+npm install -g jasmine-node
 ```
 
 Start server
@@ -14,7 +14,7 @@ Application URL
 `http://localhost:5000'
 
 Start tests
-`karma start`
+`jasmine-node . --autotest`
 
 
 ###Add credentials for contextIO email reader

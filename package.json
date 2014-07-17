@@ -8,10 +8,5 @@
     "contextio": "~0.4.0",
     "node-yaml-config": "0.0.2",
     "ws": "~0.4.31"
-  },
-  "devDependencies": {
-    "karma": "~0.12.16",
-    "karma-jasmine": "~0.1.5",
-    "karma-phantomjs-launcher": "~0.1.4"
   }
 }
