@@ -1,5 +1,41 @@
 .haring-border {
-    background: url('../images/haring/border.png') no-repeat;
-    background-size: 100%;
-    min-height: 180px;
+  background: url('../images/haring/border.png') no-repeat;
+  background-size: 100%;
+  min-height: 180px;
+  min-width: 228px;
+  text-align: center;
+  padding-top: 25px;
+}
+
+.haring-border img {
+  max-height: 140px;
+}
+
+.green {
+  background-color: #25a43d;
+}
+.red {
+  background-color: #fe2425;
+}
+.orange {
+  background-color: #ff5d37;
+}
+.pink {
+  background-color: #fd59af;
+}
+.dark-blue {
+  background-color: #094794;
+}
+.blue {
+  background-color: #3bbcff;
+}
+.yellow {
+  background-color: #fecd1b;
+}
+
+
+.walking {
+  background: #25a43d url('../images/haring/walking.png') no-repeat 50% 100%;
+  background-size: 70%;
+  min-height: 160px;
 }
