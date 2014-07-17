@@ -11,13 +11,20 @@ server.listen(port);
 
 console.log('http server listening on %d', port);
 
+var wssHaring = new WebSocketServer({server: server, path: '/haring'});
+console.log('haring websocket server created');
+
+wssHaring.on('connection', function(ws) {
+  console.log('connected to /haring');
+});
+
+
 var mapper = require('./server/mondrian/emailMapper.js');
 
-var wss = new WebSocketServer({server: server});
-console.log('websocket server created');
+var wssMondrian = new WebSocketServer({server: server, path: '/mondrian'});
+console.log('mondrian websocket server created');
 
-
-wss.on('connection', function(ws) {
+wssMondrian.on('connection', function(ws) {
 
     function newClient() {
       var numberOfUpdatesMade = 0;
@@ -27,8 +34,8 @@ wss.on('connection', function(ws) {
 
         // if (numberOfUpdatesMade < 5) {
         console.log('checking for updates (' + numberOfUpdatesMade + ')');
-        var currentData = mapper.readEmail(function(emailData, changes) {
-            if(changes || numberOfUpdatesMade <= 2) {
+        var currentData = mapper.readEmail(function(emailData, doChangesExist) {
+            if(doChangesExist || numberOfUpdatesMade <= 2) {
               console.log('CHANGES!');
               ws.send(JSON.stringify(emailData), function() {  });    
             } else {
@@ -45,7 +52,6 @@ wss.on('connection', function(ws) {
 
     var clientId = newClient();
 
-    
     console.log('websocket connection open');
 
     ws.on('close', function() {

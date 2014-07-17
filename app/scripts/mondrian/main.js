@@ -1,7 +1,7 @@
 console.log('artwise is so cool!');
 
 var host = location.origin.replace(/^http/, 'ws')
-var ws = new WebSocket(host);
+var ws = new WebSocket(host + '/mondrian');
 
 //global variables that update mondrian
 
