@@ -2,8 +2,10 @@
 var host = location.origin.replace(/^http/, 'ws');
 var ws = new WebSocket(host + '/haring');
 
+var firstRowDiv = $($('.row')[0]);
+
 ws.onmessage = function (event) {
-  var firstRowDiv = $($('.row')[0]);
+
   var historyData = JSON.parse(event.data);
   console.log(historyData);
 
@@ -14,6 +16,7 @@ ws.onmessage = function (event) {
     imgTag.attr('src', 'images/haring/' + entry.type + '.png');
     imgTag.removeClass();
     imgTag.addClass(entry.color);
+    imgTag.tooltip({"title": entry.info, "placement":"bottom"});
   };
 
 };

@@ -32,10 +32,3 @@
 .yellow {
   background-color: #fecd1b;
 }
-
-
-.walking {
-  background: #25a43d url('../images/haring/walking.png') no-repeat 50% 100%;
-  background-size: 70%;
-  min-height: 160px;
-}

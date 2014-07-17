@@ -8,22 +8,47 @@ exports.readHistory = function(callWhenDone) {
   pipelineReader.readHistory('myPipeline', mapPipelineDataToFigures, callWhenDone);
 };
 
-var colors = [
+var colorsSuccess = [
   'green',
   'blue',
-  'yellow',
+  'dark-blue'
+];
+
+var colorsFailure = [
+  'orange',
   'pink',
-  'dark-blue',
-  'orange'
+  'yellow'
 ];
 
 function mapPipelineDataToFigures(history, callWhenDone) {
+
+  function getInfo(historyEntry) {
+    var theTime = historyEntry.time.format('MMMM Do YYYY, h:mm:ss a');
+    var theResult = historyEntry.wasSuccessful() ? 'Success' : 'Stage failed: ' + historyEntry.stageFailed;
+    return theTime + ' ' + theResult;
+  }
+
+  function getFigureType(historyEntry) {
+    if(historyEntry.wasSuccessful()) {
+      return 'walking';
+    } else {
+      return 'crawling';
+    }
+  }
+
+  function getColor(historyEntry) {
+    if(historyEntry.wasSuccessful()) {
+      return colorsSuccess[Math.floor(Math.random()*colorsSuccess.length)];
+    } else {
+      return colorsFailure[Math.floor(Math.random()*colorsFailure.length)];
+    }
+  }
 
   var figures = _.map(history, function(entry, index) {
     return {
       color: getColor(entry),
       column: index + 1,
-      info: 'Some text to show in a tooltip',
+      info: getInfo(entry),
       type: getFigureType(entry)
     };
   });
@@ -32,14 +57,3 @@ function mapPipelineDataToFigures(history, callWhenDone) {
   callWhenDone(figures, changesExist);
 }
 
-function getFigureType(historyEntry) {
-  if(historyEntry.result === 'success') {
-    return 'walking';
-  } else if(historyEntry.result === 'failed') {
-    return 'crawling';
-  }
-}
-
-function getColor(historyEntry) {
-  return colors[Math.floor(Math.random()*colors.length)];
-}
