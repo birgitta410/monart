@@ -19,10 +19,10 @@ var colors = [
 
 function mapPipelineDataToFigures(history, callWhenDone) {
 
-  var figures = _.map(history, function(entry) {
+  var figures = _.map(history, function(entry, index) {
     return {
       color: getColor(entry),
-      column: 3,
+      column: index + 1,
       info: 'Some text to show in a tooltip',
       type: getFigureType(entry)
     };
