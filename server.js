@@ -11,15 +11,44 @@ server.listen(port);
 
 console.log('http server listening on %d', port);
 
+var haringGocdMapper = require('./server/haring/gocdMapper.js');
 var wssHaring = new WebSocketServer({server: server, path: '/haring'});
 console.log('haring websocket server created');
 
 wssHaring.on('connection', function(ws) {
   console.log('connected to /haring');
+
+  function newClient() {
+
+    function getHistoryAndUpdateClients() {
+
+      haringGocdMapper.readHistory(function(historyData, doChangesExist) {
+        if(doChangesExist) {
+          ws.send(JSON.stringify(historyData), function() {  });
+        } else {
+          console.log('no changes');
+        }
+      });
+
+    }
+
+    getHistoryAndUpdateClients();
+    var id = setInterval(getHistoryAndUpdateClients, 5000);
+    return id;
+  }
+
+  var clientId = newClient();
+
+  console.log('websocket connection open on /haring');
+
+  ws.on('close', function() {
+    console.log('websocket connection close on /haring');
+    clearInterval(clientId);
+  });
 });
 
-
-var mapper = require('./server/mondrian/emailMapper.js');
+/**************************/
+var mondrianEmailMapper = require('./server/mondrian/emailMapper.js');
 
 var wssMondrian = new WebSocketServer({server: server, path: '/mondrian'});
 console.log('mondrian websocket server created');
@@ -34,7 +63,7 @@ wssMondrian.on('connection', function(ws) {
 
         // if (numberOfUpdatesMade < 5) {
         console.log('checking for updates (' + numberOfUpdatesMade + ')');
-        var currentData = mapper.readEmail(function(emailData, doChangesExist) {
+        var currentData = mondrianEmailMapper.readEmail(function(emailData, doChangesExist) {
             if(doChangesExist || numberOfUpdatesMade <= 2) {
               console.log('CHANGES!');
               ws.send(JSON.stringify(emailData), function() {  });    
@@ -52,10 +81,10 @@ wssMondrian.on('connection', function(ws) {
 
     var clientId = newClient();
 
-    console.log('websocket connection open');
+    console.log('websocket connection open on /mondrian');
 
     ws.on('close', function() {
-        console.log('websocket connection close');
+        console.log('websocket connection close on /mondrian');
         clearInterval(clientId);
     });
 });

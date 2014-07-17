@@ -23,16 +23,17 @@ exports.readEmail = function(callWhenDone) {
 	emailReader.readEmail(mapEmailDataToRectangles, callWhenDone);	
 };
 
-function mapEmailDataToRectangles(messages, callback) {
+function mapEmailDataToRectangles(messages, callWhenDone) {
 	
 	// get labeled mails: in folder 'label'
 
 	var unreadMessages = _.filter(messages, function(message) {
 		return ! _.contains(message.flags, '\\Seen');
 	});
-	console.log('Got UNREAD emails from', _.map(unreadMessages, function(message) {
-		return message.addresses.from.email + ', ' + message.date;
-	}));
+
+//  console.log('Got UNREAD emails from', _.map(unreadMessages, function(message) {
+//		return message.addresses.from.email + ', ' + message.date;
+//	}));
 
 	var messagesToday = _.filter(unreadMessages, function(message) {
 		return moment().diff(moment(message.date, 'X'), 'days') === 0;
@@ -70,7 +71,8 @@ function mapEmailDataToRectangles(messages, callback) {
 		  createRectangle(10, "yellow", 0, ' labeled mails older than yesterday')  
 		]);
 
-	callback(rectangles, true);
+  var changesExist = true;
+  callWhenDone(rectangles, changesExist);
 
 }
 
