@@ -28,8 +28,11 @@ function gocdMapperCreator(pipelineReader) {
       return theTime + ' ' + theResult;
     }
 
-    function getFigureType(historyEntry) {
-      if(historyEntry.wasSuccessful()) {
+    function getFigureType(historyEntry, previousEntry) {
+      previousEntry = previousEntry || { wasSuccessful: function() { return true; }};
+      if(historyEntry.wasSuccessful() && !previousEntry.wasSuccessful()) {
+        return 'flying';
+      } else if (historyEntry.wasSuccessful()) {
         return 'walking';
       } else {
         return 'crawling';
@@ -44,13 +47,16 @@ function gocdMapperCreator(pipelineReader) {
       }
     }
 
+    // !! currently ASSUMING that history is sorted in descending chronological order, newest first
     var figures = _.map(history, function(entry, index) {
-      return {
+      var previous = index < history.length ? history[index + 1] : undefined;
+      var figure = {
         color: getColor(entry),
         column: index + 1,
         info: getInfo(entry),
-        type: getFigureType(entry)
+        type: getFigureType(entry, previous)
       };
+      return figure;
     });
 
     var changesExist = true;
