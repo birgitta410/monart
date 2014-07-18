@@ -20,6 +20,8 @@ function gocdMapperCreator(pipelineReader) {
     'yellow'
   ];
 
+  var trueFn = function() { return true; };
+
   function mapPipelineDataToFigures(history, callWhenDone) {
 
     function getInfo(historyEntry) {
@@ -28,14 +30,19 @@ function gocdMapperCreator(pipelineReader) {
       return theTime + ' ' + theResult;
     }
 
-    function getFigureType(historyEntry, previousEntry) {
-      previousEntry = previousEntry || { wasSuccessful: function() { return true; }};
-      if(historyEntry.wasSuccessful() && !previousEntry.wasSuccessful()) {
+    function getFigureType(entry, lastEntry, secondLastEntry) {
+
+      lastEntry = lastEntry || { wasSuccessful: trueFn };
+      secondLastEntry = secondLastEntry || { wasSuccessful: trueFn };
+
+      if(entry.wasSuccessful() && !lastEntry.wasSuccessful()) {
         return 'flying';
-      } else if (historyEntry.wasSuccessful()) {
+      } else if (entry.wasSuccessful()) {
         return 'walking';
-      } else {
+      } else if ( ! entry.wasSuccessful() && !lastEntry.wasSuccessful()) {
         return 'crawling';
+      } else {
+        return 'stumbling';
       }
     }
 
@@ -50,11 +57,12 @@ function gocdMapperCreator(pipelineReader) {
     // !! currently ASSUMING that history is sorted in descending chronological order, newest first
     var figures = _.map(history, function(entry, index) {
       var previous = index < history.length ? history[index + 1] : undefined;
+      var previousPrevious = index < history.length + 1 ? history[index + 2] : undefined;
       var figure = {
         color: getColor(entry),
         column: index + 1,
         info: getInfo(entry),
-        type: getFigureType(entry, previous)
+        type: getFigureType(entry, previous, previousPrevious)
       };
       return figure;
     });

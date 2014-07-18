@@ -25,7 +25,10 @@ exports.readHistory = function(pipelineName, callback, callbackParameter) {
   }
 
   fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: today, result: 'success'}));
+  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: today, result: 'failed', stageFailed: 'build'}));
   fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: yesterday, result: 'failed', stageFailed: 'build'}));
+  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: yesterday, result: 'failed', stageFailed: 'build'}));
+  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: old, result: 'success'}));
   fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: old, result: 'success'}));
 
   callback(fakeHistory, callbackParameter);

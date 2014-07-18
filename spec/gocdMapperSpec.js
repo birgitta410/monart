@@ -20,10 +20,14 @@ describe('mapper', function () {
       theGocdMapper = gocdMapperModule.create(thePipelineReader);
     });
 
-    it('should return crawling image if failure', function () {
-      fakePipelineHistory = [{ wasSuccessful: notSuccessfulFn, time: mockTime }];
+    it('should return crawling image if failed and at least two previous ones were failures', function () {
+      fakePipelineHistory = [
+        { wasSuccessful: notSuccessfulFn, time: mockTime },
+        { wasSuccessful: notSuccessfulFn, time: mockTime },
+        { wasSuccessful: notSuccessfulFn, time: mockTime },
+      ];
       theGocdMapper.readHistory(function(result) {
-        expect(result.length).toBe(1);
+        expect(result.length).toBe(3);
         expect(result[0].type).toBe('crawling');
       });
 
@@ -32,12 +36,25 @@ describe('mapper', function () {
     it('should return flying image if previous failed, current is success', function () {
       // descending order, newest first
       fakePipelineHistory = [
-        { wasSuccessful: function() { return true; }, time: mockTime },
-        { wasSuccessful: function() { return false; }, time: mockTime }
+        { wasSuccessful: successfulFn, time: mockTime },
+        { wasSuccessful: notSuccessfulFn, time: mockTime }
       ];
       theGocdMapper.readHistory(function(result) {
         expect(result.length).toBe(2);
         expect(result[0].type).toBe('flying');
+      });
+
+    });
+
+    it('should return stumbling image if previous was successful', function () {
+      // descending order, newest first
+      fakePipelineHistory = [
+        { wasSuccessful: notSuccessfulFn, time: mockTime },
+        { wasSuccessful: successfulFn, time: mockTime }
+      ];
+      theGocdMapper.readHistory(function(result) {
+        expect(result.length).toBe(2);
+        expect(result[0].type).toBe('stumbling');
       });
 
     });
