@@ -28,7 +28,7 @@ describe('atomEntryParser', function () {
     it('should set the stage name', function () {
       var entry = theAtomEntryParser.withData({ id: id });
 
-      expect(entry.stage).toBe('functional-test');
+      expect(entry.stageName).toBe('functional-test');
     });
 
     it('should set the run number', function () {

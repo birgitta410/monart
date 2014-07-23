@@ -1,4 +1,4 @@
-
+var _ = require('lodash');
 var gocdMapperModule = require('../server/haring/gocdMapper');
 
 describe('Go CD Mapper', function () {
@@ -20,14 +20,13 @@ describe('Go CD Mapper', function () {
       theGocdMapper = gocdMapperModule.create(thePipelineReader);
     });
 
-    it('should return crawling image if failed and at least two previous ones were failures', function () {
-      fakePipelineHistory = [
-        { wasSuccessful: notSuccessfulFn, time: mockTime },
-        { wasSuccessful: notSuccessfulFn, time: mockTime },
-        { wasSuccessful: notSuccessfulFn, time: mockTime },
-      ];
+    it('should return crawling image if failed and previous one was failure as well', function () {
+      fakePipelineHistory = {
+        '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
+        '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
+      };
       theGocdMapper.readHistory(function(result) {
-        expect(result.length).toBe(3);
+        expect(_.keys(result).length).toBe(2);
         expect(result[0].type).toBe('crawling');
       });
 
@@ -35,12 +34,12 @@ describe('Go CD Mapper', function () {
 
     it('should return flying image if previous failed, current is success', function () {
       // descending order, newest first
-      fakePipelineHistory = [
-        { wasSuccessful: successfulFn, time: mockTime },
-        { wasSuccessful: notSuccessfulFn, time: mockTime }
-      ];
+      fakePipelineHistory = {
+        '124': { wasSuccessful: successfulFn, time: mockTime } ,
+        '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
+      };
       theGocdMapper.readHistory(function(result) {
-        expect(result.length).toBe(2);
+        expect(_.keys(result).length).toBe(2);
         expect(result[0].type).toBe('flying');
       });
 
@@ -48,12 +47,12 @@ describe('Go CD Mapper', function () {
 
     it('should return stumbling image if previous was successful', function () {
       // descending order, newest first
-      fakePipelineHistory = [
-        { wasSuccessful: notSuccessfulFn, time: mockTime },
-        { wasSuccessful: successfulFn, time: mockTime }
-      ];
+      fakePipelineHistory = {
+        '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
+        '123': { wasSuccessful: successfulFn, time: mockTime }
+      };
       theGocdMapper.readHistory(function(result) {
-        expect(result.length).toBe(2);
+        expect(_.keys(result).length).toBe(2);
         expect(result[0].type).toBe('stumbling');
       });
 

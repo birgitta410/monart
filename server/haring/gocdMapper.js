@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var moment = require('moment');
 
 function gocdMapperCreator(pipelineReader) {
 
@@ -25,15 +26,14 @@ function gocdMapperCreator(pipelineReader) {
   function mapPipelineDataToFigures(history, callWhenDone) {
 
     function getInfo(historyEntry) {
-      var theTime = historyEntry.time.format('MMMM Do YYYY, h:mm:ss a');
+      var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
       var theResult = historyEntry.wasSuccessful() ? 'Success' : 'Stage failed: ' + historyEntry.stageFailed;
       return theTime + ' ' + theResult;
     }
 
-    function getFigureType(entry, lastEntry, secondLastEntry) {
+    function getFigureType(entry, lastEntry) {
 
       lastEntry = lastEntry || { wasSuccessful: trueFn };
-      secondLastEntry = secondLastEntry || { wasSuccessful: trueFn };
 
       if(entry.wasSuccessful() && !lastEntry.wasSuccessful()) {
         return 'flying';
@@ -55,14 +55,17 @@ function gocdMapperCreator(pipelineReader) {
     }
 
     // !! currently ASSUMING that history is sorted in descending chronological order, newest first
-    var figures = _.map(history, function(entry, index) {
-      var previous = index < history.length ? history[index + 1] : undefined;
-      var previousPrevious = index < history.length + 1 ? history[index + 2] : undefined;
+
+    var keysDescending = _.keys(history).sort().reverse();
+    var figures = _.map(keysDescending, function(key, index) {
+      var entry = history[key];
+      var previous = index < keysDescending.length ? history[keysDescending[index + 1]] : undefined;
+
       var figure = {
         color: getColor(entry),
         column: index + 1,
         info: getInfo(entry),
-        type: getFigureType(entry, previous, previousPrevious)
+        type: getFigureType(entry, previous)
       };
       return figure;
     });
@@ -77,7 +80,7 @@ function gocdMapperCreator(pipelineReader) {
 }
 
 
-var pipelineReader = require('../sources/gocd/fakePipelineReader.js');
+var pipelineReader = require('../sources/gocd/pipelineFeedReader.js');
 var gocdMapper = gocdMapperCreator(pipelineReader);
 
 exports.create = gocdMapperCreator;

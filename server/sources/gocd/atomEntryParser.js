@@ -14,7 +14,7 @@ var atomEntryParserCreator = function () {
     return {
       pipeline: parameters[0],
       buildNumber: parameters[1],
-      stage: parameters[2],
+      stageName: parameters[2],
       runNumber: parameters[3]
     };
   }
@@ -24,8 +24,9 @@ var atomEntryParserCreator = function () {
 
     // 'QEN(1197) stage build(1) Passed'
     var titleChunks = title.split(' ');
+    var result = titleChunks[3].toLowerCase();
     return {
-      result: titleChunks[3].toLowerCase()
+      result: result
     }
   }
 
