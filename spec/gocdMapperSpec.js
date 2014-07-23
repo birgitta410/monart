@@ -4,20 +4,20 @@ var gocdMapperModule = require('../server/haring/gocdMapper');
 describe('Go CD Mapper', function () {
   describe('mapPipelineDataToFigures()', function () {
 
-    var theGocdMapper, thePipelineReader;
+    var theGocdMapper, mockPipelineReader;
     var fakePipelineHistory;
     var mockTime = { format: function () { } };
     var notSuccessfulFn = function() { return false; };
     var successfulFn = function() { return true; };
 
     beforeEach(function() {
-      thePipelineReader = {
+      mockPipelineReader = {
         init: jasmine.createSpy('init'),
         readHistory: function(callback, callbackParameter) {
           callback(fakePipelineHistory, callbackParameter);
         }
       };
-      theGocdMapper = gocdMapperModule.create(thePipelineReader);
+      theGocdMapper = gocdMapperModule.create(mockPipelineReader);
     });
 
     it('should return crawling image if failed and previous one was failure as well', function () {

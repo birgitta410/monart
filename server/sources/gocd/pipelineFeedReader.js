@@ -1,28 +1,17 @@
 
 var _ = require('lodash');
 
-var pipelineFeedReaderCreator = function (xml2json, fs, atomEntryParser) {
+var pipelineFeedReaderCreator = function (xml2json, gocdRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
 
-  function jsonFromXml(xml) {
-    return xml2json.toJson(xml, {
-      object: true,
-      // sanitizing led to weird conversions of e.g. brackets in description texts
-      sanitize: false
-    });
-  }
-
   var requestStages = function (callback) {
-    // TODO: Eventually replace with real HTTP request
-    var xml = fs.readFileSync('server/sources/gocd/pipeline-stages.xml');
-    var json = jsonFromXml(xml);
-
-    json.feed.entry = _.map(json.feed.entry, function(entry) {
-      return atomEntryParser.withData(entry);
+    gocdRequestor.get(function(json) {
+      json.feed.entry = _.map(json.feed.entry, function(entry) {
+        return atomEntryParser.withData(entry);
+      });
+      callback(json);
     });
-
-    callback(json);
   };
 
   function pushEntryToPipelineHistory(entry) {
@@ -79,9 +68,9 @@ var pipelineFeedReaderCreator = function (xml2json, fs, atomEntryParser) {
 }
 
 var xml2json = require('xml2json');
-var fs = require('fs');
+var gocdRequestorCreator = require('./gocdRequestor.js');
 var atomEntryParserCreator = require('./atomEntryParser.js');
-var pipelineFeedReader = pipelineFeedReaderCreator(xml2json, fs, atomEntryParserCreator.create());
+var pipelineFeedReader = pipelineFeedReaderCreator(xml2json, gocdRequestorCreator.create(), atomEntryParserCreator.create());
 
 exports.create = pipelineFeedReaderCreator;
 exports.init = pipelineFeedReader.init;

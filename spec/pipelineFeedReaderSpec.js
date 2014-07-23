@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var fs = require('fs');
 var moment = require('moment');
 var thePipelineFeedReaderModule = require('../server/sources/gocd/pipelineFeedReader.js');
 var theAtomEntryParserModule = require('../server/sources/gocd/atomEntryParser.js');
@@ -7,11 +8,19 @@ describe('pipelineFeedReader', function () {
   describe('init()', function () {
 
     var thePipelineFeedReader
-      , fs = require('fs')
+      , mockGocdRequestor
       , xml2json = require('xml2json');
 
     beforeEach(function() {
-      thePipelineFeedReader = thePipelineFeedReaderModule.create(xml2json, fs, theAtomEntryParserModule.create());
+      var xml = fs.readFileSync('spec/fixtures/pipeline-stages.xml');
+      var json = xml2json.toJson(xml, { object: true, sanitize: false });
+
+      mockGocdRequestor = {
+        get: function(callback) {
+          callback(json);
+        }
+      };
+      thePipelineFeedReader = thePipelineFeedReaderModule.create(xml2json, mockGocdRequestor, theAtomEntryParserModule.create());
     });
 
     it('should initialise a set of pipeline runs', function () {
