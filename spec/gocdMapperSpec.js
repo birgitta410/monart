@@ -1,7 +1,7 @@
 
 var gocdMapperModule = require('../server/haring/gocdMapper');
 
-describe('mapper', function () {
+describe('Go CD Mapper', function () {
   describe('mapPipelineDataToFigures()', function () {
 
     var theGocdMapper, thePipelineReader;
@@ -13,7 +13,7 @@ describe('mapper', function () {
     beforeEach(function() {
       thePipelineReader = {
         init: jasmine.createSpy('init'),
-        readHistory: function(pipelineName, callback, callbackParameter) {
+        readHistory: function(callback, callbackParameter) {
           callback(fakePipelineHistory, callbackParameter);
         }
       };

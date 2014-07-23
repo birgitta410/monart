@@ -5,7 +5,7 @@ function gocdMapperCreator(pipelineReader) {
   pipelineReader.init();
 
   var readHistory = function(callWhenDone) {
-    pipelineReader.readHistory('myPipeline', mapPipelineDataToFigures, callWhenDone);
+    pipelineReader.readHistory(mapPipelineDataToFigures, callWhenDone);
   };
 
   var colorsSuccess = [

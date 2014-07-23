@@ -1,5 +1,6 @@
 
 var thePipelineFeedReaderModule = require('../server/sources/gocd/pipelineFeedReader.js');
+var theAtomEntryParserModule = require('../server/sources/gocd/atomEntryParser.js');
 
 describe('pipelineFeedReader', function () {
   describe('init()', function () {
@@ -10,7 +11,7 @@ describe('pipelineFeedReader', function () {
 
     beforeEach(function() {
 
-      thePipelineFeedReader = thePipelineFeedReaderModule.create(xml2json, fs);
+      thePipelineFeedReader = thePipelineFeedReaderModule.create(xml2json, fs, theAtomEntryParserModule.create());
     });
 
     it('should initialise a set of 10 pipeline runs', function () {

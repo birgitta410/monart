@@ -10,22 +10,22 @@ var fakeHistory = [];
 function newHistoryEntry(data) {
   return _.extend(data, {
     wasSuccessful: function() {
-      return data.result === 'success';
+      return data.result === 'passed';
     }
   });
 }
 
 exports.init = function(pipelineName) {
 
-  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: today, result: 'success'}));
+  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: today, result: 'passed'}));
   fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: today, result: 'failed', stageFailed: 'build'}));
   fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: yesterday, result: 'failed', stageFailed: 'build'}));
   fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: yesterday, result: 'failed', stageFailed: 'build'}));
-  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: old, result: 'success'}));
-  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: old, result: 'success'}));
+  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: old, result: 'passed'}));
+  fakeHistory.push(newHistoryEntry({ pipeline: pipelineName, time: old, result: 'passed'}));
 };
 
-exports.readHistory = function(pipelineName, callback, callbackParameter) {
+exports.readHistory = function(callback, callbackParameter) {
 
   callback(fakeHistory, callbackParameter);
 
