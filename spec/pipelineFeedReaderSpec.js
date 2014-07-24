@@ -20,7 +20,7 @@ describe('pipelineFeedReader', function () {
           callback(json);
         }
       };
-      thePipelineFeedReader = thePipelineFeedReaderModule.create(xml2json, mockGocdRequestor, theAtomEntryParserModule.create());
+      thePipelineFeedReader = thePipelineFeedReaderModule.create(mockGocdRequestor, theAtomEntryParserModule.create());
     });
 
     it('should initialise a set of pipeline runs', function () {

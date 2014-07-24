@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Projects>
+  <Project name="QEN :: build" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:52:58" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1199/build/1" />
+  <Project name="QEN :: build :: both" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:52:58" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1199/build/1/both" />
+  <Project name="QEN :: integration-test" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:53:54" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1199/integration-test/1" />
+  <Project name="QEN :: integration-test :: backend-integration" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:53:54" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1199/integration-test/1/backend-integration" />
+  <Project name="QEN :: deploy-dev" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:54:42" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1199/deploy-dev/1" />
+  <Project name="QEN :: deploy-dev :: backend" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:54:27" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1199/deploy-dev/1/backend" />
+  <Project name="QEN :: deploy-dev :: client" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:54:42" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1199/deploy-dev/1/client" />
+  <Project name="QEN :: smoke-test-dev" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:55:31" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1199/smoke-test-dev/1" />
+  <Project name="QEN :: smoke-test-dev :: backend" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T15:55:31" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1199/smoke-test-dev/1/backend" />
+  <Project name="QEN :: functional-test" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T16:08:39" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1199/functional-test/1" />
+  <Project name="QEN :: functional-test :: both" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1199" lastBuildTime="2014-07-18T16:08:39" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1199/functional-test/1/both" />
+  <Project name="QEN :: deploy-showcase" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177" lastBuildTime="2014-07-15T16:40:18" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1177/deploy-showcase/1" />
+  <Project name="QEN :: deploy-showcase :: backend" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177" lastBuildTime="2014-07-15T16:39:59" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1177/deploy-showcase/1/backend" />
+  <Project name="QEN :: deploy-showcase :: client" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177" lastBuildTime="2014-07-15T16:40:18" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1177/deploy-showcase/1/client" />
+  <Project name="QEN :: smoke-test-showcase" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177" lastBuildTime="2014-07-15T16:40:44" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1177/smoke-test-showcase/1" />
+  <Project name="QEN :: smoke-test-showcase :: backend" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177" lastBuildTime="2014-07-15T16:40:44" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1177/smoke-test-showcase/1/backend" />
+  <Project name="QEN :: deploy-integration" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177 :: 3" lastBuildTime="2014-07-15T16:45:54" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1177/deploy-integration/3" />
+  <Project name="QEN :: deploy-integration :: backend" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177 :: 3" lastBuildTime="2014-07-15T16:45:36" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1177/deploy-integration/3/backend" />
+  <Project name="QEN :: deploy-integration :: client" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177 :: 3" lastBuildTime="2014-07-15T16:45:54" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1177/deploy-integration/3/client" />
+  <Project name="QEN :: smoke-test-integration" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177" lastBuildTime="2014-07-15T16:46:12" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1177/smoke-test-integration/1" />
+  <Project name="QEN :: smoke-test-integration :: backend" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1177" lastBuildTime="2014-07-15T16:46:12" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1177/smoke-test-integration/1/backend" />
+</Projects>
+

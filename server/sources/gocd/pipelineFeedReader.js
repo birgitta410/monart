@@ -1,7 +1,7 @@
 
 var _ = require('lodash');
 
-var pipelineFeedReaderCreator = function (xml2json, gocdRequestor, atomEntryParser) {
+var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
 
@@ -67,10 +67,9 @@ var pipelineFeedReaderCreator = function (xml2json, gocdRequestor, atomEntryPars
   };
 }
 
-var xml2json = require('xml2json');
 var gocdRequestorCreator = require('./gocdRequestor.js');
 var atomEntryParserCreator = require('./atomEntryParser.js');
-var pipelineFeedReader = pipelineFeedReaderCreator(xml2json, gocdRequestorCreator.create(), atomEntryParserCreator.create());
+var pipelineFeedReader = pipelineFeedReaderCreator(gocdRequestorCreator.create(), atomEntryParserCreator.create());
 
 exports.create = pipelineFeedReaderCreator;
 exports.init = pipelineFeedReader.init;

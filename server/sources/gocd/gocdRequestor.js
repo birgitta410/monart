@@ -11,18 +11,12 @@ function gocdRequestorCreator(fs, xml2json) {
     return gocdRequestor;
   }
 
-  function jsonFromXml(xml) {
-    return xml2json.toJson(xml, {
-      object: true,
-      // sanitizing led to weird conversions of e.g. brackets in description texts
-      sanitize: false
-    });
-  }
-
   var get = function(callback) {
     // TODO: Eventually replace with real HTTP request
     var xml = fs.readFileSync('server/sources/gocd/pipeline-stages.xml');
-    var json = jsonFromXml(xml);
+    var json = xml2json.toJson(xml, {
+      object: true, sanitize: false
+    });
 
     callback(json);
   };
