@@ -1,3 +1,4 @@
+
 .haring-border {
   background: url('../images/haring/border.png') no-repeat;
   background-size: 100%;
@@ -20,6 +21,9 @@
 }
 
 .green {
+  background-color: #a3d626;
+}
+.dark-green {
   background-color: #25a43d;
 }
 .red {

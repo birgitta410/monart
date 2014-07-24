@@ -10,7 +10,7 @@ function gocdMapperCreator(pipelineReader) {
   };
 
   var colorsSuccess = [
-    'green',
+    'dark-green',
     'blue',
     'dark-blue'
   ];
