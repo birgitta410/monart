@@ -99,7 +99,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     });
 
     var changesExist = true;
-    callWhenDone(figures, changesExist);
+    callWhenDone({ figures: figures }, changesExist);
   }
 
   return {

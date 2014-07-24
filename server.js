@@ -20,6 +20,21 @@ wssHaring.on('connection', function(ws) {
 
   function newClient() {
 
+    function getActivityAndUpdateClients() {
+      haringGocdMapper.readActivity(function(activityData, doChangesExist) {
+        if(doChangesExist) {
+
+          haringGocdMapper.readHistory(function(historyData) {
+            activityData.figures = activityData.figures.concat(historyData.figures);
+            ws.send(JSON.stringify(activityData), function() {  });
+          });
+
+        } else {
+          console.log('no changes');
+        }
+      });
+    }
+
     function getHistoryAndUpdateClients() {
 
       haringGocdMapper.readHistory(function(historyData, doChangesExist) {
@@ -32,8 +47,8 @@ wssHaring.on('connection', function(ws) {
 
     }
 
-    getHistoryAndUpdateClients();
-    var id = setInterval(getHistoryAndUpdateClients, 5000);
+    getActivityAndUpdateClients();
+    var id = setInterval(getActivityAndUpdateClients, 5000);
     return id;
   }
 

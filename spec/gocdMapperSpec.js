@@ -98,8 +98,8 @@ describe('Go CD Mapper', function () {
         { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Building' }
       ];
       theGocdMapper.readActivity(function(result) {
-        expect(result.length).toBe(1);
-        expect(result[0].type).toBe('skating');
+        expect(result.figures.length).toBe(1);
+        expect(result.figures[0].type).toBe('skating');
       });
     });
 
@@ -108,8 +108,8 @@ describe('Go CD Mapper', function () {
         { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Sleeping' }
       ];
       theGocdMapper.readActivity(function(result) {
-        expect(result.length).toBe(1);
-        expect(result[0].type).toBe('dog');
+        expect(result.figures.length).toBe(1);
+        expect(result.figures[0].type).toBe('dog');
       });
     });
 

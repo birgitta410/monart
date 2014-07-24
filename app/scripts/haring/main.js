@@ -25,6 +25,8 @@ ws.onmessage = function (event) {
     imgTag.attr('src', 'images/haring/' + entry.type + '.png');
     imgTag.removeClass();
     imgTag.addClass(entry.color);
+    console.log(entry.info);
+    // TODO: Tooltip overwrite does not seem possible?
     imgTag.tooltip({"title": entry.info, "placement":"bottom"});
 
   };
