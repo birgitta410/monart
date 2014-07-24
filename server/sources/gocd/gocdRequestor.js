@@ -11,9 +11,10 @@ function gocdRequestorCreator(fs, xml2json) {
     return gocdRequestor;
   }
 
-  var get = function(callback) {
+  var get = function(next, callback) {
     // TODO: Eventually replace with real HTTP request
-    var xml = fs.readFileSync('server/sources/gocd/pipeline-stages.xml');
+    var source = next ? next : 'server/sources/gocd/pipeline-stages.xml';
+    var xml = fs.readFileSync(source);
     var json = xml2json.toJson(xml, {
       object: true, sanitize: false
     });

@@ -12,12 +12,13 @@ describe('pipelineFeedReader', function () {
       , xml2json = require('xml2json');
 
     beforeEach(function() {
-      var xml = fs.readFileSync('spec/fixtures/pipeline-stages.xml');
-      var json = xml2json.toJson(xml, { object: true, sanitize: false });
-
       mockGocdRequestor = {
-        get: function(callback) {
+        get: function(next, callback) {
+          var source = next ? next : 'spec/fixtures/pipeline-stages.xml';
+          var xml = fs.readFileSync(source);
+          var json = xml2json.toJson(xml, { object: true, sanitize: false });
           callback(json);
+
         }
       };
       thePipelineFeedReader = thePipelineFeedReaderModule.create(mockGocdRequestor, theAtomEntryParserModule.create());
@@ -26,7 +27,7 @@ describe('pipelineFeedReader', function () {
     it('should initialise a set of pipeline runs', function () {
       thePipelineFeedReader.init();
       thePipelineFeedReader.readHistory(function(results) {
-        expect(_.keys(results).length).toBeGreaterThan(0);
+        expect(_.keys(results).length).toBe(11); //1199 - 1189
         expect(results['1199']).toBeDefined();
       });
     });

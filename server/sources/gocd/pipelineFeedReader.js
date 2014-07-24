@@ -4,9 +4,10 @@ var _ = require('lodash');
 var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
+  var MAX_NUMBER_HISTORY = 25;
 
-  var requestStages = function (callback) {
-    gocdRequestor.get(function(json) {
+  var requestStages = function (next, callback) {
+    gocdRequestor.get(next, function(json) {
       json.feed.entry = _.map(json.feed.entry, function(entry) {
         return atomEntryParser.withData(entry);
       });
@@ -45,14 +46,26 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
   }
 
-  var init = function () {
-    requestStages(function (result) {
+  var next = undefined;
 
-      _.each(result.feed.entry, pushEntryToPipelineHistory);
-      pipelineHistory = _.mapValues(pipelineHistory, mapPipelineFinishTime);
-      pipelineHistory = _.mapValues(pipelineHistory, mapPipelineResult);
+  var init = function () {
+
+    requestStages(next, function (result) {
+
+      if(result !== undefined) {
+
+        _.each(result.feed.entry, pushEntryToPipelineHistory);
+        pipelineHistory = _.mapValues(pipelineHistory, mapPipelineFinishTime);
+        pipelineHistory = _.mapValues(pipelineHistory, mapPipelineResult);
+        next = _.find(result.feed.link, { rel: 'next' }).href;
+
+        if (next && _.keys(pipelineHistory).length < MAX_NUMBER_HISTORY) {
+          init();
+        }
+      }
 
     });
+
   };
 
   var readHistory = function(callback, callbackParameter) {
