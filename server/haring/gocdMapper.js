@@ -54,20 +54,17 @@ function gocdMapperCreator(pipelineReader) {
       }
     }
 
-    // !! currently ASSUMING that history is sorted in descending chronological order, newest first
-
     var keysDescending = _.keys(history).sort().reverse();
     var figures = _.map(keysDescending, function(key, index) {
       var entry = history[key];
       var previous = index < keysDescending.length ? history[keysDescending[index + 1]] : undefined;
 
-      var figure = {
+      return {
         color: getColor(entry),
         column: index + 1,
         info: getInfo(entry),
         type: getFigureType(entry, previous)
       };
-      return figure;
     });
 
     var lastBuildSuccessful = history[keysDescending[0]].wasSuccessful();
