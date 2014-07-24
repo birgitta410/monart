@@ -24,7 +24,8 @@ describe('pipelineFeedReader', function () {
     it('should initialise the list of activities', function () {
       theCcTrayReader.init();
       theCcTrayReader.readActivity(function(results) {
-        expect(_.keys(results).length).toBe(21);
+        // 12 = number of jobs
+        expect(results.length).toBe(12);
       });
     });
 
