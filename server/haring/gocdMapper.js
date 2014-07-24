@@ -70,8 +70,13 @@ function gocdMapperCreator(pipelineReader) {
       return figure;
     });
 
+    var lastBuildSuccessful = history[keysDescending[0]].wasSuccessful();
+
     var changesExist = true;
-    callWhenDone(figures, changesExist);
+    callWhenDone({
+      background: lastBuildSuccessful ? 'green' : 'orange',
+      figures: figures
+    }, changesExist);
   }
 
   return {

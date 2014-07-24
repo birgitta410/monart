@@ -26,8 +26,8 @@ describe('Go CD Mapper', function () {
         '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
       };
       theGocdMapper.readHistory(function(result) {
-        expect(_.keys(result).length).toBe(2);
-        expect(result[0].type).toBe('crawling');
+        expect(_.keys(result.figures).length).toBe(2);
+        expect(result.figures[0].type).toBe('crawling');
       });
 
     });
@@ -39,8 +39,8 @@ describe('Go CD Mapper', function () {
         '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
       };
       theGocdMapper.readHistory(function(result) {
-        expect(_.keys(result).length).toBe(2);
-        expect(result[0].type).toBe('flying');
+        expect(_.keys(result.figures).length).toBe(2);
+        expect(result.figures[0].type).toBe('flying');
       });
 
     });
@@ -52,10 +52,30 @@ describe('Go CD Mapper', function () {
         '123': { wasSuccessful: successfulFn, time: mockTime }
       };
       theGocdMapper.readHistory(function(result) {
-        expect(_.keys(result).length).toBe(2);
-        expect(result[0].type).toBe('stumbling');
+        expect(_.keys(result.figures).length).toBe(2);
+        expect(result.figures[0].type).toBe('stumbling');
       });
 
+    });
+
+    it('should set orange background colour if latest build failed', function () {
+      fakePipelineHistory = {
+        '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
+        '123': { wasSuccessful: successfulFn, time: mockTime }
+      };
+      theGocdMapper.readHistory(function(result) {
+        expect(result.background).toBe('orange');
+      });
+    });
+
+    it('should set orange background colour if latest build failed', function () {
+      fakePipelineHistory = {
+        '124': { wasSuccessful: successfulFn, time: mockTime },
+        '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
+      };
+      theGocdMapper.readHistory(function(result) {
+        expect(result.background).toBe('green');
+      });
     });
 
   });

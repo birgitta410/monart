@@ -8,9 +8,12 @@ ws.onmessage = function (event) {
   var historyData = JSON.parse(event.data);
   console.log(historyData);
 
+  $('body').removeClass();
+  $('body').addClass(historyData.background);
+
   var rowIndex = -1;
-  for(var i = 0; i < historyData.length; i++) {
-    var entry = historyData[i];
+  for(var i = 0; i < historyData.figures.length; i++) {
+    var entry = historyData.figures[i];
 
     var colIndex = (entry.column - 1) % COLS_PER_ROW;
     if(i % COLS_PER_ROW === 0) rowIndex ++;
@@ -23,6 +26,7 @@ ws.onmessage = function (event) {
     imgTag.removeClass();
     imgTag.addClass(entry.color);
     imgTag.tooltip({"title": entry.info, "placement":"bottom"});
+
   };
 
 };
