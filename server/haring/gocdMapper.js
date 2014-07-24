@@ -23,37 +23,33 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     ccTrayReader.readActivity(mapActivityDataToFigures, callWhenDone);
   };
 
-  var trueFn = function() { return true; };
+  function getFigureType(entry, lastEntryWasSuccessful) {
+
+    if(entry.wasSuccessful() && !lastEntryWasSuccessful) {
+      return 'flying';
+    } else if (entry.wasSuccessful()) {
+      return 'walking';
+    } else if ( ! entry.wasSuccessful() && !lastEntryWasSuccessful) {
+      return 'crawling';
+    } else {
+      return 'stumbling';
+    }
+  }
+
+  function getColor(entry) {
+    if(entry.wasSuccessful()) {
+      return colorsSuccess[Math.floor(Math.random()*colorsSuccess.length)];
+    } else {
+      return colorsFailure[Math.floor(Math.random()*colorsFailure.length)];
+    }
+  }
 
   function mapPipelineDataToFigures(history, callWhenDone) {
 
-    function getInfo(historyEntry) {
+    function getInfo(historyEntry, buildNumber) {
       var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
       var theResult = historyEntry.wasSuccessful() ? 'Success' : 'Stage failed: ' + historyEntry.stageFailed;
-      return theTime + ' ' + theResult;
-    }
-
-    function getFigureType(entry, lastEntry) {
-
-      lastEntry = lastEntry || { wasSuccessful: trueFn };
-
-      if(entry.wasSuccessful() && !lastEntry.wasSuccessful()) {
-        return 'flying';
-      } else if (entry.wasSuccessful()) {
-        return 'walking';
-      } else if ( ! entry.wasSuccessful() && !lastEntry.wasSuccessful()) {
-        return 'crawling';
-      } else {
-        return 'stumbling';
-      }
-    }
-
-    function getColor(historyEntry) {
-      if(historyEntry.wasSuccessful()) {
-        return colorsSuccess[Math.floor(Math.random()*colorsSuccess.length)];
-      } else {
-        return colorsFailure[Math.floor(Math.random()*colorsFailure.length)];
-      }
+      return '[' + buildNumber + '] ' + theTime + ' ' + theResult;
     }
 
     var keysDescending = _.keys(history).sort().reverse();
@@ -64,8 +60,8 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       return {
         color: getColor(entry),
         column: index + 1,
-        info: getInfo(entry),
-        type: getFigureType(entry, previous)
+        info: getInfo(entry, key),
+        type: getFigureType(entry, previous ? previous.wasSuccessful() : true)
       };
     });
 
@@ -80,21 +76,39 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
   function mapActivityDataToFigures(activity, callWhenDone) {
 
-    function getFigureType(entry) {
+    function getFigureTypeForActivity(entry) {
 
       if(entry.activity === 'Building') {
         return 'skating';
       } else {
-        return 'dog';
+        return getFigureType(entry, true);
+      }
+    }
+
+    function getColor(entry) {
+      if(entry.lastBuildStatus === 'Success') {
+        return colorsSuccess[Math.floor(Math.random()*colorsSuccess.length)];
+      } else if (entry.lastBuildStatus === 'Failure') {
+        return colorsFailure[Math.floor(Math.random()*colorsFailure.length)];
+      } else {
+        return 'grey';
+      }
+    }
+
+    function getInfo(entry) {
+      if(entry.activity === 'Building') {
+        return entry.name + ' is building';
+      } else {
+        return entry.name + ' ' + entry.lastBuildStatus;
       }
     }
 
     var figures = _.map(activity, function(entry, index) {
       return {
-        color: 'green',
+        color: getColor(entry),
         column: index + 1,
-        info: 'This is some info',
-        type: getFigureType(entry)
+        info: getInfo(entry),
+        type: getFigureTypeForActivity(entry)
       }
     });
 

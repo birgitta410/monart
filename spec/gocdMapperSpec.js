@@ -2,13 +2,15 @@ var _ = require('lodash');
 var gocdMapperModule = require('../server/haring/gocdMapper');
 
 describe('Go CD Mapper', function () {
+
+  var notSuccessfulFn = function() { return false; };
+  var successfulFn = function() { return true; };
+
   describe('mapPipelineDataToFigures()', function () {
 
     var theGocdMapper, mockPipelineReader;
     var fakePipelineHistory;
     var mockTime = { format: function () { } };
-    var notSuccessfulFn = function() { return false; };
-    var successfulFn = function() { return true; };
 
     beforeEach(function() {
       mockPipelineReader = {
@@ -103,13 +105,15 @@ describe('Go CD Mapper', function () {
       });
     });
 
-    it('should return dog type if sleeping', function () {
+    it('should return type according to last build status if sleeping', function () {
       fakeActivity = [
-        { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Sleeping' }
+        { name : 'A-PIPELINE :: integration-test :: backend-integration', wasSuccessful: successfulFn, activity: 'Sleeping' },
+        { name : 'A-PIPELINE :: deploy-dev :: backend', wasSuccessful: notSuccessfulFn, activity: 'Sleeping' }
       ];
       theGocdMapper.readActivity(function(result) {
-        expect(result.figures.length).toBe(1);
-        expect(result.figures[0].type).toBe('dog');
+        expect(result.figures.length).toBe(2);
+        expect(result.figures[0].type).toBe('walking');
+        expect(result.figures[1].type).toBe('stumbling');
       });
     });
 

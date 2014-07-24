@@ -26,6 +26,7 @@ wssHaring.on('connection', function(ws) {
 
           haringGocdMapper.readHistory(function(historyData) {
             activityData.figures = activityData.figures.concat(historyData.figures);
+            activityData.background = historyData.background;
             ws.send(JSON.stringify(activityData), function() {  });
           });
 

@@ -21,6 +21,11 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
       _.each(result.Projects.Project, function(project) {
         var pathElements = project.name.split(' :: ');
         if (pathElements.length === 3) {
+          project = _.extend(project, {
+            wasSuccessful: function() {
+              return project.lastBuildStatus === 'Success';
+            }
+          });
           activity.push(project);
         }
       });
