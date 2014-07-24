@@ -25,7 +25,7 @@ describe('pipelineFeedReader', function () {
     });
 
     it('should initialise a set of pipeline runs', function () {
-      thePipelineFeedReader.init();
+//      thePipelineFeedReader.init();
       thePipelineFeedReader.readHistory(function(results) {
         expect(_.keys(results).length).toBe(11); //1199 - 1189
         expect(results['1199']).toBeDefined();
@@ -33,7 +33,7 @@ describe('pipelineFeedReader', function () {
     });
 
     it('should determine the time the last stage finished', function () {
-      thePipelineFeedReader.init();
+//      thePipelineFeedReader.init();
       thePipelineFeedReader.readHistory(function(results) {
         var expectedTime = moment('2014-07-18T16:08:39+00:00');
         var actualTime = moment(results['1199'].time);
@@ -44,7 +44,7 @@ describe('pipelineFeedReader', function () {
     });
 
     it('should determine the result of the pipeline', function () {
-      thePipelineFeedReader.init();
+//      thePipelineFeedReader.init();
       thePipelineFeedReader.readHistory(function(results) {
         expect(results['1199'].result).toBe('passed');
         expect(results['1195'].result).toBe('failed');

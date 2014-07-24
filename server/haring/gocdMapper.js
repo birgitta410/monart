@@ -1,13 +1,7 @@
 var _ = require('lodash');
 var moment = require('moment');
 
-function gocdMapperCreator(pipelineReader) {
-
-  pipelineReader.init();
-
-  var readHistory = function(callWhenDone) {
-    pipelineReader.readHistory(mapPipelineDataToFigures, callWhenDone);
-  };
+function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
   var colorsSuccess = [
     'dark-green',
@@ -20,6 +14,14 @@ function gocdMapperCreator(pipelineReader) {
     'pink',
     'yellow'
   ];
+
+  var readHistory = function(callWhenDone) {
+    pipelineReader.readHistory(mapPipelineDataToFigures, callWhenDone);
+  };
+
+  var readActivity = function(callWhenDone) {
+    ccTrayReader.readActivity(mapActivityDataToFigures, callWhenDone);
+  };
 
   var trueFn = function() { return true; };
 
@@ -76,14 +78,41 @@ function gocdMapperCreator(pipelineReader) {
     }, changesExist);
   }
 
+  function mapActivityDataToFigures(activity, callWhenDone) {
+
+    function getFigureType(entry) {
+
+      if(entry.activity === 'Building') {
+        return 'skating';
+      } else {
+        return 'dog';
+      }
+    }
+
+    var figures = _.map(activity, function(entry, index) {
+      return {
+        color: 'green',
+        column: index + 1,
+        info: 'This is some info',
+        type: getFigureType(entry)
+      }
+    });
+
+    var changesExist = true;
+    callWhenDone(figures, changesExist);
+  }
+
   return {
-    readHistory: readHistory
+    readHistory: readHistory,
+    readActivity: readActivity
   }
 }
 
 
 var pipelineReader = require('../sources/gocd/pipelineFeedReader.js');
-var gocdMapper = gocdMapperCreator(pipelineReader);
+var ccTrayReader = require('../sources/cc/ccTrayReader.js');
+var gocdMapper = gocdMapperCreator(pipelineReader, ccTrayReader);
 
 exports.create = gocdMapperCreator;
 exports.readHistory = gocdMapper.readHistory;
+exports.readActivity = gocdMapper.readActivity;

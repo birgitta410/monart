@@ -28,12 +28,13 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
     });
   };
 
-  var readActivity = function(callback) {
-    callback(activity);
+  var readActivity = function(callback, callbackParameter) {
+    callback(activity, callbackParameter);
   };
 
+  init();
+
   return {
-    init: init,
     readActivity: readActivity
   };
 };
@@ -42,5 +43,4 @@ var ccTrayRequestorCreator = require('./ccTrayRequestor.js');
 var ccTrayReader = ccTrayReaderCreator(ccTrayRequestorCreator.create());
 
 exports.create = ccTrayReaderCreator;
-exports.init = ccTrayReader.init;
 exports.readActivity = ccTrayReader.readActivity;

@@ -12,7 +12,6 @@ describe('Go CD Mapper', function () {
 
     beforeEach(function() {
       mockPipelineReader = {
-        init: jasmine.createSpy('init'),
         readHistory: function(callback, callbackParameter) {
           callback(fakePipelineHistory, callbackParameter);
         }
@@ -20,7 +19,7 @@ describe('Go CD Mapper', function () {
       theGocdMapper = gocdMapperModule.create(mockPipelineReader);
     });
 
-    it('should return crawling image if failed and previous one was failure as well', function () {
+    it('should return crawling type if failed and previous one was failure as well', function () {
       fakePipelineHistory = {
         '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
         '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
@@ -32,7 +31,7 @@ describe('Go CD Mapper', function () {
 
     });
 
-    it('should return flying image if previous failed, current is success', function () {
+    it('should return flying type if previous failed, current is success', function () {
       // descending order, newest first
       fakePipelineHistory = {
         '124': { wasSuccessful: successfulFn, time: mockTime } ,
@@ -45,7 +44,7 @@ describe('Go CD Mapper', function () {
 
     });
 
-    it('should return stumbling image if previous was successful', function () {
+    it('should return stumbling type if previous was successful', function () {
       // descending order, newest first
       fakePipelineHistory = {
         '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
@@ -68,7 +67,7 @@ describe('Go CD Mapper', function () {
       });
     });
 
-    it('should set orange background colour if latest build failed', function () {
+    it('should set green background colour if latest build successful', function () {
       fakePipelineHistory = {
         '124': { wasSuccessful: successfulFn, time: mockTime },
         '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
@@ -79,4 +78,41 @@ describe('Go CD Mapper', function () {
     });
 
   });
+
+  describe('mapPipelineDataToFigures()', function () {
+
+    var theGocdMapper, mockCcTrayReader;
+    var fakeActivity;
+
+    beforeEach(function () {
+      mockCcTrayReader = {
+        readActivity: function (callback, callbackParameter) {
+          callback(fakeActivity, callbackParameter);
+        }
+      };
+      theGocdMapper = gocdMapperModule.create({}, mockCcTrayReader);
+    });
+
+    it('should return skating type if currently building', function () {
+      fakeActivity = [
+        { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Building' }
+      ];
+      theGocdMapper.readActivity(function(result) {
+        expect(result.length).toBe(1);
+        expect(result[0].type).toBe('skating');
+      });
+    });
+
+    it('should return dog type if sleeping', function () {
+      fakeActivity = [
+        { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Sleeping' }
+      ];
+      theGocdMapper.readActivity(function(result) {
+        expect(result.length).toBe(1);
+        expect(result[0].type).toBe('dog');
+      });
+    });
+
+  });
+
 });

@@ -74,8 +74,9 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
   };
 
+  init();
   return {
-    init: init,
+//    init: init,
     readHistory: readHistory
   };
 }
@@ -85,5 +86,5 @@ var atomEntryParserCreator = require('./atomEntryParser.js');
 var pipelineFeedReader = pipelineFeedReaderCreator(gocdRequestorCreator.create(), atomEntryParserCreator.create());
 
 exports.create = pipelineFeedReaderCreator;
-exports.init = pipelineFeedReader.init;
+//exports.init = pipelineFeedReader.init;
 exports.readHistory = pipelineFeedReader.readHistory;
