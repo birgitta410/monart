@@ -8,8 +8,9 @@ ws.onmessage = function (event) {
   var historyData = JSON.parse(event.data);
   console.log(historyData);
 
-  $('body').removeClass();
-  $('body').addClass(historyData.background);
+  var bodyTag = $('body');
+  bodyTag.removeClass();
+  bodyTag.addClass(historyData.background);
 
   var rowIndex = -1;
   for(var i = 0; i < historyData.figures.length; i++) {
@@ -21,14 +22,17 @@ ws.onmessage = function (event) {
     var rowDiv = $($('.row')[rowIndex]);
     var columnDiv = $(rowDiv.find('.haring-border')[colIndex]);
 
+    if(rowIndex <= 1) {
+      columnDiv.addClass('small');
+    }
+
     var imgTag = $(columnDiv.find('img'));
     imgTag.attr('src', 'images/haring/' + entry.type + '.png');
     imgTag.removeClass();
     imgTag.addClass(entry.color);
-    console.log(entry.info);
     // TODO: Tooltip overwrite does not seem possible?
     imgTag.tooltip({"title": entry.info, "placement":"bottom"});
 
-  };
+  }
 
 };
