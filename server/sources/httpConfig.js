@@ -2,10 +2,10 @@ var yaml_config = require('node-yaml-config');
 var request = require('request');
 var xml2json = require('xml2json');
 
-exports.create = function(configFile) {
+exports.create = function(configKey) {
 
   var config;
-  var id = configFile.replace('.yml', '').substr(configFile.lastIndexOf('/') + 1);
+  var id = configKey;
 
   init();
 
@@ -15,7 +15,7 @@ exports.create = function(configFile) {
 
   function init() {
     try {
-      config = yaml_config.load(__dirname + '/' + configFile);
+      config = yaml_config.load(__dirname + '/config.yml');
     } catch (err) {
       console.log('could not read yml, trying Heroku vars');
 

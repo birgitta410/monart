@@ -7,7 +7,7 @@ exports.get = ccTrayRequestor.get;
 
 function ccTrayRequestorCreator(request, xml2json) {
 
-  var config = require('../httpConfig.js').create('cc/cc.yml');
+  var config = require('../httpConfig.js').create('cc');
   var url = config.get().url; // ccTray file URL from config file
 
   if(ccTrayRequestor !== undefined) {
