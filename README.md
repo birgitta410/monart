@@ -22,7 +22,7 @@ Create file `server/sources/gocd/gocd.yml`
 Content:
 ```
 default:
-  goCd:
+  gocd:
     user: xxx
     password: xxxx
     url: http://the-go-host:8153
