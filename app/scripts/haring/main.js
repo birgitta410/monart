@@ -16,15 +16,11 @@ ws.onmessage = function (event) {
   for(var i = 0; i < historyData.figures.length; i++) {
     var entry = historyData.figures[i];
 
-    var colIndex = (entry.column - 1) % COLS_PER_ROW;
+    var colIndex = i % COLS_PER_ROW;
     if(i % COLS_PER_ROW === 0) rowIndex ++;
 
     var rowDiv = $($('.row')[rowIndex]);
     var columnDiv = $(rowDiv.find('.haring-border')[colIndex]);
-
-    if(rowIndex <= 1) {
-      columnDiv.addClass('small');
-    }
 
     var imgTag = $(columnDiv.find('img'));
     imgTag.attr('src', 'images/haring/' + entry.type + '.png');

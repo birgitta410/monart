@@ -63,7 +63,6 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
       return {
         color: getColor(entry),
-        column: index + 1,
         info: getInfo(entry, key),
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true)
       };
@@ -110,7 +109,6 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     var figures = _.map(activity, function(entry, index) {
       return {
         color: getColor(entry),
-        column: index + 1,
         info: getInfo(entry),
         type: getFigureTypeForActivity(entry)
       }
