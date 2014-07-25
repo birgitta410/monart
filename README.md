@@ -16,6 +16,18 @@ Application URL
 Start tests
 `jasmine-node . --autotest`
 
+###Add configuration for a Go CD server
+Create file `server/sources/gocd/gocd.yml`
+
+Content:
+```
+default:
+  goCd:
+    user: xxx
+    password: xxxx
+    url: http://the-go-host:8153
+```
+
 
 ###Add credentials for contextIO email reader
 Create file `server/sources/email/contextio.yml`

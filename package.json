@@ -8,6 +8,7 @@
     "contextio": "~0.4.0",
     "node-yaml-config": "0.0.2",
     "ws": "~0.4.31",
-    "xml2json": "~0.4.0"
+    "xml2json": "~0.4.0",
+    "request": "~2.39.0"
   }
 }

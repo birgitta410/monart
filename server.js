@@ -15,6 +15,8 @@ var haringGocdMapper = require('./server/haring/gocdMapper.js');
 var wssHaring = new WebSocketServer({server: server, path: '/haring'});
 console.log('haring websocket server created');
 
+haringGocdMapper.init();
+
 wssHaring.on('connection', function(ws) {
   console.log('connected to /haring');
 

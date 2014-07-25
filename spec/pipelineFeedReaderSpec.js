@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var fs = require('fs');
 var moment = require('moment');
+
 var thePipelineFeedReaderModule = require('../server/sources/gocd/pipelineFeedReader.js');
 var theAtomEntryParserModule = require('../server/sources/gocd/atomEntryParser.js');
 
@@ -21,7 +22,9 @@ describe('pipelineFeedReader', function () {
 
         }
       };
+
       thePipelineFeedReader = thePipelineFeedReaderModule.create(mockGocdRequestor, theAtomEntryParserModule.create());
+      thePipelineFeedReader.init();
     });
 
     it('should initialise a set of pipeline runs', function () {

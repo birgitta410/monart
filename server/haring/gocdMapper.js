@@ -15,6 +15,10 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     'yellow'
   ];
 
+  var init = function() {
+    pipelineReader.init();
+  };
+
   var readHistory = function(callWhenDone) {
     pipelineReader.readHistory(mapPipelineDataToFigures, callWhenDone);
   };
@@ -117,6 +121,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
   }
 
   return {
+    init: init,
     readHistory: readHistory,
     readActivity: readActivity
   }
@@ -128,5 +133,6 @@ var ccTrayReader = require('../sources/cc/ccTrayReader.js');
 var gocdMapper = gocdMapperCreator(pipelineReader, ccTrayReader);
 
 exports.create = gocdMapperCreator;
+exports.init = gocdMapper.init;
 exports.readHistory = gocdMapper.readHistory;
 exports.readActivity = gocdMapper.readActivity;

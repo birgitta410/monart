@@ -8,10 +8,6 @@
     <link rel="self" href="spec/fixtures/pipeline-stages-page2.xml"/>
 
 
-    <link rel="next" href=""/>
-
-
-
     <entry>
         <title><![CDATA[A-PIPELINE(1195) stage build(1) Passed]]></title>
         <updated>2014-07-18T13:43:58+00:00</updated>

@@ -46,20 +46,21 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
   }
 
-  var next = undefined;
+  var nextUrl = undefined;
 
   var init = function () {
+    initialised = true;
 
-    requestStages(next, function (result) {
-
+    requestStages(nextUrl, function (result) {
       if(result !== undefined) {
-
         _.each(result.feed.entry, pushEntryToPipelineHistory);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineFinishTime);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineResult);
-        next = _.find(result.feed.link, { rel: 'next' }).href;
 
-        if (next && _.keys(pipelineHistory).length < MAX_NUMBER_HISTORY) {
+        var nextLink = _.find(result.feed.link, { rel: 'next' });
+
+        if (nextLink && _.keys(pipelineHistory).length < MAX_NUMBER_HISTORY) {
+          nextUrl = nextLink.href;
           init();
         }
       }
@@ -69,14 +70,11 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
   };
 
   var readHistory = function(callback, callbackParameter) {
-
     callback(pipelineHistory, callbackParameter);
-
   };
 
-  init();
   return {
-//    init: init,
+    init: init,
     readHistory: readHistory
   };
 }
@@ -86,5 +84,5 @@ var atomEntryParserCreator = require('./atomEntryParser.js');
 var pipelineFeedReader = pipelineFeedReaderCreator(gocdRequestorCreator.create(), atomEntryParserCreator.create());
 
 exports.create = pipelineFeedReaderCreator;
-//exports.init = pipelineFeedReader.init;
+exports.init = pipelineFeedReader.init;
 exports.readHistory = pipelineFeedReader.readHistory;
