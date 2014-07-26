@@ -13,7 +13,9 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
     });
   };
 
-  var init = function() {
+
+  var readActivity = function(callback, callbackParameter) {
+
     requestActivity(function (result) {
 
       // Assumption (Go CD): Jobs are the ones with 3 path elements
@@ -29,15 +31,12 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
           activity.push(project);
         }
       });
+      callback(activity, callbackParameter);
 
     });
-  };
 
-  var readActivity = function(callback, callbackParameter) {
-    callback(activity, callbackParameter);
-  };
 
-  init();
+  };
 
   return {
     readActivity: readActivity
