@@ -1,32 +1,40 @@
 
-.haring-border {
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.figure-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.figure-wrapper {
+  width: 100%;
+  padding-bottom: 13%;
+  flex: 1;
+  position: relative;
+}
+.figure {
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
   background: url('../images/haring/border.png') no-repeat;
   background-size: 100%;
-  min-height: 180px;
-  min-width: 228px;
+
   text-align: center;
-  padding-top: 25px;
+
 }
 
-.haring-border.small {
-  background-size: 100% 80%;
-}
-
-.haring-border img {
-  max-height: 140px;
-  max-width: 190px;
-}
-
-.haring-border.small img {
-  max-height: 100px;
-  max-width: 150px;
-}
-
-.haring-border .less-important {
-  max-height: 100px;
-  max-width: 100px;
-  margin-top: 30px;
-  background-color: #ccc;
+.figure img {
+  max-width: 70%;
+  max-height: 70%;
+  margin-top: 15%;
 }
 
 .green {
@@ -52,4 +60,7 @@
 }
 .yellow {
   background-color: #fecd1b;
+}
+.grey {
+  background-color: #cccccc;
 }

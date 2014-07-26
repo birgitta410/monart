@@ -10,7 +10,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
   ];
 
   var colorsFailure = [
-    'orange',
+    'red',
     'pink',
     'yellow'
   ];
