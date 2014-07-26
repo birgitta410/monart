@@ -15,16 +15,12 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     'yellow'
   ];
 
-  var init = function() {
-    pipelineReader.init();
-  };
-
   var readHistory = function(callWhenDone) {
-    pipelineReader.readHistory(mapPipelineDataToFigures, callWhenDone);
+    pipelineReader.readHistory(mapPipelineDataToFigures, { callbackParameter: callWhenDone });
   };
 
   var readActivity = function(callWhenDone) {
-    ccTrayReader.readActivity(mapActivityDataToFigures, callWhenDone);
+    ccTrayReader.readActivity(mapActivityDataToFigures, { callbackParameter: callWhenDone });
   };
 
   function getFigureType(entry, lastEntryWasSuccessful) {
@@ -106,7 +102,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       }
     }
 
-    var figures = _.map(activity, function(entry, index) {
+    var figures = _.map(activity, function(entry) {
       return {
         color: getColor(entry),
         info: getInfo(entry),
@@ -119,7 +115,6 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
   }
 
   return {
-    init: init,
     readHistory: readHistory,
     readActivity: readActivity
   }
@@ -131,6 +126,5 @@ var ccTrayReader = require('../sources/cc/ccTrayReader.js');
 var gocdMapper = gocdMapperCreator(pipelineReader, ccTrayReader);
 
 exports.create = gocdMapperCreator;
-exports.init = gocdMapper.init;
 exports.readHistory = gocdMapper.readHistory;
 exports.readActivity = gocdMapper.readActivity;

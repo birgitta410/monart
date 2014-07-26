@@ -14,7 +14,9 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
   };
 
 
-  var readActivity = function(callback, callbackParameter) {
+  var readActivity = function(callback, options) {
+
+    options = options || {};
 
     requestActivity(function (result) {
 
@@ -31,7 +33,7 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
           activity.push(project);
         }
       });
-      callback(activity, callbackParameter);
+      callback(activity, options.callbackParameter);
 
     });
 

@@ -6,7 +6,7 @@ var thePipelineFeedReaderModule = require('../server/sources/gocd/pipelineFeedRe
 var theAtomEntryParserModule = require('../server/sources/gocd/atomEntryParser.js');
 
 describe('pipelineFeedReader', function () {
-  describe('init()', function () {
+  describe('readHistory()', function () {
 
     var thePipelineFeedReader
       , mockGocdRequestor
@@ -24,7 +24,7 @@ describe('pipelineFeedReader', function () {
       };
 
       thePipelineFeedReader = thePipelineFeedReaderModule.create(mockGocdRequestor, theAtomEntryParserModule.create());
-      thePipelineFeedReader.init();
+
     });
 
     it('should initialise a set of pipeline runs', function () {
@@ -32,6 +32,27 @@ describe('pipelineFeedReader', function () {
         expect(_.keys(results).length).toBe(11); //1199 - 1189
         expect(results['1199']).toBeDefined();
       });
+    });
+
+    it('should pass through a parameter for the callback', function () {
+      thePipelineFeedReader.readHistory(function(results, parameter) {
+        expect(parameter).toBe('aParameter');
+      }, { callbackParameter: 'aParameter' });
+    });
+
+    it('should pass no url to the requestor in initial call', function () {
+      spyOn(mockGocdRequestor, 'get');
+      thePipelineFeedReader.readHistory(function(results, parameter) { });
+      expect(mockGocdRequestor.get).toHaveBeenCalledWith(undefined, jasmine.any(Function));
+    });
+
+    it('should pass a next url to the requestor', function () {
+      spyOn(mockGocdRequestor, 'get');
+      thePipelineFeedReader.readHistory(function(results, parameter) { }, {
+        callbackParameter: 'aParameter',
+        nextUrl: 'nextUrl'
+      });
+      expect(mockGocdRequestor.get).toHaveBeenCalledWith('nextUrl', jasmine.any(Function));
     });
 
     it('should determine the time the last stage finished', function () {

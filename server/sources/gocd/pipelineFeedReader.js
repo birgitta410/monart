@@ -40,18 +40,16 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
     }
     historyEntry.wasSuccessful = function() {
       return historyEntry.result === 'passed';
-    }
+    };
 
     return historyEntry;
 
   }
 
-  var nextUrl = undefined;
+  var readHistory = function (callback, options) {
+    options = options || {};
 
-  var init = function () {
-    initialised = true;
-
-    requestStages(nextUrl, function (result) {
+    requestStages(options.nextUrl, function (result) {
       if(result !== undefined) {
         _.each(result.feed.entry, pushEntryToPipelineHistory);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineFinishTime);
@@ -61,7 +59,9 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
         if (nextLink && _.keys(pipelineHistory).length < MAX_NUMBER_HISTORY) {
           nextUrl = nextLink.href;
-          init();
+          readHistory(callback, _.extend(options, { nextUrl: nextUrl }));
+        } else {
+          callback(pipelineHistory, options.callbackParameter);
         }
       }
 
@@ -69,15 +69,10 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
   };
 
-  var readHistory = function(callback, callbackParameter) {
-    callback(pipelineHistory, callbackParameter);
-  };
-
   return {
-    init: init,
     readHistory: readHistory
   };
-}
+};
 
 var gocdRequestorCreator = require('./gocdRequestor.js');
 var atomEntryParserCreator = require('./atomEntryParser.js');

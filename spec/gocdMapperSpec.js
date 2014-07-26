@@ -14,8 +14,8 @@ describe('Go CD Mapper', function () {
 
     beforeEach(function() {
       mockPipelineReader = {
-        readHistory: function(callback, callbackParameter) {
-          callback(fakePipelineHistory, callbackParameter);
+        readHistory: function(callback) {
+          callback(fakePipelineHistory, function() {});
         }
       };
       theGocdMapper = gocdMapperModule.create(mockPipelineReader);
@@ -81,15 +81,15 @@ describe('Go CD Mapper', function () {
 
   });
 
-  describe('mapPipelineDataToFigures()', function () {
+  describe('mapActivityDataToFigures()', function () {
 
     var theGocdMapper, mockCcTrayReader;
     var fakeActivity;
 
     beforeEach(function () {
       mockCcTrayReader = {
-        readActivity: function (callback, callbackParameter) {
-          callback(fakeActivity, callbackParameter);
+        readActivity: function (callback) {
+          callback(fakeActivity, function() {});
         }
       };
       theGocdMapper = gocdMapperModule.create({}, mockCcTrayReader);

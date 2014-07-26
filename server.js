@@ -15,8 +15,6 @@ var haringGocdMapper = require('./server/haring/gocdMapper.js');
 var wssHaring = new WebSocketServer({server: server, path: '/haring'});
 console.log('haring websocket server created');
 
-haringGocdMapper.init();
-
 wssHaring.on('connection', function(ws) {
   console.log('connected to /haring');
 
@@ -38,21 +36,9 @@ wssHaring.on('connection', function(ws) {
       });
     }
 
-    function getHistoryAndUpdateClients() {
-
-      haringGocdMapper.readHistory(function(historyData, doChangesExist) {
-        if(doChangesExist) {
-          ws.send(JSON.stringify(historyData), function() {  });
-        } else {
-          console.log('no changes');
-        }
-      });
-
-    }
-
     getActivityAndUpdateClients();
-    var id = setInterval(getActivityAndUpdateClients, 5000);
-    return id;
+    var clientId = setInterval(getActivityAndUpdateClients, 5000);
+    return clientId;
   }
 
   var clientId = newClient();
@@ -81,20 +67,20 @@ wssMondrian.on('connection', function(ws) {
 
         // if (numberOfUpdatesMade < 5) {
         console.log('checking for updates (' + numberOfUpdatesMade + ')');
-        var currentData = mondrianEmailMapper.readEmail(function(emailData, doChangesExist) {
-            if(doChangesExist || numberOfUpdatesMade <= 2) {
-              console.log('CHANGES!');
-              ws.send(JSON.stringify(emailData), function() {  });    
-            } else {
-              console.log('no changes');
-            }
-          });
+        mondrianEmailMapper.readEmail(function(emailData, doChangesExist) {
+          if(doChangesExist || numberOfUpdatesMade <= 2) {
+            console.log('CHANGES!');
+            ws.send(JSON.stringify(emailData), function() {  });
+          } else {
+            console.log('no changes');
+          }
+        });
         // }
       }
 
       getEmailsAndUpdateClients();
-      var id = setInterval(getEmailsAndUpdateClients, 5000);
-      return id;
+      var clientId = setInterval(getEmailsAndUpdateClients, 5000);
+      return clientId;
     }
 
     var clientId = newClient();
