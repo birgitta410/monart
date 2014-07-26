@@ -89,6 +89,34 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       }
     }
 
+    function getInitials(entry) {
+
+      var allMessages = [].concat(entry.messages || []); // xml2json creates object if array only has one entry
+
+      var breakersMessage = _.find(allMessages, function(message) {
+        return message.message.kind === 'Breakers';
+      });
+
+      if(breakersMessage !== undefined) {
+        var name = breakersMessage.message.text;
+        var emailIndex = name.indexOf('<');
+        if (emailIndex > -1) {
+          name = name.substr(0, emailIndex).trim();
+        }
+
+        var nameParts = name.split(' ');
+        var initials = _.map(nameParts, function(namePart, index) {
+          if (index !== nameParts.length - 1) {
+            return namePart[0];
+          } else {
+            return namePart [0] + namePart[1];
+          }
+        }).join('');
+
+        return initials.toLowerCase();
+      }
+    }
+
     function getColor(entry) {
       if(entry.lastBuildStatus === 'Success') {
         return colorsSuccess[Math.floor(Math.random()*colorsSuccess.length)];
@@ -111,7 +139,8 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       return {
         color: getColor(entry),
         info: getInfo(entry),
-        type: getFigureTypeForActivity(entry)
+        type: getFigureTypeForActivity(entry),
+        initials: getInitials(entry)
       }
     });
 

@@ -14,8 +14,8 @@ describe('Go CD Mapper', function () {
 
     beforeEach(function() {
       mockPipelineReader = {
-        readHistory: function(callback) {
-          callback(fakePipelineHistory, function() {});
+        readHistory: function(callback, options) {
+          callback(fakePipelineHistory, options.callbackParameter);
         }
       };
       theGocdMapper = gocdMapperModule.create(mockPipelineReader);
@@ -88,8 +88,8 @@ describe('Go CD Mapper', function () {
 
     beforeEach(function () {
       mockCcTrayReader = {
-        readActivity: function (callback) {
-          callback(fakeActivity, function() {});
+        readActivity: function (callback, options) {
+          callback(fakeActivity, options.callbackParameter);
         }
       };
       theGocdMapper = gocdMapperModule.create({}, mockCcTrayReader);
@@ -114,6 +114,21 @@ describe('Go CD Mapper', function () {
         expect(result.figures.length).toBe(2);
         expect(result.figures[0].type).toBe('walking');
         expect(result.figures[1].type).toBe('stumbling');
+      });
+    });
+
+    it('should create initials of person that broke a stage', function () {
+      fakeActivity = [ {
+        wasSuccessful: notSuccessfulFn,
+        messages: [ {
+          message: {
+            text: 'Max Mustermann <mmustermann@internet.se>',
+            kind: 'Breakers'
+            }
+        }]
+      } ];
+      theGocdMapper.readActivity(function(result) {
+        expect(result.figures[0].initials).toBe('mmu');
       });
     });
 
