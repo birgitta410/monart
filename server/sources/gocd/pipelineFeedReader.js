@@ -4,7 +4,7 @@ var _ = require('lodash');
 var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
-  var MAX_NUMBER_HISTORY = 25;
+  var MIN_NUMBER_HISTORY = 25;
 
   var requestStages = function (next, callback) {
     gocdRequestor.get(next, function(json) {
@@ -57,7 +57,7 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
         var nextLink = _.find(result.feed.link, { rel: 'next' });
 
-        if (nextLink && _.keys(pipelineHistory).length < MAX_NUMBER_HISTORY) {
+        if (nextLink && _.keys(pipelineHistory).length < MIN_NUMBER_HISTORY) {
           nextUrl = nextLink.href;
           readHistory(callback, _.extend(options, { nextUrl: nextUrl }));
         } else {
