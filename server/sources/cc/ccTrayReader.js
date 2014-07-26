@@ -2,8 +2,6 @@ var _ = require('lodash');
 
 var ccTrayReaderCreator = function (ccTrayRequestor) {
 
-  var activity = [];
-
   var requestActivity = function (callback) {
     ccTrayRequestor.get(function(json) {
       json.Projects.Project = _.map(json.Projects.Project, function(entry) {
@@ -17,6 +15,7 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
   var readActivity = function(callback, options) {
 
     options = options || {};
+    var activity = [];
 
     requestActivity(function (result) {
 

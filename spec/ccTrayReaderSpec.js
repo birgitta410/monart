@@ -28,5 +28,14 @@ describe('pipelineFeedReader', function () {
       });
     });
 
+    it('should stay the same number of activities when called twice', function () {
+      theCcTrayReader.readActivity(function(results) {
+        expect(results.length).toBe(12);
+        theCcTrayReader.readActivity(function(results) {
+          expect(results.length).toBe(12);
+        });
+      });
+    });
+
   });
 });
