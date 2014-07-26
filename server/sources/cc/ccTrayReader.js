@@ -23,11 +23,25 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
       // 'PIPELINE-NAME :: stage-name :: job-name'
       _.each(result.Projects.Project, function(project) {
         var pathElements = project.name.split(' :: ');
+
+        function parseBreaker() {
+          var allMessages = [].concat(project.messages || []); // xml2json creates object if array only has one entry
+
+          var breakersMessage = _.find(allMessages, function(message) {
+            return message.message.kind === 'Breakers';
+          });
+
+          if(breakersMessage !== undefined) {
+            return breakersMessage.message.text;
+          }
+        }
+
         if (pathElements.length === 3) {
           project = _.extend(project, {
             wasSuccessful: function() {
               return project.lastBuildStatus === 'Success';
-            }
+            },
+            breaker: parseBreaker()
           });
           activity.push(project);
         }

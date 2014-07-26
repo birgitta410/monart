@@ -37,5 +37,11 @@ describe('pipelineFeedReader', function () {
       });
     });
 
+    it('should parse the breaker\'s name/email from messages', function () {
+      theCcTrayReader.readActivity(function(results) {
+        expect(results[5].breaker).toContain('Max Mustermann');
+      });
+    });
+
   });
 });

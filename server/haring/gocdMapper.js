@@ -91,14 +91,8 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
     function getInitials(entry) {
 
-      var allMessages = [].concat(entry.messages || []); // xml2json creates object if array only has one entry
-
-      var breakersMessage = _.find(allMessages, function(message) {
-        return message.message.kind === 'Breakers';
-      });
-
-      if(breakersMessage !== undefined) {
-        var name = breakersMessage.message.text;
+      if(entry.breaker !== undefined) {
+        var name = entry.breaker;
         var emailIndex = name.indexOf('<');
         if (emailIndex > -1) {
           name = name.substr(0, emailIndex).trim();

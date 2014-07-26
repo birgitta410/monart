@@ -120,12 +120,7 @@ describe('Go CD Mapper', function () {
     it('should create initials of person that broke a stage', function () {
       fakeActivity = [ {
         wasSuccessful: notSuccessfulFn,
-        messages: [ {
-          message: {
-            text: 'Max Mustermann <mmustermann@internet.se>',
-            kind: 'Breakers'
-            }
-        }]
+        breaker: 'Max Mustermann <mmustermann@internet.se>'
       } ];
       theGocdMapper.readActivity(function(result) {
         expect(result.figures[0].initials).toBe('mmu');
