@@ -12,6 +12,7 @@ function buildGrid() {
       rowDiv.append(
       '<div class="figure-wrapper"><div class="figure">' +
           '<div class="bg"></div>' +
+          '<div class="letters"></div>' +
           '<img src="images/haring/dog.png" class="grey">' +
       '</div></div>');
     }
@@ -47,10 +48,19 @@ ws.onmessage = function (event) {
         .attr('data-original-title', entry.info)
         .tooltip('fixTitle');
 
-      var imgTag = $(columnDiv.find('img'));
+      var imgTag = $(columnDiv.find('> img'));
       imgTag.attr('src', 'images/haring/' + entry.type + '.png');
       imgTag.removeClass();
       imgTag.addClass(entry.color);
+
+      var lettersDiv = $(columnDiv.find('.letters'));
+      lettersDiv.empty();
+      if(entry.initials) {
+        console.log('entry.initials', entry.initials, entry.initials.length, entry.initials[0]);
+        for (var l = 0; l < entry.initials.length; l++) {
+          $('<img src="images/haring/alphabet/' + entry.initials[l] + '.svg">').appendTo(lettersDiv);
+        }
+      }
 
     } else {
       console.log('not enough rows');
