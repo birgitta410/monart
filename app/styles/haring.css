@@ -33,6 +33,12 @@
 }
 
 /*noinspection CssUnknownTarget*/
+.bg.ground {
+  background: url('../images/haring/ground.png') no-repeat bottom center;
+  background-size: 100%;
+}
+
+/*noinspection CssUnknownTarget*/
 .figure {
 
   position: absolute;
