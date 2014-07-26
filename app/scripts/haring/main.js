@@ -11,6 +11,7 @@ function buildGrid() {
     for (var c = 0; c < COLS_PER_ROW; c++) {
       rowDiv.append(
       '<div class="figure-wrapper"><div class="figure">' +
+          '<div class="bg"></div>' +
           '<img src="images/haring/dog.png" class="grey">' +
       '</div></div>');
     }
@@ -41,17 +42,15 @@ ws.onmessage = function (event) {
 
       var columnDiv = $(rowDiv.find('.figure')[colIndex]);
 
-      //    var infoSpan = $(columnDiv.find('.info'));
-      //    infoSpan.html(entry.info);
+      columnDiv.tooltip({ placement: 'bottom'})
+        .tooltip('hide')
+        .attr('data-original-title', entry.info)
+        .tooltip('fixTitle');
 
       var imgTag = $(columnDiv.find('img'));
       imgTag.attr('src', 'images/haring/' + entry.type + '.png');
       imgTag.removeClass();
       imgTag.addClass(entry.color);
-      imgTag.tooltip({ placement: 'bottom'})
-        .tooltip('hide')
-        .attr('data-original-title', entry.info)
-        .tooltip('fixTitle');
 
     } else {
       console.log('not enough rows');
