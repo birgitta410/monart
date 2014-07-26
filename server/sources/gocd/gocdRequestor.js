@@ -8,7 +8,7 @@ exports.get = gocdRequestor.get;
 function gocdRequestorCreator(xml2json, request) {
 
   var config = require('../httpConfig.js').create('gocd');
-  var STAGES_ENDPOINT = '/go/api/pipelines/artwise/stages.xml';
+  var STAGES_ENDPOINT = '/go/api/pipelines/' + config.get().pipeline + '/stages.xml';
 
   if(gocdRequestor !== undefined) {
     return gocdRequestor;
@@ -18,7 +18,7 @@ function gocdRequestorCreator(xml2json, request) {
 
     var url = next ? config.addCredentialsToUrl(next) : config.get().url;
 
-    console.log('Requesting', url);
+    console.log('Requesting', url + STAGES_ENDPOINT);
 
     request(url + STAGES_ENDPOINT, function(error, response, body) {
       var json = xml2json.toJson(body, {

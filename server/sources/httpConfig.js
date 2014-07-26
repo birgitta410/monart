@@ -23,7 +23,8 @@ exports.create = function(configKey) {
       config[id] = {
         user: process.env[id.toUpperCase() + '_USER'],
         password: process.env[id.toUpperCase() + '_PASSWORD'],
-        url: process.env[id.toUpperCase() + '_URL']
+        url: process.env[id.toUpperCase() + '_URL'],
+        pipeline: process.env[id.toUpperCase() + '_PIPELINE']
       };
 
       if(config[id].user === undefined || config[id].password === undefined || config[id].url === undefined) {
