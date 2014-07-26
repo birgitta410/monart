@@ -44,6 +44,11 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     }
   }
 
+  function compareNumbers(a, b) {
+    // JS does lexicographical sorting by default, need to sort by number
+    return a - b;
+  }
+
   function mapPipelineDataToFigures(history, callWhenDone) {
 
     function getInfo(historyEntry, buildNumber) {
@@ -52,7 +57,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       return '[' + buildNumber + '] ' + theTime + ' ' + theResult;
     }
 
-    var keysDescending = _.keys(history).sort().reverse();
+    var keysDescending = _.keys(history).sort(compareNumbers).reverse();
     var figures = _.map(keysDescending, function(key, index) {
       var entry = history[key];
       var previous = index < keysDescending.length ? history[keysDescending[index + 1]] : undefined;
