@@ -7,38 +7,12 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="716.52417"
-   height="955.94049"
-   id="svg4455"
    version="1.1"
-   inkscape:version="0.48.2 r9819"
-   sodipodi:docname="b.svg">
+   width="791.52417"
+   height="955.94049"
+   id="svg4455">
   <defs
      id="defs4457" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="-82.891764"
-     inkscape:cy="426.36821"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     inkscape:window-width="1174"
-     inkscape:window-height="735"
-     inkscape:window-x="20"
-     inkscape:window-y="20"
-     inkscape:window-maximized="0"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0" />
   <metadata
      id="metadata4460">
     <rdf:RDF>
@@ -52,14 +26,11 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(23.536808,-2.7898144)">
+     transform="translate(23.536808,-2.7898144)"
+     id="layer1">
     <path
-       style="fill:#000000"
        d="M 229.95877,901.60185 C -5.5523796,756.11718 -80.198528,550.39113 19.619396,321.89587 110.70642,113.38416 259.15276,2.7898144 447.93679,2.7898144 c 59.14229,0 123.65802,16.1273476 143.36984,35.8421176 50.10088,50.097951 14.35428,123.897898 -60.01446,123.897898 -93.95552,0 -234.74413,82.89196 -293.75527,172.95669 -28.96739,44.2098 -52.66627,139.12369 -52.66627,210.92401 0,118.76962 9.99665,134.72447 110.78924,176.83841 60.93765,25.46265 157.97975,46.51301 215.64904,46.78133 133.89403,0.64045 194.04253,39.1973 179.57333,115.15668 -17.00602,89.29477 -325.17641,100.26888 -460.92347,16.4149 z"
        id="path3579"
-       inkscape:connector-curvature="0" />
+       style="fill:#000000" />
   </g>
 </svg>

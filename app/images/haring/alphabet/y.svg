@@ -7,38 +7,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
-   width="909.97565"
+   width="969.97565"
    height="1054.1627"
-   id="svg4455"
-   inkscape:version="0.48.2 r9819"
-   sodipodi:docname="y.svg">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1075"
-     inkscape:window-height="715"
-     id="namedview5174"
-     showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:zoom="0.23718504"
-     inkscape:cx="560.5357"
-     inkscape:cy="190.41812"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg4455" />
+   id="svg4455">
   <defs
      id="defs4457" />
   <metadata
@@ -54,8 +26,7 @@
     </rdf:RDF>
   </metadata>
   <path
-     style="fill:#000000"
-     d="M 322.08771,856.78909 C 349.52744,687.70046 324.98264,624.66405 177.5126,485.47511 -3.9911907,314.16581 -61.632749,84.075846 76.95276,84.075846 c 42.38536,0 104.17265,60.010724 137.30343,133.355654 94.37458,208.92399 196.91324,199.85161 435.27884,-38.51401 C 917.29707,-88.844413 994.90611,-50.375496 805.44894,256.19965 729.1319,379.69099 609.11355,611.16719 538.73745,770.59365 389.884,1107.7973 273.86274,1153.9584 322.08771,856.78909 z"
+     d="M 322.08771,856.78909 C 349.52744,687.70046 324.98264,624.66405 177.5126,485.47511 -3.9911905,314.16581 -61.632749,84.075846 76.95276,84.075846 c 42.38536,0 104.17265,60.010724 137.30343,133.355654 94.37458,208.92399 196.91324,199.85161 435.27884,-38.51401 C 917.29707,-88.844413 994.90611,-50.375496 805.44894,256.19965 729.1319,379.69099 609.11355,611.16719 538.73745,770.59365 389.884,1107.7973 273.86274,1153.9584 322.08771,856.78909 z"
      id="path7485"
-     inkscape:connector-curvature="0" />
+     style="fill:#000000" />
 </svg>
