@@ -59,6 +59,20 @@ describe('Go CD Mapper', function () {
 
     });
 
+    it('should create initials of person that broke the pipeline run', function () {
+      fakePipelineHistory = {
+        '123': {
+          wasSuccessful: notSuccessfulFn,
+          time: mockTime,
+          breaker: 'Max Mustermann <mmustermann@internet.se>'
+        }
+      };
+
+      theGocdMapper.readHistory(function(result) {
+        expect(result.figures[0].initials).toBe('mmu');
+      });
+    });
+
     it('should set orange background colour if latest build failed', function () {
       fakePipelineHistory = {
         '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
@@ -117,7 +131,7 @@ describe('Go CD Mapper', function () {
       });
     });
 
-    it('should create initials of person that broke a stage', function () {
+    it('should create initials of person that broke a job', function () {
       fakeActivity = [ {
         wasSuccessful: notSuccessfulFn,
         breaker: 'Max Mustermann <mmustermann@internet.se>'

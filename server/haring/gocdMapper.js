@@ -44,6 +44,28 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     }
   }
 
+  function getInitials(entry) {
+
+    if(entry.breaker !== undefined) {
+      var name = entry.breaker;
+      var emailIndex = name.indexOf('<');
+      if (emailIndex > -1) {
+        name = name.substr(0, emailIndex).trim();
+      }
+
+      var nameParts = name.split(' ');
+      var initials = _.map(nameParts, function(namePart, index) {
+        if (index !== nameParts.length - 1) {
+          return namePart[0];
+        } else {
+          return namePart [0] + namePart[1];
+        }
+      }).join('');
+
+      return initials.toLowerCase();
+    }
+  }
+
   function compareNumbers(a, b) {
     // JS does lexicographical sorting by default, need to sort by number
     return a - b;
@@ -65,7 +87,8 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       return {
         color: getColor(entry),
         info: getInfo(entry, key),
-        type: getFigureType(entry, previous ? previous.wasSuccessful() : true)
+        type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
+        initials: getInitials(entry)
       };
     });
 
@@ -86,28 +109,6 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
         return 'skating';
       } else {
         return getFigureType(entry, true);
-      }
-    }
-
-    function getInitials(entry) {
-
-      if(entry.breaker !== undefined) {
-        var name = entry.breaker;
-        var emailIndex = name.indexOf('<');
-        if (emailIndex > -1) {
-          name = name.substr(0, emailIndex).trim();
-        }
-
-        var nameParts = name.split(' ');
-        var initials = _.map(nameParts, function(namePart, index) {
-          if (index !== nameParts.length - 1) {
-            return namePart[0];
-          } else {
-            return namePart [0] + namePart[1];
-          }
-        }).join('');
-
-        return initials.toLowerCase();
       }
     }
 

@@ -72,5 +72,27 @@ describe('pipelineFeedReader', function () {
       });
     });
 
+    it('should determine the breaker of the failed job', function () {
+      thePipelineFeedReader.readHistory(function(results) {
+        expect(results['1199'].result).toBe('passed');
+        expect(results['1199'].breaker).toBeUndefined();
+        expect(results['1195'].result).toBe('failed');
+        expect(results['1195'].breaker).toContain('Max Mustermann');
+      });
+    });
+
+    xit('should not add the same entries again when called twice', function () {
+      thePipelineFeedReader.readHistory(function(results) {
+        expect(_.keys(results).length).toBe(11);
+        expect(results['1199'].stages.length).toBe(5);
+
+        thePipelineFeedReader.readHistory(function(results) {
+          expect(_.keys(results).length).toBe(11);
+          expect(results['1199'].stages.length).toBe(5);
+        });
+
+      });
+    });
+
   });
 });

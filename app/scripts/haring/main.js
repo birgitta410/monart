@@ -58,7 +58,7 @@ ws.onmessage = function (event) {
       if(entry.initials) {
         console.log('entry.initials', entry.initials, entry.initials.length, entry.initials[0]);
         for (var l = 0; l < entry.initials.length; l++) {
-          $('<img src="images/haring/alphabet/' + entry.initials[l] + '.svg">').appendTo(lettersDiv);
+          $('<img src="images/haring/alphabet/' + entry.initials[l].toLowerCase() + '.svg">').appendTo(lettersDiv);
         }
       }
 

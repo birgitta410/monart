@@ -33,8 +33,11 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
   function mapPipelineResult(historyEntry) {
     var failedStages = _.where(historyEntry.stages, { result: 'failed' });
     if (failedStages.length > 0) {
-      historyEntry.result = 'failed';
-      historyEntry.stageFailed = failedStages[0].stageName;
+      _.extend(historyEntry, {
+        result : 'failed',
+        stageFailed : failedStages[0].stageName,
+        breaker : failedStages[0].breaker
+      });
     } else {
       historyEntry.result = 'passed';
     }
