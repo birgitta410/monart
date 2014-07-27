@@ -39,6 +39,18 @@ default:
     url: http://the-ci-host/<location of cctray.xml/cctray.xml
 ```
 
+Also supports Heroku config vars instead of these config files:
+
+```
+GOCD_USER
+GOCD_PASSWORD
+GOCD_URL
+GOCD_PIPELINE
+
+CC_USER
+CC_PASSWORD
+CC_URL
+```
 
 ###Add credentials for contextIO email reader
 Create file `server/sources/email/contextio.yml`
