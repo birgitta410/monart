@@ -65,14 +65,29 @@ describe('Go CD Mapper', function () {
           wasSuccessful: notSuccessfulFn,
           time: mockTime,
           breaker: {
-            name: 'Max Mustermann',
-            email: 'mmustermann@internet.se'
+            name: 'Max Mustermann'
+          }
+        },
+        '122': {
+          wasSuccessful: notSuccessfulFn,
+          time: mockTime,
+          breaker: {
+            name: 'Has Three Names'
+          }
+        },
+        '121': {
+          wasSuccessful: notSuccessfulFn,
+          time: mockTime,
+          breaker: {
+            name: 'Special Cäracter'
           }
         }
       };
 
       theGocdMapper.readHistory(function(result) {
         expect(result.figures[0].initials).toBe('mmu');
+        expect(result.figures[1].initials).toBe('htn');
+        expect(result.figures[2].initials).toBe('scx');
       });
     });
 

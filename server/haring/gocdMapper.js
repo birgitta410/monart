@@ -44,18 +44,29 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     }
   }
 
-  function getInitials(entry) {
+  function getInitialsOfBreaker(entry) {
+
+    function onlyAtoZ(character) {
+      var isLetter = character.toLowerCase() >= "a" && character.toLowerCase() <= "z";
+      if (! isLetter) {
+        return 'x';
+      } else {
+        return character;
+      }
+    }
+
     if(entry.breaker !== undefined && entry.breaker.name !== undefined) {
       var nameParts = entry.breaker.name.split(' ');
 
       var initials = _.map(nameParts, function(namePart, index) {
         if (index !== nameParts.length - 1) {
-          return namePart[0];
+          return onlyAtoZ(namePart[0]);
         } else {
-          return namePart [0] + namePart[1];
+          return onlyAtoZ(namePart[0]) + onlyAtoZ(namePart[1]);
         }
       }).join('');
-      return initials.toLowerCase();
+
+      return initials.toLowerCase().substr(0, 3);
     }
   }
 
@@ -66,9 +77,13 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
   function mapPipelineDataToFigures(history, callWhenDone) {
 
+    function getBrokenByInfo(historyEntry) {
+      return 'Broken by ' + (historyEntry.breaker ? historyEntry.breaker.name : 'UNKNOWN');
+    }
+
     function getInfo(historyEntry, buildNumber) {
       var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
-      var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | Broken by ' + historyEntry.breaker.name;
+      var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | ' + getBrokenByInfo(historyEntry);
       return '[' + buildNumber + '] ' + theTime + ' | ' + theResult;
     }
 
@@ -81,7 +96,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
         color: getColor(entry),
         info: getInfo(entry, key),
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
-        initials: getInitials(entry)
+        initials: getInitialsOfBreaker(entry)
       };
     });
 
@@ -120,7 +135,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
         return entry.name + ' is building';
       } else {
         var info = entry.name + ' | ' + entry.lastBuildStatus;
-        if(!entry.wasSuccessful()) {
+        if(!entry.wasSuccessful() && entry.breaker) {
           info += ' | broken by ' + entry.breaker.name;
         }
         return info;
@@ -132,7 +147,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
         color: getColor(entry),
         info: getInfo(entry),
         type: getFigureTypeForActivity(entry),
-        initials: getInitials(entry)
+        initials: getInitialsOfBreaker(entry)
       }
     });
 
