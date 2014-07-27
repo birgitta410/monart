@@ -44,5 +44,22 @@ describe('atomEntryParser', function () {
       expect(entry.result).toBe('passed');
     });
 
+    it('should not set the name of the breaker if stage passed', function () {
+      var entry = theAtomEntryParser.withData({ title: 'QEN(1197) stage build(1) Passed' });
+
+      expect(entry.breaker).toBeUndefined();
+    });
+
+    it('should set the name of the breaker if stage failed', function () {
+      var entry = theAtomEntryParser.withData({
+        title: 'QEN(1197) stage build(1) Failed',
+        author: {
+          name: 'Max Mustermann <mmustermann@internet.se>'
+        }
+      });
+
+      expect(entry.breaker).toContain('Max Mustermann');
+    });
+
   });
 });

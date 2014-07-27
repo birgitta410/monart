@@ -19,20 +19,22 @@ var atomEntryParserCreator = function () {
     };
   }
 
-  function parseParametersFromTitle(title) {
+  function parseResultAndBreaker(title, author) {
     if (title === undefined) return { };
 
     // 'QEN(1197) stage build(1) Passed'
     var titleChunks = title.split(' ');
     var result = titleChunks[3].toLowerCase();
+
     return {
-      result: result
+      result: result,
+      breaker: result === 'failed' && author !== undefined ? author.name : undefined
     }
   }
 
   var withData = function(data) {
     data = _.extend(data, parseParametersFromId(data.id));
-    return _.extend(data, parseParametersFromTitle(data.title));
+    return _.extend(data, parseResultAndBreaker(data.title, data.author));
   };
 
   return {
