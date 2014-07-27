@@ -77,13 +77,13 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
   function mapPipelineDataToFigures(history, callWhenDone) {
 
-    function getBrokenByInfo(historyEntry) {
-      return 'Broken by ' + (historyEntry.breaker ? historyEntry.breaker.name : 'UNKNOWN');
+    function getChangesByInfo(historyEntry) {
+      return 'changes by ' + (historyEntry.breaker ? historyEntry.breaker.name : 'UNKNOWN');
     }
 
     function getInfo(historyEntry, buildNumber) {
       var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
-      var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | ' + getBrokenByInfo(historyEntry);
+      var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | ' + getChangesByInfo(historyEntry);
       return '[' + buildNumber + '] ' + theTime + ' | ' + theResult;
     }
 
@@ -136,7 +136,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       } else {
         var info = entry.name + ' | ' + entry.lastBuildStatus;
         if(!entry.wasSuccessful() && entry.breaker) {
-          info += ' | broken by ' + entry.breaker.name;
+          info += ' | changes by ' + entry.breaker.name;
         }
         return info;
       }

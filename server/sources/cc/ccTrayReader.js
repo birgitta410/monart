@@ -2,6 +2,8 @@ var _ = require('lodash');
 
 var ccTrayReaderCreator = function (ccTrayRequestor) {
 
+  var MAX_JOBS = 6;
+
   var requestActivity = function (callback) {
     ccTrayRequestor.get(function(json) {
       json.Projects.Project = _.map(json.Projects.Project, function(entry) {
@@ -49,7 +51,7 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
           }
         }
 
-        if (pathElements.length === 3) {
+        if (pathElements.length === 3 && activity.length < MAX_JOBS) {
           project = _.extend(project, {
             wasSuccessful: function() {
               return project.lastBuildStatus === 'Success';
