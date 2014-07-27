@@ -56,7 +56,8 @@ ws.onmessage = function (event) {
         .tooltip('fixTitle');
 
       var imgTag = $(figureDiv.find('> img'));
-      imgTag.attr('src', 'images/haring/' + entry.type + '.png');
+      var imgExtension = entry.type === 'skating' ? '.gif' : '.png';
+      imgTag.attr('src', 'images/haring/' + entry.type + imgExtension);
       imgTag.removeClass();
       imgTag.addClass(entry.color);
 
