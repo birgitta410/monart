@@ -10,7 +10,7 @@ function buildGrid() {
     var rowDiv = $('<div class="figure-row"></div>').appendTo(container);
     for (var c = 0; c < COLS_PER_ROW; c++) {
       rowDiv.append(
-      '<div class="figure-wrapper"><div class="figure">' +
+      '<div class="figure-wrapper"><div class="figure solid">' +
           '<div class="bg"></div>' +
           '<div class="letters"></div>' +
           '<img src="images/haring/dog.png" class="grey">' +
@@ -41,19 +41,26 @@ ws.onmessage = function (event) {
     if(allRows.length > rowIndex) {
       var rowDiv = $(allRows[rowIndex]);
 
-      var columnDiv = $(rowDiv.find('.figure')[colIndex]);
+      var figureDiv = $(rowDiv.find('.figure')[colIndex]);
+      figureDiv.removeClass();
+      figureDiv.addClass('figure');
+      if(entry.border === 'dotted') {
+        figureDiv.addClass('dotted');
+      } else {
+        figureDiv.addClass('solid');
+      }
 
-      columnDiv.tooltip({ placement: 'bottom'})
+      figureDiv.tooltip({ placement: 'bottom'})
         .tooltip('hide')
         .attr('data-original-title', entry.info)
         .tooltip('fixTitle');
 
-      var imgTag = $(columnDiv.find('> img'));
+      var imgTag = $(figureDiv.find('> img'));
       imgTag.attr('src', 'images/haring/' + entry.type + '.png');
       imgTag.removeClass();
       imgTag.addClass(entry.color);
 
-      var lettersDiv = $(columnDiv.find('.letters'));
+      var lettersDiv = $(figureDiv.find('.letters'));
       lettersDiv.empty();
       if(entry.initials) {
         console.log('entry.initials', entry.initials, entry.initials.length, entry.initials[0]);

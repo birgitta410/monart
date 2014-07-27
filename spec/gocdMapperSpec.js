@@ -21,7 +21,7 @@ describe('Go CD Mapper', function () {
       theGocdMapper = gocdMapperModule.create(mockPipelineReader);
     });
 
-    it('should return crawling type if failed and previous one was failure as well', function () {
+    it('should set crawling type if failed and previous one was failure as well', function () {
       fakePipelineHistory = {
         '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
         '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
@@ -33,7 +33,7 @@ describe('Go CD Mapper', function () {
 
     });
 
-    it('should return flying type if previous failed, current is success', function () {
+    it('should set flying type if previous failed, current is success', function () {
       // descending order, newest first
       fakePipelineHistory = {
         '124': { wasSuccessful: successfulFn, time: mockTime } ,
@@ -46,7 +46,7 @@ describe('Go CD Mapper', function () {
 
     });
 
-    it('should return stumbling type if previous was successful', function () {
+    it('should set stumbling type if previous was successful', function () {
       // descending order, newest first
       fakePipelineHistory = {
         '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
@@ -127,7 +127,16 @@ describe('Go CD Mapper', function () {
       theGocdMapper = gocdMapperModule.create({}, mockCcTrayReader);
     });
 
-    it('should return skating type if currently building', function () {
+    it('should set dotted border for all activity entries', function () {
+      fakeActivity = [
+        { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Building' }
+      ];
+      theGocdMapper.readActivity(function(result) {
+        expect(result.figures[0].border).toBe('dotted');
+      });
+    });
+
+    it('should set skating type if currently building', function () {
       fakeActivity = [
         { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Building' }
       ];
@@ -137,7 +146,7 @@ describe('Go CD Mapper', function () {
       });
     });
 
-    it('should return type according to last build status if sleeping', function () {
+    it('should set type according to last build status if sleeping', function () {
       fakeActivity = [
         { name : 'A-PIPELINE :: integration-test :: backend-integration', wasSuccessful: successfulFn, activity: 'Sleeping' },
         { name : 'A-PIPELINE :: deploy-dev :: backend', wasSuccessful: notSuccessfulFn, activity: 'Sleeping' }

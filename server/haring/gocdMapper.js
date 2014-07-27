@@ -147,6 +147,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
         color: getColor(entry),
         info: getInfo(entry),
         type: getFigureTypeForActivity(entry),
+        border: 'dotted',
         initials: getInitialsOfBreaker(entry)
       }
     });

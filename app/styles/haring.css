@@ -52,7 +52,6 @@
   background-size: 100%;
 }
 
-/*noinspection CssUnknownTarget*/
 .figure {
 
   position: absolute;
@@ -61,12 +60,20 @@
   left: 0;
   right: 0;
 
-
-  background: url('../images/haring/border.png') no-repeat;
-  background-size: 100%;
-
   text-align: center;
 
+}
+
+/*noinspection CssUnknownTarget*/
+.figure.solid {
+  background: url('../images/haring/border.png') no-repeat;
+  background-size: 100%;
+}
+
+/*noinspection CssUnknownTarget*/
+.figure.dotted {
+  background: url('../images/haring/border_dotted.png') no-repeat;
+  background-size: 100%;
 }
 
 .figure >img {
