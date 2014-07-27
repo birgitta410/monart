@@ -28,7 +28,7 @@ exports.create = function(configKey) {
       };
 
       if(config[id].user === undefined || config[id].password === undefined || config[id].url === undefined) {
-        throw new Error('Could not read ' + id + ' config, cannot request | ' + JSON.stringify(config));
+        console.err('Could not read ' + id + ' config, cannot request | ' + JSON.stringify(config));
       }
 
     }
