@@ -29,15 +29,25 @@ Content:
 ```
 default:
   gocd:
-    user: xxx
-    password: xxxx
     url: http://the-go-host:8153
     pipeline: <name of the pipeline you want to visualise>
-  cc:
     user: xxx
     password: xxxx
+  cc:
     url: http://the-ci-host/<location of cctray.xml/cctray.xml
+    user: xxx
+    password: xxxx
 ```
+
+If you just want to see what it looks like, setting url values to 'fake-it' will load some static fixtures to give you an idea:
+```
+default:
+  gocd:
+    url: fake-it
+  cc:
+    url: fake-it
+```
+
 
 Also supports Heroku config vars instead of these config files:
 

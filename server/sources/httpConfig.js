@@ -6,12 +6,13 @@ exports.create = function(configKey) {
 
   var config;
   var id = configKey;
+  var FAKE = 'fake-it';
 
   init();
 
   var get = function() {
     return config[id];
-  }
+  };
 
   function init() {
     try {
@@ -27,17 +28,22 @@ exports.create = function(configKey) {
         pipeline: process.env[id.toUpperCase() + '_PIPELINE']
       };
 
-      if(config[id].user === undefined || config[id].password === undefined || config[id].url === undefined) {
-        console.err('Could not read ' + id + ' config, cannot request | ' + JSON.stringify(config));
+      if( ! config[id].user || ! config[id].password || (! config[id].url && ! config[id].url === FAKE) ) {
+        console.err('Not enough values in ' + id + ' config, cannot get data | ' + JSON.stringify(config));
       }
 
     }
+
+    config[id].fakeIt = function() {
+      return config[id].url === FAKE;
+    };
+
     config[id].url = addCredentialsToUrl(config[id].url);
 
   }
 
   function addCredentialsToUrl(url) {
-    if(config[id].user && config[id].password) {
+    if(config[id].user && config[id].password && !config[id].fakeIt()) {
       var urlNoHttp = url.indexOf('http') === 0 ? url.substr('http://'.length) : url;
       return 'http://' + config[id].user + ':' + config[id].password + '@' + urlNoHttp;
     } else {
@@ -48,6 +54,6 @@ exports.create = function(configKey) {
   return {
     get: get, // returns { user, password, url }
     addCredentialsToUrl: addCredentialsToUrl
-  }
-}
+  };
+};
 

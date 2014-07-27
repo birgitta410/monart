@@ -1,11 +1,13 @@
 var request = require('request');
 var xml2json = require('xml2json');
-var gocdRequestor = gocdRequestorCreator(xml2json, request);
+var fs = require('fs');
+
+var gocdRequestor = gocdRequestorCreator(xml2json, request, fs);
 
 exports.create = gocdRequestorCreator;
 exports.get = gocdRequestor.get;
 
-function gocdRequestorCreator(xml2json, request) {
+function gocdRequestorCreator(xml2json, request, fs) {
 
   var config = require('../httpConfig.js').create('gocd');
   var STAGES_ENDPOINT = '/go/api/pipelines/' + config.get().pipeline + '/stages.xml';
@@ -16,17 +18,34 @@ function gocdRequestorCreator(xml2json, request) {
 
   var get = function(next, callback) {
 
-    var url = next ? config.addCredentialsToUrl(next) : config.get().url;
+    if (config.get().fakeIt()) {
+      getFake(next, callback);
+    } else {
 
-    console.log('Requesting', url + STAGES_ENDPOINT);
+      var url = next ? config.addCredentialsToUrl(next) : config.get().url;
 
-    request(url + STAGES_ENDPOINT, function(error, response, body) {
-      var json = xml2json.toJson(body, {
-        object: true, sanitize: false
+      console.log('Requesting', url + STAGES_ENDPOINT);
+
+      request(url + STAGES_ENDPOINT, function (error, response, body) {
+        var json = xml2json.toJson(body, {
+          object: true, sanitize: false
+        });
+        callback(json);
       });
-      callback(json);
-    });
+
+    }
   };
+
+  function getFake(next, callback) {
+    console.log('FAKING Go CD Pipeline Feed');
+    var source = next ? next : 'server/sources/gocd/pipeline-stages.xml';
+    var xml = fs.readFileSync(source);
+    var json = xml2json.toJson(xml, {
+      object: true, sanitize: false
+    });
+
+    callback(json);
+  }
 
   return {
     get: get
