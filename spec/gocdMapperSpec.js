@@ -64,7 +64,10 @@ describe('Go CD Mapper', function () {
         '123': {
           wasSuccessful: notSuccessfulFn,
           time: mockTime,
-          breaker: 'Max Mustermann <mmustermann@internet.se>'
+          breaker: {
+            name: 'Max Mustermann',
+            email: 'mmustermann@internet.se'
+          }
         }
       };
 
@@ -134,7 +137,10 @@ describe('Go CD Mapper', function () {
     it('should create initials of person that broke a job', function () {
       fakeActivity = [ {
         wasSuccessful: notSuccessfulFn,
-        breaker: 'Max Mustermann <mmustermann@internet.se>'
+        breaker: {
+          name: 'Max Mustermann',
+          email: 'mmustermann@internet.se'
+        }
       } ];
       theGocdMapper.readActivity(function(result) {
         expect(result.figures[0].initials).toBe('mmu');

@@ -45,15 +45,9 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
   }
 
   function getInitials(entry) {
+    if(entry.breaker !== undefined && entry.breaker.name !== undefined) {
+      var nameParts = entry.breaker.name.split(' ');
 
-    if(entry.breaker !== undefined) {
-      var name = entry.breaker;
-      var emailIndex = name.indexOf('<');
-      if (emailIndex > -1) {
-        name = name.substr(0, emailIndex).trim();
-      }
-
-      var nameParts = name.split(' ');
       var initials = _.map(nameParts, function(namePart, index) {
         if (index !== nameParts.length - 1) {
           return namePart[0];
@@ -61,7 +55,6 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
           return namePart [0] + namePart[1];
         }
       }).join('');
-
       return initials.toLowerCase();
     }
   }
@@ -75,8 +68,8 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
     function getInfo(historyEntry, buildNumber) {
       var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
-      var theResult = historyEntry.wasSuccessful() ? 'Success' : 'Stage failed: ' + historyEntry.stageFailed;
-      return '[' + buildNumber + '] ' + theTime + ' ' + theResult;
+      var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | Broken by ' + historyEntry.breaker.name;
+      return '[' + buildNumber + '] ' + theTime + ' | ' + theResult;
     }
 
     var keysDescending = _.keys(history).sort(compareNumbers).reverse();
@@ -126,7 +119,11 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       if(entry.activity === 'Building') {
         return entry.name + ' is building';
       } else {
-        return entry.name + ' ' + entry.lastBuildStatus;
+        var info = entry.name + ' | ' + entry.lastBuildStatus;
+        if(!entry.wasSuccessful()) {
+          info += ' | broken by ' + entry.breaker.name;
+        }
+        return info;
       }
     }
 

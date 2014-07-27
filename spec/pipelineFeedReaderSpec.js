@@ -77,7 +77,7 @@ describe('pipelineFeedReader', function () {
         expect(results['1199'].result).toBe('passed');
         expect(results['1199'].breaker).toBeUndefined();
         expect(results['1195'].result).toBe('failed');
-        expect(results['1195'].breaker).toContain('Max Mustermann');
+        expect(results['1195'].breaker.name).toContain('Max Mustermann');
       });
     });
 

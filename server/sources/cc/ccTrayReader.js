@@ -24,6 +24,19 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
       _.each(result.Projects.Project, function(project) {
         var pathElements = project.name.split(' :: ');
 
+
+        function parseBreakerNameAndEmail(text) { // !!currently duplicated in atomEntryParser
+          var breaker = {};
+          var emailIndex = text.indexOf('<');
+          if (emailIndex > -1) {
+            breaker.name = text.substr(0, emailIndex).trim();
+            breaker.email = text.substr(emailIndex).trim();
+          } else {
+            breaker.name = text;
+          }
+          return breaker;
+        }
+
         function parseBreaker() {
           var allMessages = [].concat(project.messages || []); // xml2json creates object if array only has one entry
 
@@ -32,7 +45,7 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
           });
 
           if(breakersMessage !== undefined) {
-            return breakersMessage.message.text;
+            return parseBreakerNameAndEmail(breakersMessage.message.text);
           }
         }
 

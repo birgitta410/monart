@@ -19,6 +19,20 @@ var atomEntryParserCreator = function () {
     };
   }
 
+  function parseBreaker(result, author) { // !!currently duplicated in ccTrayReader
+    if(result === 'failed' && author !== undefined) {
+      var breaker = {};
+      var emailIndex = author.name.indexOf('<');
+      if (emailIndex > -1) {
+        breaker.name = author.name.substr(0, emailIndex).trim();
+        breaker.email = author.name.substr(emailIndex).trim();
+      } else {
+        breaker.name = author.name;
+      }
+      return breaker;
+    }
+  }
+
   function parseResultAndBreaker(title, author) {
     if (title === undefined) return { };
 
@@ -28,7 +42,7 @@ var atomEntryParserCreator = function () {
 
     return {
       result: result,
-      breaker: result === 'failed' && author !== undefined ? author.name : undefined
+      breaker: parseBreaker(result, author)
     }
   }
 

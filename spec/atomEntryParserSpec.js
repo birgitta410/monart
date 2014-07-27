@@ -58,7 +58,8 @@ describe('atomEntryParser', function () {
         }
       });
 
-      expect(entry.breaker).toContain('Max Mustermann');
+      expect(entry.breaker.name).toContain('Max Mustermann');
+      expect(entry.breaker.email).toContain('internet');
     });
 
   });

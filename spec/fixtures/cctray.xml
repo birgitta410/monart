@@ -11,12 +11,12 @@
     <Project name="A-PIPELINE :: smoke-test-dev :: backend" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1238" lastBuildTime="2014-07-24T09:00:09" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1238/smoke-test-dev/1/backend" />
     <Project name="A-PIPELINE :: functional-test" activity="Sleeping" lastBuildStatus="Failure" lastBuildLabel="1238" lastBuildTime="2014-07-24T09:04:06" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1238/functional-test/1">
         <messages>
-            <message text="Max Mustermann &lt;mmustermann@internet.se&gt;" kind="Breakers" />
+            <message text="Maria Mustermann &lt;mamustermann@internet.se&gt;" kind="Breakers" />
         </messages>
     </Project>
     <Project name="A-PIPELINE :: functional-test :: both" activity="Sleeping" lastBuildStatus="Failure" lastBuildLabel="1238" lastBuildTime="2014-07-24T09:04:06" webUrl="http://the-go-host:8153/go/tab/build/detail/QEN/1238/functional-test/1/both">
         <messages>
-            <message text="Max Mustermann &lt;mmustermann@internet.se&gt;" kind="Breakers" />
+            <message text="Maria Mustermann &lt;mamustermann@internet.se&gt;" kind="Breakers" />
         </messages>
     </Project>
     <Project name="A-PIPELINE :: deploy-showcase" activity="Sleeping" lastBuildStatus="Success" lastBuildLabel="1235" lastBuildTime="2014-07-24T06:59:51" webUrl="http://the-go-host:8153/go/pipelines/A-PIPELINE/1235/deploy-showcase/1" />
