@@ -121,7 +121,7 @@ describe('Go CD Mapper', function () {
     beforeEach(function () {
       mockCcTrayReader = {
         readActivity: function (callback, options) {
-          callback(fakeActivity, options.callbackParameter);
+          callback({ jobs: fakeActivity }, options.callbackParameter);
         }
       };
       theGocdMapper = gocdMapperModule.create({}, mockCcTrayReader);

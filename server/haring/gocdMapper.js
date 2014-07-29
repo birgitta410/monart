@@ -142,7 +142,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       }
     }
 
-    var figures = _.map(activity, function(entry) {
+    var figures = _.map(activity.jobs, function(entry) {
       return {
         color: getColor(entry),
         info: getInfo(entry),

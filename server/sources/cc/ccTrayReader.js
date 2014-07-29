@@ -17,7 +17,7 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
   var readActivity = function(callback, options) {
 
     options = options || {};
-    var activity = [];
+    var activity = { jobs: [] };
 
     requestActivity(function (result) {
 
@@ -25,7 +25,6 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
       // 'PIPELINE-NAME :: stage-name :: job-name'
       _.each(result.Projects.Project, function(project) {
         var pathElements = project.name.split(' :: ');
-
 
         function parseBreakerNameAndEmail(text) { // !!currently duplicated in atomEntryParser
           var breaker = {};
@@ -51,14 +50,14 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
           }
         }
 
-        if (pathElements.length === 3 && activity.length < MAX_JOBS) {
+        if (pathElements.length === 3 && activity.jobs.length < MAX_JOBS) {
           project = _.extend(project, {
             wasSuccessful: function() {
               return project.lastBuildStatus === 'Success';
             },
             breaker: parseBreaker()
           });
-          activity.push(project);
+          activity.jobs.push(project);
         }
       });
       callback(activity, options.callbackParameter);

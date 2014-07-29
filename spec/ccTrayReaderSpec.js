@@ -2,7 +2,7 @@ var _ = require('lodash');
 var fs = require('fs');
 var theCcTrayReaderModule = require('../server/sources/cc/ccTrayReader.js');
 
-describe('pipelineFeedReader', function () {
+describe('ccTrayReader', function () {
   describe('init()', function () {
 
     var theCcTrayReader
@@ -22,25 +22,31 @@ describe('pipelineFeedReader', function () {
     });
 
     it('should initialise the list of activities', function () {
-      theCcTrayReader.readActivity(function(results) {
-        // 12 = number of jobs
-        expect(results.length).toBe(12);
+      theCcTrayReader.readActivity(function(result) {
+        // 6 = number of jobs
+        expect(result.jobs.length).toBe(6);
       });
     });
 
     it('should stay the same number of activities when called twice', function () {
-      theCcTrayReader.readActivity(function(results) {
-        expect(results.length).toBe(12);
-        theCcTrayReader.readActivity(function(results) {
-          expect(results.length).toBe(12);
+      theCcTrayReader.readActivity(function(result) {
+        expect(result.jobs.length).toBe(6);
+        theCcTrayReader.readActivity(function(result) {
+          expect(result.jobs.length).toBe(6);
         });
       });
     });
 
     it('should parse the breaker\'s name/email from messages', function () {
-      theCcTrayReader.readActivity(function(results) {
-        expect(results[5].breaker.name).toContain('Maria Mustermann');
-        expect(results[5].breaker.email).toContain('internet');
+      theCcTrayReader.readActivity(function(result) {
+        expect(result.jobs[5].breaker.name).toContain('Maria Mustermann');
+        expect(result.jobs[5].breaker.email).toContain('internet');
+      });
+    });
+
+    it('should provide id of pipeline that is currently building', function () {
+      theCcTrayReader.readActivity(function(result) {
+
       });
     });
 
