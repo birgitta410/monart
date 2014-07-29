@@ -1,3 +1,4 @@
+
 var WebSocketServer = require('ws').Server
   , http = require('http')
   , express = require('express')
@@ -95,18 +96,3 @@ wssMondrian.on('connection', function(ws) {
 
 GLOBAL.TODAY_EXTERNAL = 20;
 GLOBAL.TODAY_INTERNAL = 20;
-
-app.get('/fake/today/external/:num',
-  function(req, res) {
-    console.log('faked it', req.params.num);
-    GLOBAL.TODAY_EXTERNAL = req.params.num;
-    res.send('Set external emails today to ' + req.params.num);
-  });
-
-app.get('/fake/today/internal/:num',
-  function(req, res) {
-    console.log('faked it', req.params.num);
-    GLOBAL.TODAY_INTERNAL = req.params.num;
-    res.send('Set internal emails today to ' + req.params.num);
-  });
-
