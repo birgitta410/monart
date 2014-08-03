@@ -56,9 +56,9 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
   function getColor(entry) {
     if(entry.wasSuccessful()) {
-      return colorsSuccess[Math.floor(Math.random()*colorsSuccess.length)];
+      return 'COLD';
     } else {
-      return colorsFailure[Math.floor(Math.random()*colorsFailure.length)];
+      return 'WARM';
     }
   }
 
@@ -148,9 +148,9 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
     function getColor(entry) {
       if(entry.lastBuildStatus === 'Success') {
-        return colorsSuccess[Math.floor(Math.random()*colorsSuccess.length)];
+        return 'COLD';
       } else if (entry.lastBuildStatus === 'Failure') {
-        return colorsFailure[Math.floor(Math.random()*colorsFailure.length)];
+        return 'WARM';
       } else {
         return 'grey';
       }

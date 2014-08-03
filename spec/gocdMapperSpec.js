@@ -59,6 +59,18 @@ describe('Go CD Mapper', function () {
 
     });
 
+    it('should set color to WARM if failed, COLD if successful', function () {
+      fakePipelineHistory = {
+        '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
+        '123': { wasSuccessful: successfulFn, time: mockTime }
+      };
+      theGocdMapper.readHistory(function(result) {
+        expect(result.figures[0].color).toBe('WARM');
+        expect(result.figures[1].color).toBe('COLD');
+      });
+
+    });
+
     it('should create initials of person that broke the pipeline run', function () {
       fakePipelineHistory = {
         '123': {

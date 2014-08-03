@@ -4,6 +4,17 @@ var ws = new WebSocket(host + '/haring');
 var NUM_ROWS = 4;
 var COLS_PER_ROW = 6;
 
+var WARM_COLORS = [ 'red', 'yellow', 'pink', 'orange' ];
+var COLD_COLORS = [ 'blue', 'dark-blue', 'green', 'dark-green' ];
+
+function randomWarmColor() {
+  return WARM_COLORS[Math.floor(Math.random() * WARM_COLORS.length)];
+}
+
+function randomColdColor() {
+  return COLD_COLORS[Math.floor(Math.random() * COLD_COLORS.length)];
+}
+
 function buildGrid() {
   var container = $('.container');
   for(var r = 0; r < NUM_ROWS; r++) {
@@ -21,10 +32,11 @@ function buildGrid() {
 
 buildGrid();
 
+var DATA = { figures: [] };
+
 ws.onmessage = function (event) {
 
   var historyData = JSON.parse(event.data);
-  console.log(historyData);
 
   var bodyTag = $('body');
   bodyTag.removeClass();
@@ -33,9 +45,14 @@ ws.onmessage = function (event) {
   var rowIndex = -1;
   for(var i = 0; i < historyData.figures.length; i++) {
     var entry = historyData.figures[i];
+    var previously = DATA.figures[i];
 
     var colIndex = i % COLS_PER_ROW;
     if(i % COLS_PER_ROW === 0) rowIndex ++;
+
+    if(_.isEqual(entry, previously)) {
+      continue;
+    }
 
     var allRows = $('.figure-row');
     if(allRows.length > rowIndex) {
@@ -59,12 +76,18 @@ ws.onmessage = function (event) {
       var imgExtension = entry.type === 'skating' ? '.gif' : '.png';
       imgTag.attr('src', 'images/haring/' + entry.type + imgExtension);
       imgTag.removeClass();
-      imgTag.addClass(entry.color);
+
+      if(entry.color === 'WARM') {
+        imgTag.addClass(randomWarmColor());
+      } else if(entry.color === 'COLD') {
+        imgTag.addClass(randomColdColor());
+      } else {
+        imgTag.addClass(entry.color);
+      }
 
       var lettersDiv = $(figureDiv.find('.letters'));
       lettersDiv.empty();
       if(entry.initials) {
-        console.log('entry.initials', entry.initials, entry.initials.length, entry.initials[0]);
         for (var l = 0; l < entry.initials.length; l++) {
           $('<img src="images/haring/alphabet/' + entry.initials[l].toLowerCase() + '.svg">').appendTo(lettersDiv);
         }
@@ -75,5 +98,7 @@ ws.onmessage = function (event) {
     }
 
   }
+
+  DATA = historyData;
 
 };

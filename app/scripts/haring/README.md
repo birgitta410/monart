@@ -1,7 +1,8 @@
 ###JSON expected by Haring visualization
 
 Expects sets of figure descriptions, with attributes
-- color { 'red', 'blue', 'dark-blue', 'yellow', 'green', 'dark-green', 'pink', 'orange' }
+- color { 'red', 'yellow', 'pink', 'orange', 'blue', 'dark-blue', 'green', 'dark-green' }
+  Can also be one of the following: { 'WARM', 'COLD' }, will then be chosen by vis accordingly
 - type { 'dancing', 'running', 'flying' }
 - border: {'solid' (default), 'dotted' }
 - info = a string to show in the tooltip of the figure
