@@ -111,6 +111,15 @@ describe('Go CD Mapper', function () {
       });
     });
 
+    it('should exclude the currently active build from the history', function () {
+      var anActiveBuildNumber = '945';
+      spyOn(mockPipelineReader, 'readHistory');
+      theGocdMapper.readHistory(function(result) { }, anActiveBuildNumber);
+
+      var optionsReadHistory = mockPipelineReader.readHistory.mostRecentCall.args[1];
+      expect(optionsReadHistory.exclude).toEqual([ anActiveBuildNumber ]);
+    });
+
   });
 
   describe('mapActivityDataToFigures()', function () {
@@ -121,7 +130,7 @@ describe('Go CD Mapper', function () {
     beforeEach(function () {
       mockCcTrayReader = {
         readActivity: function (callback, options) {
-          callback({ jobs: fakeActivity }, options.callbackParameter);
+          callback({ jobs: fakeActivity, buildNumberInProgress: '1239' }, options.callbackParameter);
         }
       };
       theGocdMapper = gocdMapperModule.create({}, mockCcTrayReader);

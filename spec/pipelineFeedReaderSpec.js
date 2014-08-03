@@ -40,6 +40,12 @@ describe('pipelineFeedReader', function () {
       }, { callbackParameter: 'aParameter' });
     });
 
+    it('should exclude pipelines if specified', function () {
+      thePipelineFeedReader.readHistory(function(results) {
+        expect(_.keys(results).length).toBe(9); //1199 - 1189
+      }, { exclude: ['1199', '1198'] });
+    });
+
     it('should pass no url to the requestor in initial call', function () {
       spyOn(mockGocdRequestor, 'get');
       thePipelineFeedReader.readHistory(function(results, parameter) { });

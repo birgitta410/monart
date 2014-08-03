@@ -15,8 +15,26 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     'yellow'
   ];
 
-  var readHistory = function(callWhenDone) {
-    pipelineReader.readHistory(mapPipelineDataToFigures, { callbackParameter: callWhenDone });
+  var readHistoryAndActivity = function(callWhenDone) {
+    ccTrayReader.readActivity(function(activity) {
+      var activityHaring = mapActivityDataToFigures(activity);
+
+      pipelineReader.readHistory(function(history) {
+
+        var historyHaring = mapPipelineDataToFigures(history);
+
+        activityHaring.figures = activityHaring.figures.concat(historyHaring.figures);
+        activityHaring.background = historyHaring.background;
+
+        callWhenDone(activityHaring);
+
+      }, { exclude: [ activity.buildNumberInProgress] } );
+
+    })
+  };
+
+  var readHistory = function(callWhenDone, activeBuildNumber) {
+    pipelineReader.readHistory(mapPipelineDataToFigures, { callbackParameter: callWhenDone, exclude: [ activeBuildNumber ] });
   };
 
   var readActivity = function(callWhenDone) {
@@ -89,6 +107,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
     var keysDescending = _.keys(history).sort(compareNumbers).reverse();
     var figures = _.map(keysDescending, function(key, index) {
+
       var entry = history[key];
       var previous = index < keysDescending.length ? history[keysDescending[index + 1]] : undefined;
 
@@ -103,10 +122,17 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     var lastBuildSuccessful = history[keysDescending[0]].wasSuccessful();
 
     var changesExist = true;
-    callWhenDone({
+    var result = {
       background: lastBuildSuccessful ? 'green' : 'orange',
       figures: figures
-    }, changesExist);
+    };
+
+    if(callWhenDone) {
+      callWhenDone(result, changesExist);
+    } else {
+      return result;
+    }
+
   }
 
   function mapActivityDataToFigures(activity, callWhenDone) {
@@ -153,12 +179,18 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     });
 
     var changesExist = true;
-    callWhenDone({ figures: figures }, changesExist);
+    if(callWhenDone) {
+      callWhenDone({ figures: figures }, changesExist);
+    } else {
+      return { figures: figures };
+    }
+
   }
 
   return {
     readHistory: readHistory,
-    readActivity: readActivity
+    readActivity: readActivity,
+    readHistoryAndActivity: readHistoryAndActivity
   }
 }
 
@@ -170,3 +202,4 @@ var gocdMapper = gocdMapperCreator(pipelineReader, ccTrayReader);
 exports.create = gocdMapperCreator;
 exports.readHistory = gocdMapper.readHistory;
 exports.readActivity = gocdMapper.readActivity;
+exports.readHistoryAndActivity = gocdMapper.readHistoryAndActivity;

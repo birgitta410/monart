@@ -1,3 +1,4 @@
+var _ = require('lodash');
 
 var WebSocketServer = require('ws').Server
   , http = require('http')
@@ -22,18 +23,8 @@ wssHaring.on('connection', function(ws) {
   function newClient() {
 
     function getActivityAndUpdateClients() {
-      haringGocdMapper.readActivity(function(activityData, doChangesExist) {
-        if(doChangesExist) {
-
-          haringGocdMapper.readHistory(function(historyData) {
-            activityData.figures = activityData.figures.concat(historyData.figures);
-            activityData.background = historyData.background;
-            ws.send(JSON.stringify(activityData), function() {  });
-          });
-
-        } else {
-          console.log('no changes');
-        }
+      haringGocdMapper.readHistoryAndActivity(function(activityHaring) {
+        ws.send(JSON.stringify(activityHaring), function() {  });
       });
     }
 

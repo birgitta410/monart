@@ -51,10 +51,14 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
 
   var readHistory = function (callback, options) {
     options = options || {};
+    options.exclude = options.exclude || [];
 
     requestStages(options.nextUrl, function (result) {
       if(result !== undefined) {
         _.each(result.feed.entry, pushEntryToPipelineHistory);
+        pipelineHistory = _.omit(pipelineHistory, function(value, key) {
+          return _.contains(options.exclude, key);
+        });
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineFinishTime);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineResult);
 

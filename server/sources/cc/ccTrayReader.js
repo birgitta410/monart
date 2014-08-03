@@ -1,6 +1,6 @@
 var _ = require('lodash');
 
-var ccTrayReaderCreator = function (ccTrayRequestor) {
+var ccTrayReaderCreator = function (ccTrayRequestor, goCdAtomEntryParser) {
 
   var MAX_JOBS = 6;
 
@@ -60,6 +60,19 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
           activity.jobs.push(project);
         }
       });
+
+      function parseGoCdBuildingPipeline() {
+        var buildingJob = _.find(result.Projects.Project, function(project) {
+          return project.activity === 'Building';
+        });
+
+        if(buildingJob) {
+          return goCdAtomEntryParser.parseParametersFromJobRunUrl(buildingJob.webUrl).buildNumber;
+        }
+      }
+
+      activity.buildNumberInProgress = parseGoCdBuildingPipeline();
+
       callback(activity, options.callbackParameter);
 
     });
@@ -72,8 +85,9 @@ var ccTrayReaderCreator = function (ccTrayRequestor) {
   };
 };
 
+var goCdAtomEntryParser = require('../gocd/atomEntryParser.js');
 var ccTrayRequestorCreator = require('./ccTrayRequestor.js');
-var ccTrayReader = ccTrayReaderCreator(ccTrayRequestorCreator.create());
+var ccTrayReader = ccTrayReaderCreator(ccTrayRequestorCreator.create(), goCdAtomEntryParser.create());
 
 exports.create = ccTrayReaderCreator;
 exports.readActivity = ccTrayReader.readActivity;

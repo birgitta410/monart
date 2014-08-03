@@ -5,7 +5,7 @@ var atomEntryParserCreator = function () {
 
   var GO_PIPELINES_ENDPOINT = '/go/pipelines/';
 
-  function parseParametersFromId(id) {
+  function parseParametersFromJobRunUrl(id) {
     if (id === undefined) return { };
 
     // http://the-go-host:8153/go/pipelines/A-PIPELINE/1199/functional-test/1
@@ -47,12 +47,13 @@ var atomEntryParserCreator = function () {
   }
 
   var withData = function(data) {
-    data = _.extend(data, parseParametersFromId(data.id));
+    data = _.extend(data, parseParametersFromJobRunUrl(data.id));
     return _.extend(data, parseResultAndBreaker(data.title, data.author));
   };
 
   return {
-    withData: withData
+    withData: withData,
+    parseParametersFromJobRunUrl: parseParametersFromJobRunUrl
   };
 
 };

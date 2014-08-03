@@ -1,11 +1,13 @@
 var _ = require('lodash');
 var fs = require('fs');
 var theCcTrayReaderModule = require('../server/sources/cc/ccTrayReader.js');
+var theGoCdAtomEntryParserModule = require('../server/sources/gocd/atomEntryParser.js');
 
 describe('ccTrayReader', function () {
   describe('init()', function () {
 
     var theCcTrayReader
+      , theGoCdAtomEntryParser
       , mockCcTrayRequestor
       , xml2json = require('xml2json');
 
@@ -18,7 +20,8 @@ describe('ccTrayReader', function () {
           callback(json);
         }
       };
-      theCcTrayReader = theCcTrayReaderModule.create(mockCcTrayRequestor);
+      theGoCdAtomEntryParser = theGoCdAtomEntryParserModule.create();
+      theCcTrayReader = theCcTrayReaderModule.create(mockCcTrayRequestor, theGoCdAtomEntryParser);
     });
 
     it('should initialise the list of activities', function () {
@@ -46,7 +49,7 @@ describe('ccTrayReader', function () {
 
     it('should provide id of pipeline that is currently building', function () {
       theCcTrayReader.readActivity(function(result) {
-
+        expect(result.buildNumberInProgress).toBe('1239');
       });
     });
 
