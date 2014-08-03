@@ -1,6 +1,6 @@
 
-var host = location.origin.replace(/^http/, 'ws');
-var ws = new WebSocket(host + '/haring');
+var wsHost = location.origin.replace(/^http/, 'ws');
+var ws = new WebSocket(wsHost + '/haring');
 var NUM_ROWS = 4;
 var COLS_PER_ROW = 6;
 
@@ -102,3 +102,12 @@ ws.onmessage = function (event) {
   DATA = historyData;
 
 };
+
+// Let server know we're still watching (Keep alive Heroku)
+setInterval(function() {
+
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open( "GET", location.origin + '/alive', false );
+  xmlHttp.send( null );
+
+}, 10 * 1000);

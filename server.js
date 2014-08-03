@@ -87,3 +87,9 @@ wssMondrian.on('connection', function(ws) {
 
 GLOBAL.TODAY_EXTERNAL = 20;
 GLOBAL.TODAY_INTERNAL = 20;
+
+app.get('/alive',
+  function(req, res) {
+    console.log('life sign');
+    res.send('OK');
+  });
