@@ -21,13 +21,17 @@ var atomEntryParserCreator = function () {
 
   function parseBreaker(result, author) { // !!currently duplicated in ccTrayReader
     if(result === 'failed' && author !== undefined) {
+      var authors = [].concat(author || []);
+      var breakerName = authors[authors.length - 1].name;
+
       var breaker = {};
-      var emailIndex = author.name.indexOf('<');
+
+      var emailIndex = breakerName.indexOf('<');
       if (emailIndex > -1) {
-        breaker.name = author.name.substr(0, emailIndex).trim();
-        breaker.email = author.name.substr(emailIndex).trim();
+        breaker.name = breakerName.substr(0, emailIndex).trim();
+        breaker.email = breakerName.substr(emailIndex).trim();
       } else {
-        breaker.name = author.name;
+        breaker.name = breakerName;
       }
       return breaker;
     }
