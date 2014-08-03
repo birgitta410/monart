@@ -30,8 +30,21 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
     return historyEntry;
   }
 
+  function getLatestRunsOfStages(stages) {
+    var allStageNames = _.unique(_.map(stages, function(stage) { return stage.stageName; }));
+    return _.map(allStageNames, function(stageName) {
+      var allEntriesForStage = _.where(stages, { 'stageName': stageName });
+      allEntriesForStage = _.sortBy(allEntriesForStage, 'runNumber').reverse();
+      return allEntriesForStage[0];
+    });
+  }
+
   function mapPipelineResult(historyEntry) {
-    var failedStages = _.where(historyEntry.stages, { result: 'failed' });
+
+    var lastRuns = getLatestRunsOfStages(historyEntry.stages);
+
+    var failedStages = _.where(lastRuns, { result: 'failed' });
+
     if (failedStages.length > 0) {
       _.extend(historyEntry, {
         result : 'failed',

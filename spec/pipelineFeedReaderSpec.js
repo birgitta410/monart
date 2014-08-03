@@ -78,6 +78,12 @@ describe('pipelineFeedReader', function () {
       });
     });
 
+    it('should say a pipeline passed when a job was rerun and passed the second time', function () {
+      thePipelineFeedReader.readHistory(function(results) {
+        expect(results['1198'].result).toBe('passed');
+      });
+    });
+
     it('should determine the breaker of the failed job', function () {
       thePipelineFeedReader.readHistory(function(results) {
         expect(results['1199'].result).toBe('passed');
