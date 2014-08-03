@@ -3,18 +3,6 @@ var moment = require('moment');
 
 function gocdMapperCreator(pipelineReader, ccTrayReader) {
 
-  var colorsSuccess = [
-    'dark-green',
-    'blue',
-    'dark-blue'
-  ];
-
-  var colorsFailure = [
-    'red',
-    'pink',
-    'yellow'
-  ];
-
   var readHistoryAndActivity = function(callWhenDone) {
     ccTrayReader.readActivity(function(activity) {
       var activityHaring = mapActivityDataToFigures(activity);
@@ -157,10 +145,11 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     }
 
     function getInfo(entry) {
+      var entryTitle = '[' + entry.buildNumber + '] ' + entry.name;
       if(entry.activity === 'Building') {
-        return entry.name + ' is building';
+        return entryTitle + ' is building';
       } else {
-        var info = entry.name + ' | ' + entry.lastBuildStatus;
+        var info = entryTitle + ' | ' + entry.lastBuildStatus;
         if(!entry.wasSuccessful() && entry.breaker) {
           info += ' | changes by ' + entry.breaker.name;
         }
@@ -172,6 +161,7 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
       return {
         color: getColor(entry),
         info: getInfo(entry),
+        showInfo: ! entry.wasSuccessful(),
         type: getFigureTypeForActivity(entry),
         border: 'dotted',
         initials: getInitialsOfBreaker(entry)

@@ -150,7 +150,10 @@ describe('Go CD Mapper', function () {
 
     it('should set dotted border for all activity entries', function () {
       fakeActivity = [
-        { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Building' }
+        { name : 'A-PIPELINE :: integration-test :: backend-integration',
+          activity: 'Building',
+          wasSuccessful: successfulFn
+        }
       ];
       theGocdMapper.readActivity(function(result) {
         expect(result.figures[0].border).toBe('dotted');
@@ -159,7 +162,10 @@ describe('Go CD Mapper', function () {
 
     it('should set skating type if currently building', function () {
       fakeActivity = [
-        { name : 'A-PIPELINE :: integration-test :: backend-integration', activity: 'Building' }
+        { name : 'A-PIPELINE :: integration-test :: backend-integration',
+          activity: 'Building',
+          wasSuccessful: successfulFn
+        }
       ];
       theGocdMapper.readActivity(function(result) {
         expect(result.figures.length).toBe(1);
@@ -176,6 +182,15 @@ describe('Go CD Mapper', function () {
         expect(result.figures.length).toBe(2);
         expect(result.figures[0].type).toBe('walking');
         expect(result.figures[1].type).toBe('stumbling');
+      });
+    });
+
+    it('should show info by default if a stage fails', function () {
+      fakeActivity = [ {
+        wasSuccessful: notSuccessfulFn
+      } ];
+      theGocdMapper.readActivity(function(result) {
+        expect(result.figures[0].showInfo).toBe(true);
       });
     });
 

@@ -57,6 +57,7 @@ var ccTrayReaderCreator = function (ccTrayRequestor, goCdAtomEntryParser) {
             },
             breaker: parseBreaker()
           });
+          project = _.extend(project, goCdAtomEntryParser.parseParametersFromJobRunUrl(project.webUrl));
           activity.jobs.push(project);
         }
       });

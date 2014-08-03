@@ -6,6 +6,7 @@ Expects sets of figure descriptions, with attributes
 - type { 'dancing', 'running', 'flying' }
 - border: {'solid' (default), 'dotted' }
 - info = a string to show in the tooltip of the figure
+- showInfo = a boolean indicating if the tooltip info should be displayed by default, without the need to hover; default false
 - initials = letters to show as initials in a frame
 
 Visualisation will iterate over the array of figures and put them into rows, left to right.
@@ -19,6 +20,7 @@ Visualisation will iterate over the array of figures and put them into rows, lef
       type: 'dancing',
       border: 'solid',
       info: 'Some text to show in a tooltip',
+      showInfo: true,
       initials: 'mmu'
     },
     {

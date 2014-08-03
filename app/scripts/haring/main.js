@@ -72,6 +72,10 @@ ws.onmessage = function (event) {
         .attr('data-original-title', entry.info)
         .tooltip('fixTitle');
 
+      if(entry.showInfo) {
+        figureDiv.tooltip('show');
+      }
+
       var imgTag = $(figureDiv.find('> img'));
       var imgExtension = entry.type === 'skating' ? '.gif' : '.png';
       imgTag.attr('src', 'images/haring/' + entry.type + imgExtension);
