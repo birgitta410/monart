@@ -114,4 +114,4 @@ setInterval(function() {
   xmlHttp.open( "GET", location.origin + '/alive', false );
   xmlHttp.send( null );
 
-}, 10 * 1000);
+}, 10 * 60 * 1000);
