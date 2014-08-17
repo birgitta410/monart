@@ -160,6 +160,10 @@ function processFigure(index, entry, colIndex, rowIndex) {
       imgTag.addClass(entry.color);
     }
 
+    if(entry.type === 'skating') {
+      imgTag.addClass('skating');
+    }
+
     var lettersDiv = $(figureDiv.find('.letters'));
     lettersDiv.empty();
     if(entry.initials) {

@@ -103,6 +103,13 @@
   margin-top: 13%;
 }
 
+.skating {
+  margin-top: 7% !important;
+  margin-left: 1% !important;
+  max-width: 100% !important;
+  max-height: 83% !important;
+}
+
 .green {
   background-color: #a3d626;
 }
