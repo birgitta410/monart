@@ -1,8 +1,5 @@
-var _ = require('lodash');
-var moment = require('moment');
 
-function gocdMapperCreator(pipelineReader, ccTrayReader) {
-
+var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
   var readHistoryAndActivity = function(callWhenDone) {
     ccTrayReader.readActivity(function(activity) {
       var activityHaring = mapActivityDataToFigures(activity);
@@ -182,14 +179,6 @@ function gocdMapperCreator(pipelineReader, ccTrayReader) {
     readActivity: readActivity,
     readHistoryAndActivity: readHistoryAndActivity
   }
-}
+};
 
-
-var pipelineReader = require('../sources/gocd/pipelineFeedReader.js');
-var ccTrayReader = require('../sources/cc/ccTrayReader.js');
-var gocdMapper = gocdMapperCreator(pipelineReader, ccTrayReader);
-
-exports.create = gocdMapperCreator;
-exports.readHistory = gocdMapper.readHistory;
-exports.readActivity = gocdMapper.readActivity;
-exports.readHistoryAndActivity = gocdMapper.readHistoryAndActivity;
+define(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/sources/cc/ccTrayReader'], gocdMapper);

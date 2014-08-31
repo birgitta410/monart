@@ -1,52 +1,61 @@
-var yaml_config = require('node-yaml-config');
-var ContextIO = require('contextio');
-var _ = require('lodash');
 
-var ctxioClient;
+define(['node-yaml-config', 'contextio', 'module', 'path'], function (yaml_config, ContextIO, module, path) {
 
-exports.init = function() {
-	var config;
+  var ctxioClient;
 
-	try {
-		config = yaml_config.load(__dirname + '/contextio.yml');
-	} catch(err) {
-		console.log('could not read yml, trying Heroku vars');
-		config = {
-		  contextIo: {
-		    key: process.env.CONTEXT_KEY,
-		    secret: process.env.CONTEXT_SECRET
-		  }
-		};
-	}
+  var init = function () {
+    var config;
 
-	ctxioClient = new ContextIO.Client({
-		key: config.contextIo.key,
-		secret: config.contextIo.secret
-	});	
-};
+    try {
+      console.log(path.dirname(module.uri) + '/contextio.yml');
+      config = yaml_config.load(path.dirname(module.uri) + '/contextio.yml');
+    } catch (err) {
+      console.log('could not read yml, trying Heroku vars');
+      config = {
+        contextIo: {
+          key: process.env.CONTEXT_KEY,
+          secret: process.env.CONTEXT_SECRET
+        }
+      };
+    }
 
-exports.readEmail = function(callback, callbackParameter) {
+    ctxioClient = new ContextIO.Client({
+      key: config.contextIo.key,
+      secret: config.contextIo.secret
+    });
+  };
 
-	// TODO:  query with date_after = since last time I asked
+  var readEmail = function (callback, callbackParameter) {
 
-	ctxioClient.accounts('539414518c157fa37d8aaf71').messages().get(
-		{
-			limit:15,
-			include_flags: 1
-			// flag_seen: 1
-		}, function (err, response) {
-	    if (err) throw err;
-	    // console.log('response', response.body);
-	    callback(response.body, callbackParameter);
-	});
+    // TODO:  query with date_after = since last time I asked
 
-};
+    ctxioClient.accounts('539414518c157fa37d8aaf71').messages().get(
+      {
+        limit: 15,
+        include_flags: 1
+        // flag_seen: 1
+      }, function (err, response) {
+        if (err) throw err;
+        // console.log('response', response.body);
+        callback(response.body, callbackParameter);
+      });
 
-exports.getAccountInfo = function(callback, callbackParameter) {
-	ctxioClient.accounts('539414518c157fa37d8aaf71').get(
-		{ }, function (err, response) {
-	    if (err) throw err;
-	    // console.log('response', response.body);
-	    callback(response.body, callbackParameter);
-	});
-};
+  };
+
+  var getAccountInfo = function (callback, callbackParameter) {
+    ctxioClient.accounts('539414518c157fa37d8aaf71').get(
+      { }, function (err, response) {
+        console.log('err', err, response);
+        if (err) throw err;
+        // console.log('response', response.body);
+        callback(response.body, callbackParameter);
+      });
+  };
+
+  return {
+    init: init,
+    readEmail: readEmail,
+    getAccountInfo: getAccountInfo
+  };
+
+});

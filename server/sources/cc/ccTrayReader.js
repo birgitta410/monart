@@ -1,6 +1,5 @@
-var _ = require('lodash');
 
-var ccTrayReaderCreator = function (ccTrayRequestor, goCdAtomEntryParser) {
+define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atomEntryParser'], function (_, ccTrayRequestor, goCdAtomEntryParser) {
 
   var MAX_JOBS = 6;
 
@@ -12,7 +11,6 @@ var ccTrayReaderCreator = function (ccTrayRequestor, goCdAtomEntryParser) {
       callback(json);
     });
   };
-
 
   var readActivity = function(callback, options) {
 
@@ -84,11 +82,4 @@ var ccTrayReaderCreator = function (ccTrayRequestor, goCdAtomEntryParser) {
   return {
     readActivity: readActivity
   };
-};
-
-var goCdAtomEntryParser = require('../gocd/atomEntryParser.js');
-var ccTrayRequestorCreator = require('./ccTrayRequestor.js');
-var ccTrayReader = ccTrayReaderCreator(ccTrayRequestorCreator.create(), goCdAtomEntryParser.create());
-
-exports.create = ccTrayReaderCreator;
-exports.readActivity = ccTrayReader.readActivity;
+});

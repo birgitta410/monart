@@ -1,7 +1,5 @@
 
-var _ = require('lodash');
-
-var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
+define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'], function (_, gocdRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
   var MIN_NUMBER_HISTORY = 25;
@@ -92,12 +90,4 @@ var pipelineFeedReaderCreator = function (gocdRequestor, atomEntryParser) {
   return {
     readHistory: readHistory
   };
-};
-
-var gocdRequestorCreator = require('./gocdRequestor.js');
-var atomEntryParserCreator = require('./atomEntryParser.js');
-var pipelineFeedReader = pipelineFeedReaderCreator(gocdRequestorCreator.create(), atomEntryParserCreator.create());
-
-exports.create = pipelineFeedReaderCreator;
-exports.init = pipelineFeedReader.init;
-exports.readHistory = pipelineFeedReader.readHistory;
+});

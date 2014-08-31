@@ -4,22 +4,16 @@ artwise
 ###SETUP PROJECT
 ```
 npm install
-npm install -g jasmine-node
 ```
 
 Start server
 ```
-node server
+node app
 ```
 
 Application URL
 ```
 http://localhost:5000
-```
-
-Start tests
-```
-jasmine-node .
 ```
 
 ###Add configuration for HTTP Requests
@@ -71,4 +65,10 @@ default:
   contextIo:
     key: xxx
     secret: xxxx
+```
+
+
+Run tests
+```
+sh ./run_spec.sh
 ```

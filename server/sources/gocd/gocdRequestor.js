@@ -1,20 +1,8 @@
-var request = require('request');
-var xml2json = require('xml2json');
-var fs = require('fs');
 
-var gocdRequestor = gocdRequestorCreator(xml2json, request, fs);
+define(['xml2json', 'request', 'fs', 'server/sources/httpConfig'], function (xml2json, request, fs, httpConfig) {
 
-exports.create = gocdRequestorCreator;
-exports.get = gocdRequestor.get;
-
-function gocdRequestorCreator(xml2json, request, fs) {
-
-  var config = require('../httpConfig.js').create('gocd');
+  var config = httpConfig.create('gocd');
   var STAGES_ENDPOINT = '/go/api/pipelines/' + config.get().pipeline + '/stages.xml';
-
-  if(gocdRequestor !== undefined) {
-    return gocdRequestor;
-  }
 
   var get = function(next, callback) {
 
@@ -50,5 +38,5 @@ function gocdRequestorCreator(xml2json, request, fs) {
   return {
     get: get
   }
-}
+});
 

@@ -1,62 +1,59 @@
-var _ = require('lodash');
 
-var WebSocketServer = require('ws').Server
-  , http = require('http')
-  , express = require('express')
-  , app = express()
-  , port = process.env.PORT || 5000;
+define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper'], function (ws, http, express, module, path, _, haringGocdMapper) {
 
-app.use(express.static(__dirname + '/'));
+  var WebSocketServer = ws.Server
+    , app = express();
 
-var server = http.createServer(app);
-server.listen(port);
+  app.use(express.static(path.dirname(module.uri) + '/'));
+  var server = http.createServer(app);
 
-console.log('http server listening on %d', port);
+  function listenToHaring() {
+    var wssHaring = new WebSocketServer({server: server, path: '/haring'});
+    console.log('haring websocket server created');
 
-var haringGocdMapper = require('./server/haring/gocdMapper.js');
-var wssHaring = new WebSocketServer({server: server, path: '/haring'});
-console.log('haring websocket server created');
+    wssHaring.on('connection', function(ws) {
+      console.log('connected to /haring');
 
-wssHaring.on('connection', function(ws) {
-  console.log('connected to /haring');
+      function newClient() {
 
-  function newClient() {
+        function getActivityAndUpdateClients() {
+          haringGocdMapper.readHistoryAndActivity(function(activityHaring) {
+            ws.send(JSON.stringify({ haring: activityHaring }), function() {  });
+          });
+        }
 
-    function getActivityAndUpdateClients() {
-      haringGocdMapper.readHistoryAndActivity(function(activityHaring) {
-        ws.send(JSON.stringify({ haring: activityHaring }), function() {  });
+        getActivityAndUpdateClients();
+        var clientId = setInterval(getActivityAndUpdateClients, 5000);
+        return clientId;
+      }
+
+      var clientId = newClient();
+
+      console.log('websocket connection open on /haring');
+
+      ws.on('message', function(msg) {
+        if(msg === 'ping') {
+          console.log('PING');
+          ws.send(JSON.stringify({ping: 'success'}));
+        }
       });
-    }
 
-    getActivityAndUpdateClients();
-    var clientId = setInterval(getActivityAndUpdateClients, 5000);
-    return clientId;
+      ws.on('close', function() {
+        console.log('websocket connection close on /haring');
+        clearInterval(clientId);
+      });
+    });
   }
 
-  var clientId = newClient();
+  listenToHaring();
 
-  console.log('websocket connection open on /haring');
+  /**************************/
+  var mondrianEmailMapper = require('./server/mondrian/emailMapper.js');
 
-  ws.on('message', function(msg) {
-    if(msg === 'ping') {
-      console.log('PING');
-      ws.send(JSON.stringify({ping: 'success'}));
-    }
-  });
+  var wssMondrian = new WebSocketServer({server: server, path: '/mondrian'});
+  console.log('mondrian websocket server created');
 
-  ws.on('close', function() {
-    console.log('websocket connection close on /haring');
-    clearInterval(clientId);
-  });
-});
-
-/**************************/
-var mondrianEmailMapper = require('./server/mondrian/emailMapper.js');
-
-var wssMondrian = new WebSocketServer({server: server, path: '/mondrian'});
-console.log('mondrian websocket server created');
-
-wssMondrian.on('connection', function(ws) {
+  wssMondrian.on('connection', function(ws) {
 
     function newClient() {
       var numberOfUpdatesMade = 0;
@@ -87,16 +84,20 @@ wssMondrian.on('connection', function(ws) {
     console.log('websocket connection open on /mondrian');
 
     ws.on('close', function() {
-        console.log('websocket connection close on /mondrian');
-        clearInterval(clientId);
+      console.log('websocket connection close on /mondrian');
+      clearInterval(clientId);
     });
-});
-
-GLOBAL.TODAY_EXTERNAL = 20;
-GLOBAL.TODAY_INTERNAL = 20;
-
-app.get('/alive',
-  function(req, res) {
-    console.log('life sign');
-    res.send('OK');
   });
+
+  GLOBAL.TODAY_EXTERNAL = 20;
+  GLOBAL.TODAY_INTERNAL = 20;
+
+  app.get('/alive',
+    function(req, res) {
+      console.log('life sign');
+      res.send('OK');
+    });
+
+  return server;
+
+});
