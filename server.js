@@ -24,7 +24,7 @@ wssHaring.on('connection', function(ws) {
 
     function getActivityAndUpdateClients() {
       haringGocdMapper.readHistoryAndActivity(function(activityHaring) {
-        ws.send(JSON.stringify(activityHaring), function() {  });
+        ws.send(JSON.stringify({ haring: activityHaring }), function() {  });
       });
     }
 
@@ -36,6 +36,13 @@ wssHaring.on('connection', function(ws) {
   var clientId = newClient();
 
   console.log('websocket connection open on /haring');
+
+  ws.on('message', function(msg) {
+    if(msg === 'ping') {
+      console.log('PING');
+      ws.send(JSON.stringify({ping: 'success'}));
+    }
+  });
 
   ws.on('close', function() {
     console.log('websocket connection close on /haring');

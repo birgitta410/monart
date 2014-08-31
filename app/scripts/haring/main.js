@@ -181,14 +181,20 @@ function processFigure(index, entry, colIndex, rowIndex) {
 
 ws.onmessage = function (event) {
 
-  var historyData = JSON.parse(event.data);
+  var data = JSON.parse(event.data);
+  if(data.haring) {
 
-  var bodyTag = $('body');
-  bodyTag.removeClass();
-  bodyTag.addClass(historyData.background);
+    var historyData = data.haring;
 
-  iterateData(historyData, processFigure);
-  DATA = historyData;
+    var bodyTag = $('body');
+    bodyTag.removeClass();
+    bodyTag.addClass(historyData.background);
+
+    iterateData(historyData, processFigure);
+    DATA = historyData;
+  } else if(data.ping) {
+    console.log('ping success - still connected to server');
+  }
 
 };
 
@@ -199,10 +205,13 @@ setInterval(function() {
   xmlHttp.open( "GET", location.origin + '/alive', false );
   xmlHttp.send( null );
 
-}, 10 * 60 * 1000);
+  ws.send('ping');
 
-$('body').on('click', function() {
-  $('body').chardinJs('start');
+}, 5 * 60 * 1000);
+
+var body = $('body');
+body.on('click', function() {
+  body.chardinJs('start');
 });
 
-$('body').bind('chardinJs:start', chardiner.adjustPositioning);
+body.bind('chardinJs:start', chardiner.adjustPositioning);
