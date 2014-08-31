@@ -32,8 +32,6 @@ function buildInitialGrid() {
   }
 }
 
-buildInitialGrid();
-
 function Chardiner() {
 
   var dottedExplained, colorsExplained, failFigureExplained, passFigureExplained;
@@ -47,17 +45,20 @@ function Chardiner() {
 
   function spaceForHint(rowIndex, colIndex) {
     return ! _.contains(hints[rowIndex], colIndex)
-      && ! _.contains(hints[rowIndex], colIndex -1)
-      && ! (colIndex >= COLS_PER_ROW - 1);
+      && ! _.contains(hints[rowIndex], colIndex -2)
+      && ! (colIndex >= COLS_PER_ROW - 2);
   }
 
   var addHint = function(figureDiv, entry, colIndex, rowIndex) {
     if(spaceForHint(rowIndex, colIndex)) {
+
       if (entry.border === 'dotted' && !dottedExplained) {
-        figureDiv.attr('data-intro', 'Dotted border: This is a job from the activity feed, it will show the separate jobs in a pipeline.');
+        figureDiv.attr('data-intro', 'Dotted border means this is a job from the activity feed, it will show the LAST OR CURRENT job runs in a pipeline. ' +
+          'Solid border frames on the other hand are results of whole pipeline runs in the PAST.');
         figureDiv.attr('data-position', 'right');
         dottedExplained = true;
         rememberHint(rowIndex, colIndex);
+        return;
       }
 
       if (entry.color === 'WARM' && !colorsExplained) {
@@ -65,20 +66,26 @@ function Chardiner() {
         figureDiv.attr('data-position', 'right');
         colorsExplained = true;
         rememberHint(rowIndex, colIndex);
+        return;
       }
 
-      if (entry.type === 'crawling' && !failFigureExplained) {
-        figureDiv.attr('data-intro', 'The type of figure corresponds to the result of a job or stage - a stumbling man means a stage just failed for the first time, the radiant baby means it is not the first time.');
+      if ((entry.type === 'crawling' || entry.type === 'stumbling') && !failFigureExplained) {
+        figureDiv.attr('data-intro',
+          'The type of figure corresponds to the result of a job or stage - a stumbling man means a ' +
+            'stage just failed for the first time, the \'Radiant Baby\' means it is not the first time in a row.');
         figureDiv.attr('data-position', 'right');
         failFigureExplained = true;
         rememberHint(rowIndex, colIndex);
+        return;
       }
 
       if ((entry.type === 'walking' || entry.type === 'flying') && !passFigureExplained) {
-        figureDiv.attr('data-intro', 'Figures for a successful stage or job are a walking man or the \'Flying Angel\'. The angel indicates that the stage just passed for the first time after a previous failure.');
+        figureDiv.attr('data-intro', 'Figures for a successful stage or job are a walking man or the \'Flying Angel\'. ' +
+          'The angel indicates that the stage just passed for the first time after a previous failure.');
         figureDiv.attr('data-position', 'right');
         passFigureExplained = true;
         rememberHint(rowIndex, colIndex);
+        return;
       }
     }
 
@@ -100,7 +107,10 @@ function Chardiner() {
 
 }
 
+
+buildInitialGrid();
 var chardiner = new Chardiner();
+
 
 function iterateData(historyData, callback) {
   var rowIndex = -1;
@@ -162,6 +172,7 @@ function processFigure(index, entry, colIndex, rowIndex) {
 
     if(entry.type === 'skating') {
       imgTag.addClass('skating');
+      figureDiv.append('<div class="changer"></div>')
     }
 
     var lettersDiv = $(figureDiv.find('.letters'));
