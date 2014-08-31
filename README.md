@@ -16,7 +16,7 @@ Application URL
 http://localhost:5000
 ```
 
-###Add configuration for HTTP Requests
+###Add configuration for Go CD and CC tray
 Create file `server/sources/config.yml`. Currently takes variables for requests to CI servers that provide a cctray.xml file, and Go CD servers.
 
 Content:
@@ -42,6 +42,18 @@ default:
     url: fake-it
 ```
 
+###Configure the jobs to show from CC Tray activity
+By default, all jobs from CC Tray's activity feed will be displayed. You can restrict that by providing a list of jobs. The application will use the strings in that list to check if a job name STARTS WITH that.
+```
+default:
+  cc:
+    url: fake-it
+    jobs:
+      - 'A-PIPELINE :: build'
+      - 'A-PIPELINE :: integration-test'
+      - 'A-PIPELINE :: deploy-dev'
+```
+
 
 Also supports Heroku config vars instead of the config files (`heroku config:set GOCD_PIPELINE=mypipeline`).
 
@@ -54,6 +66,7 @@ GOCD_PIPELINE
 CC_USER
 CC_PASSWORD
 CC_URL
+CC_JOBS
 ```
 
 ###Add credentials for contextIO email reader

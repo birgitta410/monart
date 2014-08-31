@@ -1,7 +1,7 @@
 
-define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atomEntryParser'], function (_, ccTrayRequestor, goCdAtomEntryParser) {
+define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atomEntryParser', 'server/sources/httpConfig'], function (_, ccTrayRequestor, goCdAtomEntryParser, config) {
 
-  var MAX_JOBS = 6;
+  var configValues = config.create('cc').get();
 
   var requestActivity = function (callback) {
     ccTrayRequestor.get(function(json) {
@@ -23,6 +23,7 @@ define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atom
       // 'PIPELINE-NAME :: stage-name :: job-name'
       _.each(result.Projects.Project, function(project) {
         var pathElements = project.name.split(' :: ');
+        var isAJob = pathElements.length === 3;
 
         function parseBreakerNameAndEmail(text) { // !!currently duplicated in atomEntryParser
           var breaker = {};
@@ -48,7 +49,20 @@ define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atom
           }
         }
 
-        if (pathElements.length === 3 && activity.jobs.length < MAX_JOBS) {
+        function includeJob() {
+          if(configValues.jobs !== undefined) {
+            var configured = _.any(_.values(configValues.jobs), function(jobName) {
+              return project.name.indexOf(jobName) === 0;
+            });
+            return configured && isAJob;
+          } else {
+            return isAJob;
+          }
+        }
+
+
+        if (includeJob()) {
+
           project = _.extend(project, {
             wasSuccessful: function() {
               return project.lastBuildStatus === 'Success';

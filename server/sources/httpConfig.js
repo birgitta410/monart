@@ -23,8 +23,13 @@ define(['xml2json', 'module', 'path', 'node-yaml-config'], function (xml2json, m
           user: process.env[id.toUpperCase() + '_USER'],
           password: process.env[id.toUpperCase() + '_PASSWORD'],
           url: process.env[id.toUpperCase() + '_URL'],
-          pipeline: process.env[id.toUpperCase() + '_PIPELINE']
+          pipeline: process.env[id.toUpperCase() + '_PIPELINE'],
+          jobs: process.env[id.toUpperCase() + '_JOBS']
         };
+
+        if(config[id].jobs) {
+          config[id].jobs = config[id].jobs.split(',');
+        }
 
         console.log('From Heroku vars: ', config[id]);
 

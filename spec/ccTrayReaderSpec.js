@@ -1,17 +1,27 @@
 
-var fs = require('fs');
-var xml2json = require('xml2json');
+var xml = require('fs').readFileSync('spec/fixtures/cctray.xml');
+var json = require('xml2json').toJson(xml, { object: true, sanitize: false });
 
-var xml = fs.readFileSync('spec/fixtures/cctray.xml');
-var json = xml2json.toJson(xml, { object: true, sanitize: false });
-
-mockCcTrayRequestor = {
+var mockCcTrayRequestor = {
   get: function (callback) {
     callback(json);
   }
 };
+
+var configuration = {};
+var mockConfig = {
+  create: function() {
+    return {
+      get: function() {
+        return configuration;
+      }
+    };
+  }
+};
+
 var mocks = {
-  'server/sources/cc/ccTrayRequestor': mockCcTrayRequestor
+  'server/sources/cc/ccTrayRequestor': mockCcTrayRequestor,
+  'server/sources/httpConfig': mockConfig
 };
 
 var context = createContext(mocks);
@@ -21,18 +31,40 @@ context(['lodash', 'server/sources/cc/ccTrayReader'], function(_, theCcTrayReade
   describe('ccTrayReader', function () {
     describe('init()', function () {
 
-      it('should initialise the list of activities', function () {
+      beforeEach(function() {
+        configuration.jobs = undefined;
+      });
+
+      it('should by default only use jobs, i.e. project names with 3 name elements', function () {
+        // 6 = number of jobs
         theCcTrayReader.readActivity(function (result) {
-          // 6 = number of jobs
-          expect(result.jobs.length).toBe(6);
+          expect(result.jobs.length).toBe(12);
+        });
+      });
+
+      it('should only read the jobs that are configured', function () {
+        // 6 = number of jobs
+        configuration.jobs = [ 'A-PIPELINE :: build' ];
+        theCcTrayReader.readActivity(function (result) {
+          expect(result.jobs.length).toBe(1);
+        });
+      });
+
+      it('should support configuration of stage name and then choose all the jobs under that stage', function () {
+        // 6 = number of jobs
+        configuration.jobs = {
+          '0': 'A-PIPELINE :: deploy-dev'
+        };
+        theCcTrayReader.readActivity(function (result) {
+          expect(result.jobs.length).toBe(2);
         });
       });
 
       it('should stay the same number of activities when called twice', function () {
         theCcTrayReader.readActivity(function (result) {
-          expect(result.jobs.length).toBe(6);
+          expect(result.jobs.length).toBe(12);
           theCcTrayReader.readActivity(function (result) {
-            expect(result.jobs.length).toBe(6);
+            expect(result.jobs.length).toBe(12);
           });
         });
       });
