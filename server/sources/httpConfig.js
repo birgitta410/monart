@@ -26,6 +26,8 @@ define(['xml2json', 'module', 'path', 'node-yaml-config'], function (xml2json, m
           pipeline: process.env[id.toUpperCase() + '_PIPELINE']
         };
 
+        console.log('From Heroku vars: ', config[id]);
+
         if (!config[id].user || !config[id].password || (!config[id].url && !config[id].url === FAKE)) {
           console.log('ERROR: Not enough values in ' + id + ' config, cannot get data | ' + JSON.stringify(config));
         }
