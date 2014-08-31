@@ -43,7 +43,7 @@ default:
 ```
 
 
-Also supports Heroku config vars instead of these config files:
+Also supports Heroku config vars instead of the config files (`heroku config:set GOCD_PIPELINE=mypipeline`).
 
 ```
 GOCD_USER
