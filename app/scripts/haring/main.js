@@ -193,7 +193,7 @@ ws.onmessage = function (event) {
     iterateData(historyData, processFigure);
     DATA = historyData;
   } else if(data.ping) {
-    console.log('ping success - still connected to server');
+    console.log('ping success - still connected to server', new Date());
   }
 
 };
