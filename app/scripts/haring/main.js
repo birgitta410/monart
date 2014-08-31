@@ -9,6 +9,9 @@ var DATA = { figures: [] };
 var WARM_COLORS = [ 'red', 'yellow', 'pink', 'orange' ];
 var COLD_COLORS = [ 'blue', 'dark-blue', 'green', 'dark-green' ];
 
+var LAST_PING = new Date();
+var PING_INTERVAL = 5 * 60 * 1000;
+
 function randomWarmColor() {
   return WARM_COLORS[Math.floor(Math.random() * WARM_COLORS.length)];
 }
@@ -190,6 +193,12 @@ function processFigure(index, entry, colIndex, rowIndex) {
 
 }
 
+function setBackgroundStyle(styleClass) {
+  var bodyTag = $('body');
+  bodyTag.removeClass();
+  bodyTag.addClass(styleClass);
+}
+
 ws.onmessage = function (event) {
 
   var data = JSON.parse(event.data);
@@ -197,14 +206,13 @@ ws.onmessage = function (event) {
 
     var historyData = data.haring;
 
-    var bodyTag = $('body');
-    bodyTag.removeClass();
-    bodyTag.addClass(historyData.background);
+    setBackgroundStyle(historyData.background);
 
     iterateData(historyData, processFigure);
     DATA = historyData;
   } else if(data.ping) {
-    console.log('ping success - still connected to server', new Date());
+    LAST_PING = new Date();
+    console.log('ping success - still connected to server', LAST_PING);
   }
 
 };
@@ -212,13 +220,19 @@ ws.onmessage = function (event) {
 // Let server know we're still watching (Keep alive Heroku)
 setInterval(function() {
 
+  var timeSinceLastPing = new Date() - LAST_PING;
+  if(timeSinceLastPing > (PING_INTERVAL * 1.1)) {
+    console.log('Last successful ping too long ago', timeSinceLastPing);
+    setBackgroundStyle('grey');
+  }
+
   var xmlHttp = new XMLHttpRequest();
   xmlHttp.open( "GET", location.origin + '/alive', false );
   xmlHttp.send( null );
 
   ws.send('ping');
 
-}, 5 * 60 * 1000);
+}, PING_INTERVAL);
 
 var body = $('body');
 body.on('click', function() {
