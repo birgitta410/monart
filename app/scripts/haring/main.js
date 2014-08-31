@@ -1,5 +1,5 @@
 
-var wsHost = location.origin.replace(/^http/, 'ws');
+var wsHost = 'ws://' + window.location.host;
 var ws = new WebSocket(wsHost + '/haring');
 var NUM_ROWS = 4;
 var COLS_PER_ROW = 6;
