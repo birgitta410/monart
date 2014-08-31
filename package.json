@@ -9,7 +9,8 @@
     "node-yaml-config": "0.0.2",
     "ws": "~0.4.31",
     "xml2json": "~0.4.0",
-    "request": "~2.39.0"
+    "request": "~2.39.0",
+    "requirejs": "~2.1.14"
   },
   "devDependencies": {
     "jasmine-node": "~1.14.5"
