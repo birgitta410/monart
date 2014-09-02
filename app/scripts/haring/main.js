@@ -224,6 +224,7 @@ setInterval(function() {
   if(timeSinceLastPing > (PING_INTERVAL * 1.1)) {
     console.log('Last successful ping too long ago', timeSinceLastPing);
     setBackgroundStyle('grey');
+    window.location = window.location;
   }
 
   var xmlHttp = new XMLHttpRequest();
