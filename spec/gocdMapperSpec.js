@@ -4,13 +4,13 @@ var mockTime = { format: function () { } };
 
 mockPipelineReader = {
   readHistory: function (callback, options) {
-    callback(fakePipelineHistory, options.callbackParameter);
+    callback(fakePipelineHistory, options ? options.callbackParameter : undefined);
   }
 };
 
 mockCcTrayReader = {
   readActivity: function (callback, options) {
-    callback({ jobs: fakeActivity, buildNumberInProgress: '1239' }, options.callbackParameter);
+    callback({ jobs: fakeActivity, buildNumberInProgress: '1239' }, options ? options.callbackParameter : undefined);
   }
 };
 
@@ -37,10 +37,53 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
       return true;
     };
 
+    describe('readHistoryAndActivity()', function() {
+      it('should set the background colour to green if successful', function() {
+        fakePipelineHistory = {
+          '125': { wasSuccessful: successfulFn, time: mockTime }
+        };
+        fakeActivity = [
+          { name: 'NAME',
+            wasSuccessful: successfulFn
+          }
+        ];
+        theGocdMapper.readHistoryAndActivity(function(result) {
+          expect(result.background).toBe('green');
+        });
+      });
+      it('should set the background colour to orange if unsuccessful', function() {
+        fakePipelineHistory = {
+          '125': { wasSuccessful: notSuccessfulFn, time: mockTime }
+        };
+        fakeActivity = [
+          { name: 'NAME',
+            wasSuccessful: notSuccessfulFn
+          }
+        ];
+        theGocdMapper.readHistoryAndActivity(function(result) {
+          expect(result.background).toBe('orange');
+        });
+      });
+      it('should set the background colour to blue if building', function() {
+        fakePipelineHistory = {
+          '125': { wasSuccessful: successfulFn, time: mockTime }
+        };
+        fakeActivity = [
+          { name: 'NAME',
+            activity: 'Building',
+            wasSuccessful: notSuccessfulFn
+          }
+        ];
+        theGocdMapper.readHistoryAndActivity(function(result) {
+          expect(result.background).toBe('blue');
+        });
+      });
+    });
+
     describe('mapPipelineDataToFigures()', function () {
 
       beforeEach(function () {
-
+        fakePipelineHistory = {};
       });
 
       it('should set crawling type if failed and previous one was failure as well', function () {
@@ -160,8 +203,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
     describe('mapActivityDataToFigures()', function () {
 
       beforeEach(function () {
-
-//        theGocdMapper = gocdMapperModule.create({}, mockCcTrayReader);
+        fakeActivity = [];
       });
 
       it('should set dotted border for all activity entries', function () {

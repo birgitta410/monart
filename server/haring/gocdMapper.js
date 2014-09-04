@@ -8,10 +8,11 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
 
         var historyHaring = mapPipelineDataToFigures(history);
 
-        activityHaring.figures = activityHaring.figures.concat(historyHaring.figures);
-        activityHaring.background = historyHaring.background;
+        var finalFigures = {};
+        finalFigures.figures = activityHaring.figures.concat(historyHaring.figures);
+        finalFigures.background = activityHaring.background || historyHaring.background;
 
-        callWhenDone(activityHaring);
+        callWhenDone(finalFigures);
 
       }, { exclude: [ activity.buildNumberInProgress] } );
 
@@ -112,7 +113,7 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
       figures: figures
     };
 
-    if(callWhenDone) {
+    if(callWhenDone !== undefined) {
       callWhenDone(result, changesExist);
     } else {
       return result;
@@ -165,11 +166,18 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
       }
     });
 
+    var isBuilding = _.any(activity.jobs, function(entry) {
+      return entry.activity === 'Building';
+    });
+
     var changesExist = true;
-    if(callWhenDone) {
+    if(callWhenDone !== undefined) {
       callWhenDone({ figures: figures }, changesExist);
     } else {
-      return { figures: figures };
+      return { 
+        background: isBuilding ? 'blue' : undefined,
+        figures: figures 
+      };
     }
 
   }
