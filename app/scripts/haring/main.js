@@ -28,7 +28,8 @@ function buildInitialGrid() {
       rowDiv.append(
       '<div class="figure-wrapper"><div class="figure solid">' +
           '<div class="bg"></div>' +
-          '<div class="letters"></div>' +
+          '<div class="letters top-left"></div>' +
+          '<div class="letters bottom-right"></div>' +
           '<img src="images/haring/dog.png" class="grey">' +
       '</div></div>');
     }
@@ -178,7 +179,7 @@ function processFigure(index, entry, colIndex, rowIndex) {
       figureDiv.append('<div class="changer"></div>')
     }
 
-    var lettersDiv = $(figureDiv.find('.letters'));
+    var lettersDiv = $(figureDiv.find('.letters.bottom-right'));
     lettersDiv.empty();
     if(entry.initials) {
       for (var l = 0; l < entry.initials.length; l++) {

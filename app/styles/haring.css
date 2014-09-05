@@ -39,19 +39,28 @@
 .letters {
   position: absolute;
 
-  bottom: 10%;
-  right: 5%;
-  padding-right: 5%;
-
-  width: 100%;
-  height: 11%;
-
-  text-align: right;
-
   transform:rotate(-7deg);
   -ms-transform:rotate(-7deg); /* IE 9 */
   -webkit-transform:rotate(-7deg); /* Opera, Chrome, and Safari */
 
+  width: 100%;
+  height: 11%;
+}
+
+.letters.bottom-right {
+  bottom: 10%;
+  right: 5%;
+  padding-right: 5%;
+
+  text-align: right;
+}
+
+.letters.top-left {
+  top: 2%;
+  left: 5%;
+  padding-left: 5%;
+
+  text-align: left;
 }
 
 .letters img {
