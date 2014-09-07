@@ -48,9 +48,10 @@ function Chardiner() {
   }
 
   function spaceForHint(rowIndex, colIndex) {
-    return ! _.contains(hints[rowIndex], colIndex)
-      && ! _.contains(hints[rowIndex], colIndex -2)
-      && ! (colIndex >= COLS_PER_ROW - 2);
+    var space = !_.contains(hints[rowIndex], colIndex)
+      && !_.contains(hints[rowIndex], colIndex - 1)
+      && !(colIndex >= COLS_PER_ROW - 2);
+    return space;
   }
 
   var addHint = function(figureDiv, entry, colIndex, rowIndex) {
