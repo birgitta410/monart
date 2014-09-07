@@ -1,5 +1,5 @@
 
-var mockPipelineReader, mockCcTrayReader, fakePipelineHistory, fakeActivity;
+var mockPipelineReader, mockCcTrayReader, fakePipelineHistory, fakeActivity, fakeBuildNumberInProgress = '1239';
 var mockTime = { format: function () { } };
 
 mockPipelineReader = {
@@ -10,7 +10,7 @@ mockPipelineReader = {
 
 mockCcTrayReader = {
   readActivity: function (callback, options) {
-    callback({ jobs: fakeActivity, buildNumberInProgress: '1239' }, options ? options.callbackParameter : undefined);
+    callback({ jobs: fakeActivity, buildNumberInProgress: fakeBuildNumberInProgress }, options ? options.callbackParameter : undefined);
   }
 };
 
@@ -111,6 +111,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
     describe('mapPipelineDataToFigures()', function () {
 
       beforeEach(function () {
+        fakeActivity = [];
         fakePipelineHistory = {};
       });
 
@@ -119,7 +120,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
         };
-        theGocdMapper.readHistory(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(_.keys(result.figures).length).toBe(2);
           expect(result.figures[0].type).toBe('crawling');
         });
@@ -132,7 +133,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           '124': { wasSuccessful: successfulFn, time: mockTime },
           '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
         };
-        theGocdMapper.readHistory(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(_.keys(result.figures).length).toBe(2);
           expect(result.figures[0].type).toBe('flying');
         });
@@ -145,7 +146,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
           '123': { wasSuccessful: successfulFn, time: mockTime }
         };
-        theGocdMapper.readHistory(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(_.keys(result.figures).length).toBe(2);
           expect(result.figures[0].type).toBe('stumbling');
         });
@@ -157,7 +158,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
           '123': { wasSuccessful: successfulFn, time: mockTime }
         };
-        theGocdMapper.readHistory(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures[0].color).toBe('WARM');
           expect(result.figures[1].color).toBe('COLD');
         });
@@ -189,7 +190,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           }
         };
 
-        theGocdMapper.readHistory(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures[0].initials).toBe('mmu');
           expect(result.figures[1].initials).toBe('htn');
           expect(result.figures[2].initials).toBe('scx');
@@ -201,7 +202,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
           '123': { wasSuccessful: successfulFn, time: mockTime }
         };
-        theGocdMapper.readHistory(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.background).toBe('orange');
         });
       });
@@ -211,19 +212,17 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           '124': { wasSuccessful: successfulFn, time: mockTime },
           '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
         };
-        theGocdMapper.readHistory(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.background).toBe('green');
         });
       });
 
       it('should exclude the currently active build from the history', function () {
-        var anActiveBuildNumber = '945';
         spyOn(mockPipelineReader, 'readHistory');
-        theGocdMapper.readHistory(function (result) {
-        }, anActiveBuildNumber);
+        theGocdMapper.readHistoryAndActivity(function (result) { });
 
         var optionsReadHistory = mockPipelineReader.readHistory.mostRecentCall.args[1];
-        expect(optionsReadHistory.exclude).toEqual([ anActiveBuildNumber ]);
+        expect(optionsReadHistory.exclude).toEqual([ fakeBuildNumberInProgress ]);
       });
 
 
@@ -244,7 +243,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
             }
           }
         };
-        theGocdMapper.readHistory(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures[0].initials).toBeUndefined();
           expect(result.figures[1].initials).toBe('mmu');
         });
@@ -256,6 +255,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
 
       beforeEach(function () {
         fakeActivity = [];
+        fakePipelineHistory = {};
       });
 
       it('should set dotted border for all activity entries', function () {
@@ -265,7 +265,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
             wasSuccessful: successfulFn
           }
         ];
-        theGocdMapper.readActivity(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures[0].border).toBe('dotted');
         });
       });
@@ -277,10 +277,12 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
             wasSuccessful: successfulFn
           }
         ];
-        theGocdMapper.readActivity(function (result) {
+        console.log('++++++++++++++++++++++++++++++++++++++++++++');
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures.length).toBe(1);
           expect(result.figures[0].type).toBe('skating');
         });
+        console.log('++++++++++++++++++++++++++++++++++++++++++++');
       });
 
       it('should set type according to last build status if sleeping', function () {
@@ -288,7 +290,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           { name: 'A-PIPELINE :: integration-test :: backend-integration', wasSuccessful: successfulFn, activity: 'Sleeping' },
           { name: 'A-PIPELINE :: deploy-dev :: backend', wasSuccessful: notSuccessfulFn, activity: 'Sleeping' }
         ];
-        theGocdMapper.readActivity(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures.length).toBe(2);
           expect(result.figures[0].type).toBe('walking');
           expect(result.figures[1].type).toBe('stumbling');
@@ -301,7 +303,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
             wasSuccessful: notSuccessfulFn
           }
         ];
-        theGocdMapper.readActivity(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures[0].showInfo).toBe(true);
         });
       });
@@ -316,7 +318,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
             }
           }
         ];
-        theGocdMapper.readActivity(function (result) {
+        theGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures[0].initials).toBe('mmu');
         });
       });

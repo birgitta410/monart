@@ -69,9 +69,13 @@ define(['lodash'], function (_) {
   }
 
   var withData = function(data) {
-    data = _.extend(data, parseParametersFromJobRunUrl(data.id));
-    data = _.extend(data, parseAuthor(data.author));
-    return _.extend(data, parseResult(data.title));
+    var result = {
+      name: data.name,
+      updated: data.updated
+    }; // only expose the data we currently need
+    result = _.extend(result, parseParametersFromJobRunUrl(data.id));
+    result = _.extend(result, parseAuthor(data.author));
+    return _.extend(result, parseResult(data.title));
   };
 
   return {

@@ -24,6 +24,17 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
   describe('pipelineFeedReader', function () {
     describe('readHistory()', function () {
 
+      it('should log an example to the console, for documentation purposes', function () {
+        thePipelineFeedReader.readHistory(function (results) {
+          var keys = _.keys(results);
+          var dataToLog = {};
+          results[keys[0]].stages = [ results[keys[0]].stages[0]];
+          dataToLog[keys[0]] = results[keys[0]];
+
+          console.log('SAMPLE HISTORY PARSED FROM go PIPELINE FEED', JSON.stringify(dataToLog, undefined, 2));
+        });
+      });
+
       it('should initialise a set of pipeline runs', function () {
         thePipelineFeedReader.readHistory(function (results) {
           expect(_.keys(results).length).toBe(12); //1200 - 1189

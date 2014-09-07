@@ -1,25 +1,22 @@
 
-var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
+var gocdMapper = function(_, moment, gocdReader) {
   var readHistoryAndActivity = function(callWhenDone) {
-    ccTrayReader.readActivity(function(activity) {
-      var activity = mapActivityDataToFigures(activity);
+    gocdReader.readData(function(data) {
 
-      pipelineReader.readHistory(function(history) {
+      var activityHaring = mapActivityDataToFigures(data.activity);
+      var historyHaring = mapPipelineDataToFigures(data.history);
 
-        var historyHaring = mapPipelineDataToFigures(history);
+      var historyFigures = historyHaring.figures;
+      mapInitialsFromHistoryToActivity(historyFigures, activityHaring.figures);
 
-        var historyFigures = historyHaring.figures;
-        mapInitialsFromHistoryToActivity(historyFigures, activity.figures);
+      var finalFigures = {};
+      finalFigures.figures = activityHaring.figures.concat(historyFigures);
+      finalFigures.background = activityHaring.background || historyHaring.background;
 
-        var finalFigures = {};
-        finalFigures.figures = activity.figures.concat(historyFigures);
-        finalFigures.background = activity.background || historyHaring.background;
+      callWhenDone(finalFigures);
 
-        callWhenDone(finalFigures);
+    });
 
-      }, { exclude: [ activity.buildNumberInProgress] } );
-
-    })
   };
 
   function mapInitialsFromHistoryToActivity(historyFigures, activityFigures) {
@@ -32,14 +29,6 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
       }
     });
   }
-
-  var readHistory = function(callWhenDone, activeBuildNumber) {
-    pipelineReader.readHistory(mapPipelineDataToFigures, { callbackParameter: callWhenDone, exclude: [ activeBuildNumber ] });
-  };
-
-  var readActivity = function(callWhenDone) {
-    ccTrayReader.readActivity(mapActivityDataToFigures, { callbackParameter: callWhenDone });
-  };
 
   function getFigureType(entry, lastEntryWasSuccessful) {
 
@@ -106,6 +95,10 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
     }
 
     var keysDescending = _.keys(history).sort(compareNumbers).reverse();
+    if(keysDescending.length === 0) {
+      return { figures: [] };
+    }
+
     var figures = _.map(keysDescending, function(key, index) {
 
       var entry = history[key];
@@ -200,10 +193,8 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
   }
 
   return {
-    readHistory: readHistory,
-    readActivity: readActivity,
     readHistoryAndActivity: readHistoryAndActivity
   }
 };
 
-define(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/sources/cc/ccTrayReader'], gocdMapper);
+define(['lodash', 'moment', 'server/sources/gocd/gocdReader'], gocdMapper);

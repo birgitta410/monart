@@ -35,6 +35,13 @@ context(['lodash', 'server/sources/cc/ccTrayReader'], function(_, theCcTrayReade
         configuration.jobs = undefined;
       });
 
+      it('should log an example to the console, for documentation purposes', function () {
+        theCcTrayReader.readActivity(function (result) {
+          result.jobs = [result.jobs[0]];
+          console.log('SAMPLE ACTIVITY PARSED FROM cctray.xml', JSON.stringify(result, undefined, 2));
+        });
+      });
+
       it('should by default only use jobs, i.e. project names with 3 name elements', function () {
         // 6 = number of jobs
         theCcTrayReader.readActivity(function (result) {

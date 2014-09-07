@@ -69,7 +69,7 @@ define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atom
             },
             breaker: parseBreaker()
           });
-          project = _.extend(project, goCdAtomEntryParser.parseParametersFromJobRunUrl(project.webUrl));
+          project = _.extend(project, goCdAtomEntryParser.parseParametersFromJobRunUrl(project.webUrl)); // TODO: currently only supports Go CD
           activity.jobs.push(project);
         }
       });
