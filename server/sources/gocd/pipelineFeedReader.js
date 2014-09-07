@@ -1,5 +1,5 @@
 
-define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'], function (_, gocdRequestor, atomEntryParser) {
+define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'], function (_, cheerio, gocdRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
   var MIN_NUMBER_HISTORY = 25;
@@ -71,6 +71,28 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
 
   }
 
+  function enrichWithCommitDetails(basicData) {
+
+    function withoutTimestamp(data) {
+      return data.indexOf('on 2') === -1 ? data : data.slice(0, data.indexOf('on 2')).trim();
+    }
+
+    gocdRequestor.getMaterialHtml(basicData.stages[0].id, function(html) {
+      var $ = cheerio.load(html);
+      try {
+        var modifiedBy = withoutTimestamp($('.material_tab .change .modified_by dd')[0].children[0].data);
+        var comment = $('.material_tab .change .comment p')[0].children[0].data;
+        basicData.materials = {
+          comment: comment,
+          committer: modifiedBy
+        };
+      } catch(error) {
+        console.log('ERROR loading material', error);
+      }
+    });
+
+  }
+
   var readHistory = function (callback, options) {
     options = options || {};
     options.exclude = options.exclude || [];
@@ -84,6 +106,11 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineFinishTime);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineResult);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineAuthor);
+
+        _.each(pipelineHistory, function(entry) {
+          // TODO: Does this async call really fill up values before we're done?
+          enrichWithCommitDetails(entry);
+        });
 
         var nextLink = _.find(result.feed.link, { rel: 'next' });
 
