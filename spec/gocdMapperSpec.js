@@ -225,7 +225,6 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
         expect(optionsReadHistory.exclude).toEqual([ fakeBuildNumberInProgress ]);
       });
 
-
       it('should not add initials of authors of passed jobs', function () {
         fakePipelineHistory = {
           '124': {
@@ -249,6 +248,20 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
         });
       });
 
+      it('should put commit message into info text, if present', function () {
+        fakePipelineHistory = {
+          '124': {
+            wasSuccessful: successfulFn,
+            materials: {
+              committer: 'Max Mustermann',
+              comment: 'Awesome change'
+            }
+          }
+        };
+        theGocdMapper.readHistoryAndActivity(function (result) {
+          expect(result.figures[0].info).toContain('Awesome change');
+        });
+      });
     });
 
     describe('mapActivityDataToFigures()', function () {

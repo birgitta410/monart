@@ -8,7 +8,10 @@ var mockGocdRequestor = {
     var xml = fs.readFileSync(source);
     var json = xml2json.toJson(xml, { object: true, sanitize: false });
     callback(json);
-
+  },
+  getMaterialHtml: function(id, callback) {
+    var html = fs.readFileSync('spec/fixtures/materials.html');
+    callback(html);
   }
 };
 
@@ -101,6 +104,13 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
           expect(results['1199'].author.name).toContain('Max Mustermann');
           expect(results['1195'].result).toBe('failed');
           expect(results['1195'].author.name).toContain('Max Mustermann');
+        });
+      });
+
+      it('should parse committer and commit message from material HTML', function () {
+        thePipelineFeedReader.readHistory(function (results) {
+          expect(results['1199'].materials.committer).toContain('Max Mustermann');
+          expect(results['1199'].materials.comment).toContain('awesome');
         });
       });
 

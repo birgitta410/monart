@@ -136,6 +136,12 @@
   background-color: #cccccc;
 }
 
+/* bootstrap extensions */
+.tooltip {
+  font-size: 1em;
+}
+
+/* chardin extensions */
 .chardinjs-tooltip.chardinjs-right:before {
   left: -20px;
 }

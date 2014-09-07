@@ -26,7 +26,7 @@ define(['xml2json', 'request', 'fs', 'server/sources/httpConfig'], function (xml
 
   function getFake(next, callback) {
     console.log('FAKING Go CD Pipeline Feed');
-    var source = next ? next : 'server/sources/gocd/pipeline-stages.xml';
+    var source = next ? next : 'server/sources/gocd/fake/pipeline-stages.xml';
     var xml = fs.readFileSync(source);
     var json = xml2json.toJson(xml, {
       object: true, sanitize: false
@@ -35,8 +35,27 @@ define(['xml2json', 'request', 'fs', 'server/sources/httpConfig'], function (xml
     callback(json);
   }
 
+  var getMaterialHtml = function(jobId, callback) {
+    if (config.get().fakeIt()) {
+      getFakeMaterial(jobId, callback);
+    } else {
+      var url = config.addCredentialsToUrl(jobId + '/materials');
+      console.log('Requesting', url);
+      request(url, function(error, response, body) {
+        callback(body);
+      });
+    }
+  };
+
+  function getFakeMaterial(jobId, callback) {
+    var html = fs.readFileSync('server/sources/gocd/fake/materials.html');
+
+    callback(html);
+  }
+
   return {
-    get: get
+    get: get,
+    getMaterialHtml: getMaterialHtml
   }
 });
 

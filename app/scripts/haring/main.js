@@ -97,8 +97,8 @@ function Chardiner() {
   };
 
   var adjustPositioning = function(right) {
-    var allToolTips = $(".chardinjs-tooltiptext");
-    var toolTipLayer = allToolTips.parent();
+    var allChardinToolTips = $(".chardinjs-tooltiptext");
+    var toolTipLayer = allChardinToolTips.parent();
     if (toolTipLayer !== undefined) {
       var top = toolTipLayer.position().top;
       toolTipLayer.attr('style', 'top: ' + top + 'px; right: -80px');

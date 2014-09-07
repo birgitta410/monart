@@ -70,6 +70,7 @@ define(['lodash'], function (_) {
 
   var withData = function(data) {
     var result = {
+      id: data.id,
       name: data.name,
       updated: data.updated
     }; // only expose the data we currently need

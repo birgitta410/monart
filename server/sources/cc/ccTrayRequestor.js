@@ -23,7 +23,7 @@ define(['request', 'xml2json', 'fs', 'server/sources/httpConfig'], function (req
 
   function getFake(callback) {
     console.log('FAKING cctray.xml');
-    var xml = fs.readFileSync('server/sources/cc/cctray.xml');
+    var xml = fs.readFileSync('server/sources/cc/fake/cctray.xml');
     var json = xml2json.toJson(xml, {
       object: true, sanitize: false
     });
