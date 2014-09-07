@@ -26,7 +26,7 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
 
       it('should initialise a set of pipeline runs', function () {
         thePipelineFeedReader.readHistory(function (results) {
-          expect(_.keys(results).length).toBe(11); //1199 - 1189
+          expect(_.keys(results).length).toBe(12); //1200 - 1189
           expect(results['1199']).toBeDefined();
         });
       });
@@ -39,7 +39,7 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
 
       it('should exclude pipelines if specified', function () {
         thePipelineFeedReader.readHistory(function (results) {
-          expect(_.keys(results).length).toBe(9); //1199 - 1189
+          expect(_.keys(results).length).toBe(10); //1200 - 1189
         }, { exclude: ['1199', '1198'] });
       });
 
@@ -83,12 +83,13 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
         });
       });
 
-      it('should determine the breaker of the failed job', function () {
+      it('should determine the author of a job', function () {
         thePipelineFeedReader.readHistory(function (results) {
           expect(results['1199'].result).toBe('passed');
-          expect(results['1199'].breaker).toBeUndefined();
+          expect(results['1199'].author).toBeDefined();
+          expect(results['1199'].author.name).toContain('Max Mustermann');
           expect(results['1195'].result).toBe('failed');
-          expect(results['1195'].breaker.name).toContain('Max Mustermann');
+          expect(results['1195'].author.name).toContain('Max Mustermann');
         });
       });
 

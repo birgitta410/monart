@@ -2,15 +2,18 @@
 var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
   var readHistoryAndActivity = function(callWhenDone) {
     ccTrayReader.readActivity(function(activity) {
-      var activityHaring = mapActivityDataToFigures(activity);
+      var activity = mapActivityDataToFigures(activity);
 
       pipelineReader.readHistory(function(history) {
 
         var historyHaring = mapPipelineDataToFigures(history);
 
+        var historyFigures = historyHaring.figures;
+        mapInitialsFromHistoryToActivity(historyFigures, activity.figures);
+
         var finalFigures = {};
-        finalFigures.figures = activityHaring.figures.concat(historyHaring.figures);
-        finalFigures.background = activityHaring.background || historyHaring.background;
+        finalFigures.figures = activity.figures.concat(historyFigures);
+        finalFigures.background = activity.background || historyHaring.background;
 
         callWhenDone(finalFigures);
 
@@ -18,6 +21,17 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
 
     })
   };
+
+  function mapInitialsFromHistoryToActivity(historyFigures, activityFigures) {
+    _.each(activityFigures, function(activityFigure) {
+      var historyFigureWithSameKey = _.find(historyFigures, function(historyFigure) {
+        return activityFigure.key === historyFigure.key;
+      });
+      if(historyFigureWithSameKey !== undefined) {
+        activityFigure.initials = historyFigureWithSameKey.hiddenInitials;
+      }
+    });
+  }
 
   var readHistory = function(callWhenDone, activeBuildNumber) {
     pipelineReader.readHistory(mapPipelineDataToFigures, { callbackParameter: callWhenDone, exclude: [ activeBuildNumber ] });
@@ -48,7 +62,7 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
     }
   }
 
-  function getInitialsOfBreaker(entry) {
+  function getInitialsOfAuthor(entry) {
 
     function onlyAtoZ(character) {
       var isLetter = character.toLowerCase() >= "a" && character.toLowerCase() <= "z";
@@ -59,8 +73,8 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
       }
     }
 
-    if(entry.breaker !== undefined && entry.breaker.name !== undefined) {
-      var nameParts = entry.breaker.name.split(' ');
+    if(entry.author !== undefined && entry.author.name !== undefined) {
+      var nameParts = entry.author.name.split(' ');
 
       var initials = _.map(nameParts, function(namePart, index) {
         if (index !== nameParts.length - 1) {
@@ -82,7 +96,7 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
   function mapPipelineDataToFigures(history, callWhenDone) {
 
     function getChangesByInfo(historyEntry) {
-      return 'changes by ' + (historyEntry.breaker ? historyEntry.breaker.name : 'UNKNOWN');
+      return 'changes by ' + (historyEntry.author ? historyEntry.author.name : 'UNKNOWN');
     }
 
     function getInfo(historyEntry, buildNumber) {
@@ -101,7 +115,9 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
         color: getColor(entry),
         info: getInfo(entry, key),
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
-        initials: getInitialsOfBreaker(entry)
+        hiddenInitials: getInitialsOfAuthor(entry), // need to save initials for merging with activity
+        initials: entry.wasSuccessful() ? undefined : getInitialsOfAuthor(entry),
+        key: key
       };
     });
 
@@ -148,8 +164,8 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
         return entryTitle + ' is building';
       } else {
         var info = entryTitle + ' | ' + entry.lastBuildStatus;
-        if(!entry.wasSuccessful() && entry.breaker) {
-          info += ' | changes by ' + entry.breaker.name;
+        if(!entry.wasSuccessful() && entry.author) {
+          info += ' | changes by ' + entry.author.name;
         }
         return info;
       }
@@ -162,7 +178,8 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
         showInfo: ! entry.wasSuccessful(),
         type: getFigureTypeForActivity(entry),
         border: 'dotted',
-        initials: getInitialsOfBreaker(entry)
+        initials: getInitialsOfAuthor(entry),
+        key: entry.buildNumber
       }
     });
 

@@ -38,7 +38,7 @@ context(['lodash', 'server/sources/cc/ccTrayReader'], function(_, theCcTrayReade
       it('should by default only use jobs, i.e. project names with 3 name elements', function () {
         // 6 = number of jobs
         theCcTrayReader.readActivity(function (result) {
-          expect(result.jobs.length).toBe(12);
+          expect(result.jobs.length).toBe(8);
         });
       });
 
@@ -62,9 +62,9 @@ context(['lodash', 'server/sources/cc/ccTrayReader'], function(_, theCcTrayReade
 
       it('should stay the same number of activities when called twice', function () {
         theCcTrayReader.readActivity(function (result) {
-          expect(result.jobs.length).toBe(12);
+          expect(result.jobs.length).toBe(8);
           theCcTrayReader.readActivity(function (result) {
-            expect(result.jobs.length).toBe(12);
+            expect(result.jobs.length).toBe(8);
           });
         });
       });
@@ -78,7 +78,7 @@ context(['lodash', 'server/sources/cc/ccTrayReader'], function(_, theCcTrayReade
 
       it('should provide id of pipeline that is currently building', function () {
         theCcTrayReader.readActivity(function (result) {
-          expect(result.buildNumberInProgress).toBe('1239');
+          expect(result.buildNumberInProgress).toBe('1200');
         });
       });
 

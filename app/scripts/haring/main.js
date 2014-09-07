@@ -28,9 +28,9 @@ function buildInitialGrid() {
       rowDiv.append(
       '<div class="figure-wrapper"><div class="figure solid">' +
           '<div class="bg"></div>' +
+          '<img src="images/haring/dog.png" class="grey">' +
           '<div class="letters top-left"></div>' +
           '<div class="letters bottom-right"></div>' +
-          '<img src="images/haring/dog.png" class="grey">' +
       '</div></div>');
     }
   }

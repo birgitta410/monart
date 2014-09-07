@@ -51,22 +51,15 @@ context(['server/sources/gocd/atomEntryParser'], function(theAtomEntryParser) {
         expect(entry.result).toBe('passed');
       });
 
-      it('should not set the name of the breaker if stage passed', function () {
-        var entry = theAtomEntryParser.withData({ title: 'QEN(1197) stage build(1) Passed' });
-
-        expect(entry.breaker).toBeUndefined();
-      });
-
-      it('should set the name of the breaker if stage failed', function () {
+      it('should set the name and email of the author', function () {
         var entry = theAtomEntryParser.withData({
-          title: 'QEN(1197) stage build(1) Failed',
           author: {
             name: 'Max Mustermann <mmustermann@internet.se>'
           }
         });
 
-        expect(entry.breaker.name).toContain('Max Mustermann');
-        expect(entry.breaker.email).toContain('internet');
+        expect(entry.author.name).toContain('Max Mustermann');
+        expect(entry.author.email).toContain('internet');
       });
 
     });

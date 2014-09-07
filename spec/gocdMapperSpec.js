@@ -38,6 +38,12 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
     };
 
     describe('readHistoryAndActivity()', function() {
+
+      beforeEach(function() {
+        fakeActivity = [];
+        fakePipelineHistory = {};
+      });
+
       it('should set the background colour to green if successful', function() {
         fakePipelineHistory = {
           '125': { wasSuccessful: successfulFn, time: mockTime }
@@ -76,6 +82,28 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
         ];
         theGocdMapper.readHistoryAndActivity(function(result) {
           expect(result.background).toBe('blue');
+        });
+      });
+
+      it('should add info about author to activity from history, even if history failed', function () {
+        fakePipelineHistory = {
+          '125': {
+            wasSuccessful: successfulFn,
+            time: mockTime,
+            author: {
+              name: 'Max Mustermann'
+            }
+          }
+        };
+        fakeActivity = [
+          {
+            buildNumber: '125',
+            wasSuccessful: notSuccessfulFn
+          }
+        ];
+        theGocdMapper.readHistoryAndActivity(function(result) {
+          expect(result.figures[0].initials).toBe('mmu');
+          expect(result.figures[1].initials).toBeUndefined;
         });
       });
     });
@@ -141,21 +169,21 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           '123': {
             wasSuccessful: notSuccessfulFn,
             time: mockTime,
-            breaker: {
+            author: {
               name: 'Max Mustermann'
             }
           },
           '122': {
             wasSuccessful: notSuccessfulFn,
             time: mockTime,
-            breaker: {
+            author: {
               name: 'Has Three Names'
             }
           },
           '121': {
             wasSuccessful: notSuccessfulFn,
             time: mockTime,
-            breaker: {
+            author: {
               name: 'Special Cäracter'
             }
           }
@@ -196,6 +224,30 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
 
         var optionsReadHistory = mockPipelineReader.readHistory.mostRecentCall.args[1];
         expect(optionsReadHistory.exclude).toEqual([ anActiveBuildNumber ]);
+      });
+
+
+      it('should not add initials of authors of passed jobs', function () {
+        fakePipelineHistory = {
+          '124': {
+            wasSuccessful: successfulFn,
+            author: {
+              name: 'Max Mustermann',
+              email: 'mmustermann@internet.se'
+            }
+          },
+          '123': {
+            wasSuccessful: notSuccessfulFn,
+            author: {
+              name: 'Max Mustermann',
+              email: 'mmustermann@internet.se'
+            }
+          }
+        };
+        theGocdMapper.readHistory(function (result) {
+          expect(result.figures[0].initials).toBeUndefined();
+          expect(result.figures[1].initials).toBe('mmu');
+        });
       });
 
     });
@@ -254,11 +306,11 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
         });
       });
 
-      it('should create initials of person that broke a job', function () {
+      it('should create initials of person that authored changes for a failed job', function () {
         fakeActivity = [
           {
             wasSuccessful: notSuccessfulFn,
-            breaker: {
+            author: {
               name: 'Max Mustermann',
               email: 'mmustermann@internet.se'
             }

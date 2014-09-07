@@ -36,25 +36,27 @@ define(['lodash'], function (_) {
     };
   }
 
-  function parseBreaker(result, author) { // !!currently duplicated in ccTrayReader
-    if(result === 'failed' && author !== undefined) {
+  function parseAuthor(author) { // !!currently duplicated in ccTrayReader
+    if(author !== undefined) {
       var authors = [].concat(author || []);
-      var breakerName = authors[authors.length - 1].name;
+      var authorName = authors[authors.length - 1].name;
 
-      var breaker = {};
+      var author = {};
 
-      var emailIndex = breakerName.indexOf('<');
+      var emailIndex = authorName.indexOf('<');
       if (emailIndex > -1) {
-        breaker.name = breakerName.substr(0, emailIndex).trim();
-        breaker.email = breakerName.substr(emailIndex).trim();
+        author.name = authorName.substr(0, emailIndex).trim();
+        author.email = authorName.substr(emailIndex).trim();
       } else {
-        breaker.name = breakerName;
+        author.name = authorName;
       }
-      return breaker;
+      return {
+        author: author
+      };
     }
   }
 
-  function parseResultAndBreaker(title, author) {
+  function parseResult(title) {
     if (title === undefined) return { };
 
     // 'QEN(1197) stage build(1) Passed'
@@ -62,14 +64,14 @@ define(['lodash'], function (_) {
     var result = titleChunks[3].toLowerCase();
 
     return {
-      result: result,
-      breaker: parseBreaker(result, author)
+      result: result
     }
   }
 
   var withData = function(data) {
     data = _.extend(data, parseParametersFromJobRunUrl(data.id));
-    return _.extend(data, parseResultAndBreaker(data.title, data.author));
+    data = _.extend(data, parseAuthor(data.author));
+    return _.extend(data, parseResult(data.title));
   };
 
   return {

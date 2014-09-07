@@ -37,6 +37,18 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
     });
   }
 
+  function mapPipelineAuthor(historyEntry) {
+
+    var firstStage = _.first(historyEntry.stages);
+
+    _.extend(historyEntry, {
+      author: firstStage.author
+    });
+
+    return historyEntry;
+
+  }
+
   function mapPipelineResult(historyEntry) {
 
     var lastRuns = getLatestRunsOfStages(historyEntry.stages);
@@ -46,8 +58,7 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
     if (failedStages.length > 0) {
       _.extend(historyEntry, {
         result : 'failed',
-        stageFailed : failedStages[0].stageName,
-        breaker : failedStages[0].breaker
+        stageFailed : failedStages[0].stageName
       });
     } else {
       historyEntry.result = 'passed';
@@ -72,11 +83,12 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
         });
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineFinishTime);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineResult);
+        pipelineHistory = _.mapValues(pipelineHistory, mapPipelineAuthor);
 
         var nextLink = _.find(result.feed.link, { rel: 'next' });
 
         if (nextLink && _.keys(pipelineHistory).length < MIN_NUMBER_HISTORY) {
-          nextUrl = nextLink.href;
+          var nextUrl = nextLink.href;
           readHistory(callback, _.extend(options, { nextUrl: nextUrl }));
         } else {
           callback(pipelineHistory, options.callbackParameter);

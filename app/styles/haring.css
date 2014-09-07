@@ -104,6 +104,9 @@
   margin: 7% !important;
   max-width: 87% !important;
 }
+.skating ~ .letters {
+  display: none;
+}
 
 .green {
   background-color: #a3d626;
