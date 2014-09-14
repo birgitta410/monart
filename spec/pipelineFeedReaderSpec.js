@@ -1,28 +1,18 @@
 
-var fs = require('fs');
-var xml2json = require('xml2json');
-
-var mockGocdRequestor = {
-  get: function(next, callback) {
-    var source = next ? next : 'spec/fixtures/pipeline-stages.xml';
-    var xml = fs.readFileSync(source);
-    var json = xml2json.toJson(xml, { object: true, sanitize: false });
-    callback(json);
-  },
-  getMaterialHtml: function(id, callback) {
-    var html = fs.readFileSync('spec/fixtures/materials.html');
-    callback(html);
+var yaml_config = require('node-yaml-config');
+var mockYamlConfig = {
+  load: function() {
+    return yaml_config.load('spec/fixtures/config.yml');
   }
 };
 
 var mocks = {
-  'server/sources/gocd/gocdRequestor': mockGocdRequestor
+  'node-yaml-config': mockYamlConfig
 };
 
 var context = createContext(mocks);
 
-
-context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function(_, moment, thePipelineFeedReader) {
+context(['lodash', 'moment', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/pipelineFeedReader'], function(_, moment, mockGocdRequestor, thePipelineFeedReader) {
 
   var NUM_ENTRIES_IN_FIXTURE = 12;
 
@@ -120,6 +110,13 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
           expect(results['1199'].materials[0].comment).toContain('awesome');
           expect(results['1199'].materials[0].sha).toBe('074cc70d464ad708c82bc6316f6c21ee35cffdcf');
           expect(results['1199'].materials[1].sha).toBe('185cc70d464ad708c82bc6316f6c21ee35cffdcf');
+        });
+      });
+
+      it('should get commit stats from github', function () {
+        thePipelineFeedReader.readHistory(function (results) {
+          expect(results['1199'].materials.length).toBe(2);
+          expect(results['1199'].materials[0].stats).toBeDefined();
         });
       });
 

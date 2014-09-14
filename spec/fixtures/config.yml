@@ -1,0 +1,14 @@
+
+default:
+  gocd:
+    fake: true
+  cc:
+    fake: true
+    jobs:
+      - 'A-PIPELINE :: build'
+      - 'A-PIPELINE :: integration-test'
+      - 'A-PIPELINE :: deploy-dev'
+      - 'A-PIPELINE :: smoke-test-dev'
+      - 'A-PIPELINE :: functional-test'
+  github:
+    fake: true

@@ -25,7 +25,6 @@ define(['xml2json', 'request', 'fs', 'server/sources/httpConfig'], function (xml
   };
 
   function getFake(next, callback) {
-    console.log('FAKING Go CD Pipeline Feed');
     var source = next ? next : 'server/sources/gocd/fake/pipeline-stages.xml';
     var xml = fs.readFileSync(source);
     var json = xml2json.toJson(xml, {

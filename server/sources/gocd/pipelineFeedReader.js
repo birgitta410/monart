@@ -1,5 +1,6 @@
 
-define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'], function (_, cheerio, gocdRequestor, atomEntryParser) {
+define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser', 'server/sources/github/githubRequestor'],
+  function (_, cheerio, gocdRequestor, atomEntryParser, githubRequestor) {
 
   var pipelineHistory = { };
   var MIN_NUMBER_HISTORY = 25;
@@ -101,11 +102,15 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
           var modifiedBy = withoutTimestamp($(change).find('.modified_by dd')[0].children[0].data);
           var comment = $(change).find('.comment p')[0].children[0].data;
           var sha = $(change).find('.revision dd')[0].children[0].data;
-          return {
+          var material = {
             comment: comment,
             committer: modifiedBy,
             sha: sha
           };
+          githubRequestor.getCommitStats(sha, function(stats) {
+            material.stats = stats;
+          });
+          return material;
         });
 
       } catch(error) {
