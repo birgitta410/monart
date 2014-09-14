@@ -95,12 +95,19 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
     gocdRequestor.getMaterialHtml(basicData.stages[0].id, function(html) {
       var $ = cheerio.load(html);
       try {
-        var modifiedBy = withoutTimestamp($('.material_tab .change .modified_by dd')[0].children[0].data);
-        var comment = $('.material_tab .change .comment p')[0].children[0].data;
-        basicData.materials = {
-          comment: comment,
-          committer: modifiedBy
-        };
+        var changes = $('.material_tab .change');
+
+        basicData.materials = _.map(changes, function(change) {
+          var modifiedBy = withoutTimestamp($(change).find('.modified_by dd')[0].children[0].data);
+          var comment = $(change).find('.comment p')[0].children[0].data;
+          var sha = $(change).find('.revision dd')[0].children[0].data;
+          return {
+            comment: comment,
+            committer: modifiedBy,
+            sha: sha
+          };
+        });
+
       } catch(error) {
         console.log('ERROR loading material', error);
       }

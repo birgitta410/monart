@@ -252,10 +252,10 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
         fakePipelineHistory = {
           '124': {
             wasSuccessful: successfulFn,
-            materials: {
+            materials: [{
               committer: 'Max Mustermann',
               comment: 'Awesome change'
-            }
+            }]
           }
         };
         theGocdMapper.readHistoryAndActivity(function (result) {

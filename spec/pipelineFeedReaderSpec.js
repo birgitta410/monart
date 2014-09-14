@@ -115,8 +115,11 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
 
       it('should parse committer and commit message from material HTML', function () {
         thePipelineFeedReader.readHistory(function (results) {
-          expect(results['1199'].materials.committer).toContain('Max Mustermann');
-          expect(results['1199'].materials.comment).toContain('awesome');
+          expect(results['1199'].materials.length).toBe(2);
+          expect(results['1199'].materials[0].committer).toContain('Max Mustermann');
+          expect(results['1199'].materials[0].comment).toContain('awesome');
+          expect(results['1199'].materials[0].sha).toBe('074cc70d464ad708c82bc6316f6c21ee35cffdcf');
+          expect(results['1199'].materials[1].sha).toBe('185cc70d464ad708c82bc6316f6c21ee35cffdcf');
         });
       });
 
