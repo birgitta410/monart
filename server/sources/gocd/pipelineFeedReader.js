@@ -21,6 +21,10 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
   }
 
   function mapPipelineFinishTime(historyEntry) {
+    if(historyEntry.time !== undefined) {
+      return historyEntry;
+    }
+
     var lastFinishedStage = _.sortBy(historyEntry.stages, function(stage) {
       return  stage.updated;
     })[historyEntry.stages.length - 1];
@@ -39,6 +43,10 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
 
   function mapPipelineAuthor(historyEntry) {
 
+    if(historyEntry.author !== undefined) {
+      return historyEntry;
+    }
+
     var firstStage = _.first(historyEntry.stages);
 
     _.extend(historyEntry, {
@@ -50,6 +58,9 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
   }
 
   function mapPipelineResult(historyEntry) {
+    if(historyEntry.result !== undefined) {
+      return historyEntry;
+    }
 
     var lastRuns = getLatestRunsOfStages(historyEntry.stages);
 
@@ -72,6 +83,10 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
   }
 
   function enrichWithCommitDetails(basicData) {
+
+    if(basicData.materials !== undefined) {
+      return;
+    }
 
     function withoutTimestamp(data) {
       return data.indexOf('on 2') === -1 ? data : data.slice(0, data.indexOf('on 2')).trim();
@@ -126,7 +141,12 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
 
   };
 
+  var clear = function() {
+    pipelineHistory = {};
+  };
+
   return {
-    readHistory: readHistory
+    readHistory: readHistory,
+    clear: clear
   };
 });

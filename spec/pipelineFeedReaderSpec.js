@@ -24,7 +24,13 @@ var context = createContext(mocks);
 
 context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function(_, moment, thePipelineFeedReader) {
 
+  var NUM_ENTRIES_IN_FIXTURE = 12;
+
   describe('pipelineFeedReader', function () {
+    beforeEach(function() {
+      thePipelineFeedReader.clear();
+    });
+
     describe('readHistory()', function () {
 
       it('should log an example to the console, for documentation purposes', function () {
@@ -40,7 +46,7 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
 
       it('should initialise a set of pipeline runs', function () {
         thePipelineFeedReader.readHistory(function (results) {
-          expect(_.keys(results).length).toBe(12); //1200 - 1189
+          expect(_.keys(results).length).toBe(NUM_ENTRIES_IN_FIXTURE);
           expect(results['1199']).toBeDefined();
         });
       });
@@ -53,7 +59,7 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
 
       it('should exclude pipelines if specified', function () {
         thePipelineFeedReader.readHistory(function (results) {
-          expect(_.keys(results).length).toBe(10); //1200 - 1189
+          expect(_.keys(results).length).toBe(NUM_ENTRIES_IN_FIXTURE - 2);
         }, { exclude: ['1199', '1198'] });
       });
 
@@ -112,6 +118,19 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
           expect(results['1199'].materials.committer).toContain('Max Mustermann');
           expect(results['1199'].materials.comment).toContain('awesome');
         });
+      });
+
+      it('should not request material info again if already set in previous call', function () {
+        spyOn(mockGocdRequestor, 'getMaterialHtml').andCallThrough();
+        thePipelineFeedReader.readHistory(function (results) {
+          expect(results['1199'].materials).toBeDefined();
+          expect(mockGocdRequestor.getMaterialHtml.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
+          thePipelineFeedReader.readHistory(function (results) {
+            expect(results['1199'].materials).toBeDefined();
+            expect(mockGocdRequestor.getMaterialHtml.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
+          });
+        });
+
       });
 
       xit('should not add the same entries again when called twice', function () {
