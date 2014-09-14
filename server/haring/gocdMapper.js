@@ -90,9 +90,10 @@ var gocdMapper = function(_, moment, gocdReader) {
 
     function getInfo(historyEntry, buildNumber) {
       var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
-      var theCommit = '<br>' + (historyEntry.materials ? historyEntry.materials.comment : 'Unknown change');
+      var theCommit = historyEntry.materials ? historyEntry.materials.comment : 'Unknown change';
+      var theAuthor = historyEntry.author ? historyEntry.author.name : 'Unknown author';
       var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | ' + getChangesByInfo(historyEntry);
-      return '[' + buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit;
+      return '[' + buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit + ' | ' + theAuthor;
     }
 
     var keysDescending = _.keys(history).sort(compareNumbers).reverse();
