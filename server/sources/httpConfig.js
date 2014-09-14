@@ -1,10 +1,14 @@
 
-define(['xml2json', 'module', 'path', 'node-yaml-config'], function (xml2json, module, path, yaml_config) {
+define(['xml2json', 'module', 'path', 'node-yaml-config', 'lodash'], function (xml2json, module, path, yaml_config, _) {
+
+  var HEROKU_VARS_SUPPORT = [
+    'user', 'password', 'url', 'pipeline', 'jobs', 'token', 'repo'
+  ];
+
   var create = function (configKey) {
 
     var config;
     var id = configKey;
-    var FAKE = 'fake-it';
 
     init();
 
@@ -13,19 +17,17 @@ define(['xml2json', 'module', 'path', 'node-yaml-config'], function (xml2json, m
     };
 
     function init() {
+
       try {
         config = yaml_config.load(path.dirname(module.uri) + '/config.yml');
       } catch (err) {
         console.log('could not read yml, trying Heroku vars');
 
         config = {};
-        config[id] = {
-          user: process.env[id.toUpperCase() + '_USER'],
-          password: process.env[id.toUpperCase() + '_PASSWORD'],
-          url: process.env[id.toUpperCase() + '_URL'],
-          pipeline: process.env[id.toUpperCase() + '_PIPELINE'],
-          jobs: process.env[id.toUpperCase() + '_JOBS']
-        };
+        config[id] = {};
+        _.each(HEROKU_VARS_SUPPORT, function(varName) {
+          config[id][varName] = process.env[id.toUpperCase() + '_' + varName.toUpperCase()];
+        });
 
         if(config[id].jobs) {
           config[id].jobs = config[id].jobs.split(',');
@@ -39,8 +41,9 @@ define(['xml2json', 'module', 'path', 'node-yaml-config'], function (xml2json, m
 
       }
 
+      config[id] = config[id] || { fake: true };
       config[id].fakeIt = function () {
-        return config[id].url === FAKE;
+        return config[id] === {} || config[id].fake === true;
       };
 
       config[id].url = addCredentialsToUrl(config[id].url);
