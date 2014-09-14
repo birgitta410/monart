@@ -133,16 +133,49 @@ context(['lodash', 'moment', 'server/sources/gocd/gocdRequestor', 'server/source
 
       });
 
-      xit('should not add the same entries again when called twice', function () {
+      it('should put author and commit message into info text, if present', function () {
         thePipelineFeedReader.readHistory(function (results) {
-          expect(_.keys(results).length).toBe(11);
-          expect(results['1199'].stages.length).toBe(5);
+          expect(results['1199'].info).toContain('Mustermann');
+          expect(results['1199'].info).toContain('second change');
+        });
+      });
 
-          thePipelineFeedReader.readHistory(function (results) {
-            expect(_.keys(results).length).toBe(11);
-            expect(results['1199'].stages.length).toBe(5);
-          });
+      it('should create initials of person that authored changes for a failed job', function () {
+        thePipelineFeedReader.readHistory(function (results) {
+          expect(results['1199'].author.initials).toContain('mmu');
+        });
+      });
 
+      xit('should create initials of person that broke the pipeline run', function () {
+        // TODO: Rewrite this test to work here
+        fakePipelineHistory = {
+          '123': {
+            wasSuccessful: notSuccessfulFn,
+            time: mockTime,
+            author: {
+              name: 'Max Mustermann'
+            }
+          },
+          '122': {
+            wasSuccessful: notSuccessfulFn,
+            time: mockTime,
+            author: {
+              name: 'Has Three Names'
+            }
+          },
+          '121': {
+            wasSuccessful: notSuccessfulFn,
+            time: mockTime,
+            author: {
+              name: 'Special Cäracter'
+            }
+          }
+        };
+
+        haringGocdMapper.readHistoryAndActivity(function (result) {
+          expect(result.figures[0].initials).toBe('mmu');
+          expect(result.figures[1].initials).toBe('htn');
+          expect(result.figures[2].initials).toBe('scx');
         });
       });
 

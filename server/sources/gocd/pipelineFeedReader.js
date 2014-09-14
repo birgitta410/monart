@@ -1,6 +1,6 @@
 
-define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser', 'server/sources/github/githubRequestor'],
-  function (_, cheerio, gocdRequestor, atomEntryParser, githubRequestor) {
+define(['lodash', 'cheerio', 'moment', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser', 'server/sources/github/githubRequestor'],
+  function (_, cheerio, moment, gocdRequestor, atomEntryParser, githubRequestor) {
 
   var pipelineHistory = { };
   var MIN_NUMBER_HISTORY = 25;
@@ -17,6 +17,7 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
   function pushEntryToPipelineHistory(entry) {
     pipelineHistory[entry.buildNumber] = pipelineHistory[entry.buildNumber] || {};
     var historyEntry = pipelineHistory[entry.buildNumber];
+    historyEntry.buildNumber = entry.buildNumber;
     historyEntry.stages = historyEntry.stages || [];
     historyEntry.stages.push(entry);
   }
@@ -30,6 +31,22 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
       return  stage.updated;
     })[historyEntry.stages.length - 1];
     historyEntry.time = lastFinishedStage.updated;
+    return historyEntry;
+  }
+
+  function mapInfoText(historyEntry) {
+    if(historyEntry.info !== undefined) {
+      return historyEntry;
+    }
+
+    var lastCommitMaterial = _.last(historyEntry.materials);
+
+    var theCommit = lastCommitMaterial ? lastCommitMaterial.comment : 'Unknown change';
+    var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
+    var theAuthor = historyEntry.author ? historyEntry.author.name : 'Unknown author';
+    var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed;
+    historyEntry.info = '[' + historyEntry.buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit + ' | ' + theAuthor;
+
     return historyEntry;
   }
 
@@ -48,11 +65,38 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
       return historyEntry;
     }
 
+    function getInitialsOfAuthor(author) {
+
+      function onlyAtoZ(character) {
+        var isLetter = character.toLowerCase() >= "a" && character.toLowerCase() <= "z";
+        if (! isLetter) {
+          return 'x';
+        } else {
+          return character;
+        }
+      }
+
+      if(author.name !== undefined) {
+        var nameParts = author.name.split(' ');
+
+        var initials = _.map(nameParts, function(namePart, index) {
+          if (index !== nameParts.length - 1) {
+            return onlyAtoZ(namePart[0]);
+          } else {
+            return onlyAtoZ(namePart[0]) + onlyAtoZ(namePart[1]);
+          }
+        }).join('');
+
+        return initials.toLowerCase().substr(0, 3);
+      }
+    }
+
     var firstStage = _.first(historyEntry.stages);
 
     _.extend(historyEntry, {
       author: firstStage.author
     });
+    historyEntry.author.initials = getInitialsOfAuthor(firstStage.author);
 
     return historyEntry;
 
@@ -138,6 +182,8 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
           // TODO: Does this async call really fill up values before we're done?
           enrichWithCommitDetails(entry);
         });
+
+        pipelineHistory = _.mapValues(pipelineHistory, mapInfoText);
 
         var nextLink = _.find(result.feed.link, { rel: 'next' });
 

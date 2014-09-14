@@ -86,7 +86,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
             wasSuccessful: successfulFn,
             time: mockTime,
             author: {
-              name: 'Max Mustermann'
+              initials: 'mmu'
             }
           }
         };
@@ -160,38 +160,6 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
 
       });
 
-      it('should create initials of person that broke the pipeline run', function () {
-        fakePipelineHistory = {
-          '123': {
-            wasSuccessful: notSuccessfulFn,
-            time: mockTime,
-            author: {
-              name: 'Max Mustermann'
-            }
-          },
-          '122': {
-            wasSuccessful: notSuccessfulFn,
-            time: mockTime,
-            author: {
-              name: 'Has Three Names'
-            }
-          },
-          '121': {
-            wasSuccessful: notSuccessfulFn,
-            time: mockTime,
-            author: {
-              name: 'Special Cäracter'
-            }
-          }
-        };
-
-        haringGocdMapper.readHistoryAndActivity(function (result) {
-          expect(result.figures[0].initials).toBe('mmu');
-          expect(result.figures[1].initials).toBe('htn');
-          expect(result.figures[2].initials).toBe('scx');
-        });
-      });
-
       it('should set orange background colour if latest build failed', function () {
         fakePipelineHistory = {
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
@@ -225,15 +193,13 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
           '124': {
             wasSuccessful: successfulFn,
             author: {
-              name: 'Max Mustermann',
-              email: 'mmustermann@internet.se'
+              initials: 'mmu'
             }
           },
           '123': {
             wasSuccessful: notSuccessfulFn,
             author: {
-              name: 'Max Mustermann',
-              email: 'mmustermann@internet.se'
+              initials: 'mmu'
             }
           }
         };
@@ -243,20 +209,6 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
         });
       });
 
-      it('should put commit message into info text, if present', function () {
-        fakePipelineHistory = {
-          '124': {
-            wasSuccessful: successfulFn,
-            materials: [{
-              committer: 'Max Mustermann',
-              comment: 'Awesome change'
-            }]
-          }
-        };
-        haringGocdMapper.readHistoryAndActivity(function (result) {
-          expect(result.figures[0].info).toContain('Awesome change');
-        });
-      });
     });
 
     describe('mapActivityDataToFigures()', function () {
@@ -313,21 +265,6 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
         ];
         haringGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.figures[0].showInfo).toBe(true);
-        });
-      });
-
-      it('should create initials of person that authored changes for a failed job', function () {
-        fakeActivity = [
-          {
-            wasSuccessful: notSuccessfulFn,
-            author: {
-              name: 'Max Mustermann',
-              email: 'mmustermann@internet.se'
-            }
-          }
-        ];
-        haringGocdMapper.readHistoryAndActivity(function (result) {
-          expect(result.figures[0].initials).toBe('mmu');
         });
       });
 

@@ -51,52 +51,12 @@ var haringGocdMapper = function(_, moment, gocdReader) {
     }
   }
 
-  function getInitialsOfAuthor(entry) {
-
-    function onlyAtoZ(character) {
-      var isLetter = character.toLowerCase() >= "a" && character.toLowerCase() <= "z";
-      if (! isLetter) {
-        return 'x';
-      } else {
-        return character;
-      }
-    }
-
-    if(entry.author !== undefined && entry.author.name !== undefined) {
-      var nameParts = entry.author.name.split(' ');
-
-      var initials = _.map(nameParts, function(namePart, index) {
-        if (index !== nameParts.length - 1) {
-          return onlyAtoZ(namePart[0]);
-        } else {
-          return onlyAtoZ(namePart[0]) + onlyAtoZ(namePart[1]);
-        }
-      }).join('');
-
-      return initials.toLowerCase().substr(0, 3);
-    }
-  }
-
   function compareNumbers(a, b) {
     // JS does lexicographical sorting by default, need to sort by number
     return a - b;
   }
 
   function mapPipelineDataToFigures(history) {
-
-    function getChangesByInfo(historyEntry) {
-      return 'changes by ' + (historyEntry.author ? historyEntry.author.name : 'UNKNOWN');
-    }
-
-    function getInfo(historyEntry, buildNumber) {
-      var lastCommitMaterial = _.last(historyEntry.materials);
-
-      var theCommit = lastCommitMaterial ? lastCommitMaterial.comment : 'Unknown change';
-      var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
-      var theAuthor = historyEntry.author ? historyEntry.author.name : 'Unknown author';
-      var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | ' + getChangesByInfo(historyEntry);
-      return '[' + buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit + ' | ' + theAuthor;
-    }
 
     var keysDescending = _.keys(history).sort(compareNumbers).reverse();
     if(keysDescending.length === 0) {
@@ -110,10 +70,10 @@ var haringGocdMapper = function(_, moment, gocdReader) {
 
       return {
         color: getColor(entry),
-        info: getInfo(entry, key),
+        info: entry.info,
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
-        hiddenInitials: getInitialsOfAuthor(entry), // need to save initials for merging with activity
-        initials: entry.wasSuccessful() ? undefined : getInitialsOfAuthor(entry),
+        hiddenInitials: entry.author ? entry.author.initials : undefined, // need to save initials for merging with activity
+        initials: entry.wasSuccessful() ? undefined : (entry.author ? entry.author.initials : undefined),
         key: key
       };
     });
@@ -170,7 +130,7 @@ var haringGocdMapper = function(_, moment, gocdReader) {
         showInfo: ! entry.wasSuccessful(),
         type: getFigureTypeForActivity(entry),
         border: 'dotted',
-        initials: getInitialsOfAuthor(entry),
+        initials: entry.author ? entry.author.initials : undefined,
         key: entry.buildNumber
       }
     });

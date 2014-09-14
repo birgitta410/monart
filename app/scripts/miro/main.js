@@ -36,6 +36,15 @@ function processStone(index, entry) {
   var allStones = $('.stone');
   var stoneDiv = $(allStones[index]);
 
+  stoneDiv.tooltip({ placement: 'bottom'})
+    .tooltip('hide')
+    .attr('data-original-title', entry.info)
+    .tooltip('fixTitle');
+
+  if(entry.showInfo) {
+    stoneDiv.tooltip('show');
+  }
+
   var imgTag = $(stoneDiv.find('> img'));
   imgTag.attr('src', 'images/miro/' + entry.size + '_' + entry.color + '.png');
 

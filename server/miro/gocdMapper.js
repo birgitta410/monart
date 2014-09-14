@@ -13,11 +13,14 @@ var miroGocdMapper = function(_, moment, gocdReader) {
       var lastBuildSuccessful = history[keysDescending[0]].wasSuccessful();
 
       var finalShapes = {};
-      finalShapes.stroke = { color: lastBuildSuccessful ? 'black' : 'red' };
+      finalShapes.stroke = {
+        color: lastBuildSuccessful ? 'black' : 'red',
+        info: 'info'
+      };
       finalShapes.stones = [
-        { size: 'large', color: 'black' },
-        { size: 'medium', color: 'white' },
-        { size: 'small', color: 'red' }
+        { size: 'large', color: 'black', info: 'black' },
+        { size: 'medium', color: 'white', info: 'black' },
+        { size: 'small', color: 'red', info: 'black' }
       ];
 
       callWhenDone(finalShapes);
