@@ -33,13 +33,13 @@ default:
     password: xxxx
 ```
 
-If you just want to see what it looks like, setting url values to 'fake-it' will load some static fixtures to give you an idea:
+If you just want to see what it looks like, setting 'fake' to true will load some static fixtures to give you an idea:
 ```
 default:
   gocd:
-    url: fake-it
+    fake: true
   cc:
-    url: fake-it
+    fake: true
 ```
 
 ###Configure the jobs to show from CC Tray activity
@@ -47,7 +47,7 @@ By default, all jobs from CC Tray's activity feed will be displayed. You can res
 ```
 default:
   cc:
-    url: fake-it
+    fake: true
     jobs:
       - 'A-PIPELINE :: build'
       - 'A-PIPELINE :: integration-test'

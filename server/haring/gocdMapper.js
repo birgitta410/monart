@@ -90,7 +90,7 @@ var gocdMapper = function(_, moment, gocdReader) {
 
     function getInfo(historyEntry, buildNumber) {
       var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
-      var theCommit = '<br>' + historyEntry.materials ? historyEntry.materials.comment : 'Unknown change';
+      var theCommit = '<br>' + (historyEntry.materials ? historyEntry.materials.comment : 'Unknown change');
       var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | ' + getChangesByInfo(historyEntry);
       return '[' + buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit;
     }
