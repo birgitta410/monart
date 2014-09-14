@@ -1,5 +1,5 @@
 
-var gocdMapper = function(_, moment, gocdReader) {
+var haringGocdMapper = function(_, moment, gocdReader) {
   var readHistoryAndActivity = function(callWhenDone) {
     gocdReader.readData(function(data) {
 
@@ -199,4 +199,4 @@ var gocdMapper = function(_, moment, gocdReader) {
   }
 };
 
-define(['lodash', 'moment', 'server/sources/gocd/gocdReader'], gocdMapper);
+define(['lodash', 'moment', 'server/sources/gocd/gocdReader'], haringGocdMapper);

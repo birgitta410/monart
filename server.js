@@ -1,11 +1,13 @@
 
-define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper'], function (ws, http, express, module, path, _, haringGocdMapper) {
+define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper', 'server/miro/gocdMapper'], function (ws, http, express, module, path, _, haringGocdMapper, miroGocdMapper) {
 
   var WebSocketServer = ws.Server
     , app = express();
 
   app.use(express.static(path.dirname(module.uri) + '/'));
   var server = http.createServer(app);
+
+  /** HARING ************************/
 
   function listenToHaring() {
     var wssHaring = new WebSocketServer({server: server, path: '/haring'});
@@ -47,7 +49,49 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
 
   listenToHaring();
 
-  /**************************/
+  /** MIRO ************************/
+
+  function listenToMiro() {
+    var wssMiro = new WebSocketServer({server: server, path: '/miro'});
+    console.log('miro websocket server created');
+
+    wssMiro.on('connection', function(ws) {
+      console.log('connected to /miro');
+
+      function newClient() {
+
+        function getActivityAndUpdateClients() {
+          miroGocdMapper.readHistoryAndActivity(function(activityMiro) {
+            ws.send(JSON.stringify({ miro: activityMiro }), function() {  });
+          });
+        }
+
+        getActivityAndUpdateClients();
+        var clientId = setInterval(getActivityAndUpdateClients, 5000);
+        return clientId;
+      }
+
+      var clientId = newClient();
+
+      console.log('websocket connection open on /miro');
+
+      ws.on('message', function(msg) {
+        if(msg === 'ping') {
+          console.log('PING');
+          ws.send(JSON.stringify({ping: 'success'}));
+        }
+      });
+
+      ws.on('close', function() {
+        console.log('websocket connection close on /miro');
+        clearInterval(clientId);
+      });
+    });
+  }
+
+  listenToMiro();
+
+  /** MONDRIAN ************************/
   var mondrianEmailMapper = require('./server/mondrian/emailMapper.js');
 
   var wssMondrian = new WebSocketServer({server: server, path: '/mondrian'});
