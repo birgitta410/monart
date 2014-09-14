@@ -82,7 +82,7 @@ var haringGocdMapper = function(_, moment, gocdReader) {
     return a - b;
   }
 
-  function mapPipelineDataToFigures(history, callWhenDone) {
+  function mapPipelineDataToFigures(history) {
 
     function getChangesByInfo(historyEntry) {
       return 'changes by ' + (historyEntry.author ? historyEntry.author.name : 'UNKNOWN');
@@ -120,21 +120,16 @@ var haringGocdMapper = function(_, moment, gocdReader) {
 
     var lastBuildSuccessful = history[keysDescending[0]].wasSuccessful();
 
-    var changesExist = true;
     var result = {
       background: lastBuildSuccessful ? 'green' : 'orange',
       figures: figures
     };
 
-    if(callWhenDone !== undefined) {
-      callWhenDone(result, changesExist);
-    } else {
-      return result;
-    }
+    return result;
 
   }
 
-  function mapActivityDataToFigures(activity, callWhenDone) {
+  function mapActivityDataToFigures(activity) {
 
     function getFigureTypeForActivity(entry) {
 
@@ -184,15 +179,10 @@ var haringGocdMapper = function(_, moment, gocdReader) {
       return entry.activity === 'Building';
     });
 
-    var changesExist = true;
-    if(callWhenDone !== undefined) {
-      callWhenDone({ figures: figures }, changesExist);
-    } else {
-      return { 
-        background: isBuilding ? 'blue' : undefined,
-        figures: figures 
-      };
-    }
+    return {
+      background: isBuilding ? 'blue' : undefined,
+      figures: figures
+    };
 
   }
 
