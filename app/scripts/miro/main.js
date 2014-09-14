@@ -58,6 +58,10 @@ ws.onmessage = function (event) {
 
     var strokeImgTag = $('.long-stroke > img');
     strokeImgTag.attr('src', 'images/miro/stroke_' + historyData.stroke.color + '.png');
+    strokeImgTag.tooltip({ placement: 'bottom'})
+      .tooltip('hide')
+      .attr('data-original-title', historyData.stroke.info)
+      .tooltip('fixTitle');
 
     iterateStones(historyData, processStone);
     DATA = historyData;

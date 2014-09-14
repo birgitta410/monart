@@ -10,18 +10,22 @@ var miroGocdMapper = function(_, moment, gocdReader) {
       var keysDescending = _.keys(history).sort(function(a, b) {
         return a - b; // JS does lexicographical sorting by default, need to sort by number
       }).reverse();
-      var lastBuildSuccessful = history[keysDescending[0]].wasSuccessful();
+      var lastBuild = history[keysDescending[0]];
 
       var finalShapes = {};
       finalShapes.stroke = {
-        color: lastBuildSuccessful ? 'black' : 'red',
-        info: 'info'
+        color: lastBuild.wasSuccessful() ? 'black' : 'red',
+        info: lastBuild.info
       };
-      finalShapes.stones = [
-        { size: 'large', color: 'black', info: 'black' },
-        { size: 'medium', color: 'white', info: 'black' },
-        { size: 'small', color: 'red', info: 'black' }
-      ];
+
+      finalShapes.stones = _.map(keysDescending.splice(1), function(key) {
+        var entry = history[key];
+        return {
+          size: 'small',
+          color: entry.wasSuccessful() ? 'black' : 'red',
+          info: entry.info
+        };
+      });
 
       callWhenDone(finalShapes);
 
