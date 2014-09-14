@@ -36,7 +36,7 @@ function processStone(index, entry) {
   var allStones = $('.stone');
   var stoneDiv = $(allStones[index]);
 
-  stoneDiv.tooltip({ placement: 'bottom'})
+  stoneDiv.tooltip({ placement: 'right'})
     .tooltip('hide')
     .attr('data-original-title', entry.info)
     .tooltip('fixTitle');
@@ -58,7 +58,7 @@ ws.onmessage = function (event) {
 
     var strokeImgTag = $('.long-stroke > img');
     strokeImgTag.attr('src', 'images/miro/stroke_' + historyData.stroke.color + '.png');
-    strokeImgTag.tooltip({ placement: 'bottom'})
+    strokeImgTag.tooltip({ placement: 'right'})
       .tooltip('hide')
       .attr('data-original-title', historyData.stroke.info)
       .tooltip('fixTitle');

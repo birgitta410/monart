@@ -56,3 +56,9 @@ body {
   position: absolute;
   bottom: 10%;
 }
+
+/* bootstrap extensions */
+.tooltip {
+  font-size: 1em;
+  margin-top: 100px;
+}
