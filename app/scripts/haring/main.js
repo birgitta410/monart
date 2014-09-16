@@ -211,6 +211,13 @@ ws.onmessage = function (event) {
     setBackgroundStyle(historyData.background);
 
     iterateData(historyData, processFigure);
+
+    if(historyData.greatSuccess === true) {
+      $('.great-success').show();
+    } else {
+      $('.great-success').hide();
+    }
+
     DATA = historyData;
   } else if(data.ping) {
     LAST_PING = new Date();

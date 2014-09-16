@@ -100,6 +100,27 @@
   margin-left: 15%;
 }
 
+.great-success {
+  position: absolute;
+  bottom: -5%;
+  left: 25%;
+  width: 50%;
+  height: 85%;
+  display: none;
+}
+.great-success >img {
+  width: 70%;
+}
+.great-success >.top-left {
+  top: 4%;
+}
+.great-success >.bottom-right {
+  bottom: 34%;
+}
+.great-success >.letters img {
+  max-height: 45%;
+}
+
 .skating {
   margin: 7% !important;
   max-width: 87% !important;
