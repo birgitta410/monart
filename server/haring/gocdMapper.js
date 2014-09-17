@@ -9,6 +9,10 @@ var gocdMapper = function(_, moment, gocdReader) {
       var greatSuccess = ! _.any(data.history, function(entry) {
         return ! entry.wasSuccessful();
       });
+      var allResults = _.map(data.history, function(entry) {
+        return entry.wasSuccessful();
+      });
+      console.log('GREAT SUCCESS?', greatSuccess, allResults);
 
       var historyFigures = historyHaring.figures;
       mapInitialsFromHistoryToActivity(historyFigures, activityHaring.figures);
