@@ -6,18 +6,18 @@ var gocdMapper = function(_, moment, gocdReader) {
       var activityHaring = mapActivityDataToFigures(data.activity);
       var historyHaring = mapPipelineDataToFigures(data.history);
 
-      var greatSuccess = ! _.any(data.history, function(entry) {
-        return ! entry.wasSuccessful();
-      });
-      var allResults = _.map(data.history, function(entry) {
-        return entry.wasSuccessful();
-      });
-      console.log('GREAT SUCCESS?', greatSuccess, allResults);
+//      var greatSuccess = ! _.any(data.history, function(entry) {
+//        return ! entry.wasSuccessful();
+//      });
+//      var allResults = _.map(data.history, function(entry) {
+//        return entry.wasSuccessful();
+//      });
+//      console.log('GREAT SUCCESS?', greatSuccess, allResults);
 
       var historyFigures = historyHaring.figures;
       mapInitialsFromHistoryToActivity(historyFigures, activityHaring.figures);
 
-      var finalFigures = { greatSuccess: greatSuccess };
+      var finalFigures = {  };
       finalFigures.figures = activityHaring.figures.concat(historyFigures);
       finalFigures.background = activityHaring.background || historyHaring.background;
 

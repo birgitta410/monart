@@ -212,7 +212,12 @@ ws.onmessage = function (event) {
 
     iterateData(historyData, processFigure);
 
-    if(historyData.greatSuccess === true) {
+    var greatSuccess = ! _.any(historyData, function(entry) {
+      return entry.color === 'WARM';
+    });
+    console.log('greatSuccess?', greatSuccess);
+
+    if(greatSuccess === true) {
       $('.great-success').show();
     } else {
       $('.great-success').hide();
