@@ -212,7 +212,7 @@ ws.onmessage = function (event) {
 
     iterateData(historyData, processFigure);
 
-    var greatSuccess = ! _.any(historyData, function(entry) {
+    var greatSuccess = ! _.any(historyData.figures, function(entry) {
       return entry.color === 'WARM';
     });
     console.log('greatSuccess?', greatSuccess);
