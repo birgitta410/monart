@@ -1,5 +1,5 @@
 
-var gocdMapper = function(_, moment, gocdReader) {
+var haringGocdMapper = function(_, moment, gocdReader) {
 
   var NUM_FIGURES_IN_VIS = 24;
 
@@ -116,7 +116,7 @@ var gocdMapper = function(_, moment, gocdReader) {
     }
   }
 
-  function mapPipelineDataToFigures(history, callWhenDone) {
+  function mapPipelineDataToFigures(history) {
 
     function getChangesByInfo(historyEntry) {
       return 'changes by ' + (historyEntry.author ? historyEntry.author.name : 'UNKNOWN');
@@ -142,31 +142,26 @@ var gocdMapper = function(_, moment, gocdReader) {
 
       return {
         color: getColor(entry),
-        info: getInfo(entry, key),
+        info: entry.info,
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
-        hiddenInitials: getInitialsOfAuthor(entry), // need to save initials for merging with activity
-        initials: entry.wasSuccessful() ? undefined : getInitialsOfAuthor(entry),
+        hiddenInitials: entry.author ? entry.author.initials : undefined, // need to save initials for merging with activity
+        initials: entry.wasSuccessful() ? undefined : (entry.author ? entry.author.initials : undefined),
         key: key
       };
     });
 
     var lastBuildSuccessful = history[keysDescending[0]].wasSuccessful();
 
-    var changesExist = true;
     var result = {
       background: lastBuildSuccessful ? 'green' : 'orange',
       figures: figures
     };
 
-    if(callWhenDone !== undefined) {
-      callWhenDone(result, changesExist);
-    } else {
-      return result;
-    }
+    return result;
 
   }
 
-  function mapActivityDataToFigures(activity, callWhenDone) {
+  function mapActivityDataToFigures(activity) {
 
     function getFigureTypeForActivity(entry) {
 
@@ -207,7 +202,7 @@ var gocdMapper = function(_, moment, gocdReader) {
         showInfo: ! entry.wasSuccessful(),
         type: getFigureTypeForActivity(entry),
         border: 'dotted',
-        initials: getInitialsOfAuthor(entry),
+        initials: entry.author ? entry.author.initials : undefined,
         key: entry.buildNumber
       }
     });
@@ -216,15 +211,10 @@ var gocdMapper = function(_, moment, gocdReader) {
       return entry.activity === 'Building';
     });
 
-    var changesExist = true;
-    if(callWhenDone !== undefined) {
-      callWhenDone({ figures: figures }, changesExist);
-    } else {
-      return { 
-        background: isBuilding ? 'blue' : undefined,
-        figures: figures 
-      };
-    }
+    return {
+      background: isBuilding ? 'blue' : undefined,
+      figures: figures
+    };
 
   }
 
@@ -233,4 +223,4 @@ var gocdMapper = function(_, moment, gocdReader) {
   }
 };
 
-define(['lodash', 'moment', 'server/sources/gocd/gocdReader'], gocdMapper);
+define(['lodash', 'moment', 'server/sources/gocd/gocdReader'], haringGocdMapper);

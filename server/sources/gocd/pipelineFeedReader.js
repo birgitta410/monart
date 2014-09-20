@@ -1,5 +1,6 @@
 
-define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'], function (_, gocdRequestor, atomEntryParser) {
+define(['lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/github/githubRequestor', 'server/sources/gocd/atomEntryParser'],
+  function (_, moment, cheerio, gocdRequestor, githubRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
   var MIN_NUMBER_HISTORY = 25;
@@ -16,6 +17,7 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
   function pushEntryToPipelineHistory(entry) {
     pipelineHistory[entry.buildNumber] = pipelineHistory[entry.buildNumber] || {};
     var historyEntry = pipelineHistory[entry.buildNumber];
+    historyEntry.buildNumber = entry.buildNumber;
     historyEntry.stages = historyEntry.stages || [];
     historyEntry.stages.push(entry);
   }
@@ -29,6 +31,22 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
       return  stage.updated;
     })[historyEntry.stages.length - 1];
     historyEntry.time = lastFinishedStage.updated;
+    return historyEntry;
+  }
+
+  function mapInfoText(historyEntry) {
+    if(historyEntry.info !== undefined) {
+      return historyEntry;
+    }
+
+    var lastCommitMaterial = _.last(historyEntry.materials);
+
+    var theCommit = lastCommitMaterial ? lastCommitMaterial.comment : 'Unknown change';
+    var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
+    var theAuthor = historyEntry.author ? historyEntry.author.name : 'Unknown author';
+    var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed;
+    historyEntry.info = '[' + historyEntry.buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit + ' | ' + theAuthor;
+
     return historyEntry;
   }
 
@@ -47,11 +65,38 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
       return historyEntry;
     }
 
+    function getInitialsOfAuthor(author) {
+
+      function onlyAtoZ(character) {
+        var isLetter = character.toLowerCase() >= "a" && character.toLowerCase() <= "z";
+        if (! isLetter) {
+          return 'x';
+        } else {
+          return character;
+        }
+      }
+
+      if(author.name !== undefined) {
+        var nameParts = author.name.split(' ');
+
+        var initials = _.map(nameParts, function(namePart, index) {
+          if (index !== nameParts.length - 1) {
+            return onlyAtoZ(namePart[0]);
+          } else {
+            return onlyAtoZ(namePart[0]) + onlyAtoZ(namePart[1]);
+          }
+        }).join('');
+
+        return initials.toLowerCase().substr(0, 3);
+      }
+    }
+
     var firstStage = _.first(historyEntry.stages);
 
     _.extend(historyEntry, {
       author: firstStage.author
     });
+    historyEntry.author.initials = getInitialsOfAuthor(firstStage.author);
 
     return historyEntry;
 
@@ -88,19 +133,32 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
       return;
     }
 
-    gocdRequestor.getStageDetails(basicData.stages[0].buildNumber, function(stageDetails) {
-      try {
-        var material = stageDetails.pipeline.materials.material;
-        basicData.materials = {
-          committer: material.modifications.changeset.user,
-          comment: material.modifications.changeset.message,
-          revision: material.modifications.changeset.revision
-        };
-      } catch(error) {
-        // too lazy to make undefined checks for all this hierarchy - either it's there or it isn't
-        console.log('could not read material', stageDetails);
-      }
+    function withoutTimestamp(data) {
+      return data.indexOf('on 2') === -1 ? data : data.slice(0, data.indexOf('on 2')).trim();
+    }
 
+    gocdRequestor.getMaterialHtml(basicData.stages[0].id, function(html) {
+      var $ = cheerio.load(html);
+      try {
+        var changes = $('.material_tab .change');
+
+        basicData.materials = _.map(changes, function(change) {
+          var modifiedBy = withoutTimestamp($(change).find('.modified_by dd')[0].children[0].data);
+          var comment = $(change).find('.comment p')[0].children[0].data;
+          var sha = $(change).find('.revision dd')[0].children[0].data;
+          var material = {
+            comment: comment,
+            committer: modifiedBy,
+            sha: sha
+          };
+          githubRequestor.getCommitStats(sha, function(stats) {
+            material.stats = stats;
+          });
+          return material;
+        });
+      } catch(error) {
+        console.log('ERROR loading material', error);
+      }
     });
 
   }
@@ -123,6 +181,8 @@ define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atom
           // TODO: Does this async call really fill up values before we're done?
           enrichWithCommitDetails(entry);
         });
+
+        pipelineHistory = _.mapValues(pipelineHistory, mapInfoText);
 
         var nextLink = _.find(result.feed.link, { rel: 'next' });
 

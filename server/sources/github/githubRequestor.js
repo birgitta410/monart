@@ -1,7 +1,7 @@
 
-define(['request', 'fs', 'lodash', 'server/sources/httpConfig'], function (request, fs, _, httpConfig) {
+define(['request', 'fs', 'lodash', 'server/sources/ymlHerokuConfig'], function (request, fs, _, configReader) {
 
-  var config = httpConfig.create('github');
+  var config = configReader.create('github');
 
   var host = 'https://api.github.com';
   var path = '/repos/'+config.get().user+'/'+config.get().repo+'/commits/';
@@ -16,7 +16,7 @@ define(['request', 'fs', 'lodash', 'server/sources/httpConfig'], function (reque
   var getCommitStats = function(sha, callback) {
 
     if (config.get().sampleIt()) {
-      getSampleCommitStats(callback);
+      getSampleCommitStats(sha, callback);
     } else {
 
       console.log('Requesting', host, path + sha);
@@ -41,7 +41,8 @@ define(['request', 'fs', 'lodash', 'server/sources/httpConfig'], function (reque
     }
   };
 
-  function getSampleCommitStats(callback) {
+
+  function getSampleCommitStats(sha, callback) {
     var source = 'server/sources/github/sample/github_commit.json';
     var jsonString = fs.readFileSync(source);
 

@@ -67,11 +67,31 @@ define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function
     callback(json);
   }
 
+  var getMaterialHtml = function(jobId, callback) {
+    if (config.get().sampleIt()) {
+      getSampleMaterialHtml(jobId, callback);
+    } else {
+      var url = config.addCredentialsToUrl(jobId + '/materials');
+      console.log('Requesting', jobId + '/materials');
+      request(url, function(error, response, body) {
+        callback(body);
+      });
+    }
+  };
+
+  function getSampleMaterialHtml(jobId, callback) {
+    var html = fs.readFileSync('server/sources/gocd/sample/materials.html');
+
+    callback(html);
+  }
+
   return {
     get: get,
     getSample: getSample,
     getStageDetails: getStageDetails,
-    getSampleStageDetails: getSampleStageDetails
+    getSampleStageDetails: getSampleStageDetails,
+    getMaterialHtml: getMaterialHtml,
+    getSampleMaterialHtml: getSampleMaterialHtml
   }
 });
 

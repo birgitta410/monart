@@ -1,13 +1,15 @@
 
 var context = createContext({});
 
-context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/sources/gocd/gocdRequestor'], function(_, moment, thePipelineFeedReader, gocdRequestor) {
+context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/sources/gocd/gocdRequestor', 'server/sources/github/githubRequestor'], function(_, moment, thePipelineFeedReader, gocdRequestor, githubRequestor) {
 
   var NUM_ENTRIES_IN_FIXTURE = 12;
 
   beforeEach(function() {
     gocdRequestor.get = gocdRequestor.getSample;
     gocdRequestor.getStageDetails = gocdRequestor.getSampleStageDetails;
+    gocdRequestor.getMaterialHtml = gocdRequestor.getSampleMaterialHtml;
+    githubRequestor.getCommitStats = githubRequestor.getSampleCommitStats
   });
 
   describe('pipelineFeedReader', function () {
@@ -99,34 +101,77 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
 
       it('should parse committer and commit message from material HTML', function () {
         thePipelineFeedReader.readHistory(function (results) {
-          expect(results['1199'].materials.committer).toContain('Max Mustermann');
-          expect(results['1199'].materials.comment).toContain('awesome');
+          expect(results['1199'].materials.length).toBe(2);
+          expect(results['1199'].materials[0].committer).toContain('Max Mustermann');
+          expect(results['1199'].materials[0].comment).toContain('awesome');
+          expect(results['1199'].materials[0].sha).toBe('074cc70d464ad708c82bc6316f6c21ee35cffdcf');
+          expect(results['1199'].materials[1].sha).toBe('185cc70d464ad708c82bc6316f6c21ee35cffdcf');
+        });
+      });
+
+      it('should get commit stats from github', function () {
+        thePipelineFeedReader.readHistory(function (results) {
+          expect(results['1199'].materials.length).toBe(2);
+          expect(results['1199'].materials[0].stats).toBeDefined();
         });
       });
 
       it('should not request material info again if already set in previous call', function () {
-        spyOn(gocdRequestor, 'getStageDetails').andCallThrough();
+        spyOn(gocdRequestor, 'getMaterialHtml').andCallThrough();
         thePipelineFeedReader.readHistory(function (results) {
           expect(results['1199'].materials).toBeDefined();
-          expect(gocdRequestor.getStageDetails.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
+          expect(gocdRequestor.getMaterialHtml.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
           thePipelineFeedReader.readHistory(function (results) {
             expect(results['1199'].materials).toBeDefined();
-            expect(gocdRequestor.getStageDetails.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
+            expect(gocdRequestor.getMaterialHtml.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
           });
         });
 
       });
 
-      xit('should not add the same entries again when called twice', function () {
+      it('should put author and commit message into info text, if present', function () {
         thePipelineFeedReader.readHistory(function (results) {
-          expect(_.keys(results).length).toBe(11);
-          expect(results['1199'].stages.length).toBe(5);
+          expect(results['1199'].info).toContain('Mustermann');
+          expect(results['1199'].info).toContain('second change');
+        });
+      });
 
-          thePipelineFeedReader.readHistory(function (results) {
-            expect(_.keys(results).length).toBe(11);
-            expect(results['1199'].stages.length).toBe(5);
-          });
+      it('should create initials of person that authored changes for a failed job', function () {
+        thePipelineFeedReader.readHistory(function (results) {
+          expect(results['1199'].author.initials).toContain('mmu');
+        });
+      });
 
+      xit('should create initials of person that broke the pipeline run', function () {
+        // TODO: Rewrite this test to work here
+        fakePipelineHistory = {
+          '123': {
+            wasSuccessful: notSuccessfulFn,
+            time: mockTime,
+            author: {
+              name: 'Max Mustermann'
+            }
+          },
+          '122': {
+            wasSuccessful: notSuccessfulFn,
+            time: mockTime,
+            author: {
+              name: 'Has Three Names'
+            }
+          },
+          '121': {
+            wasSuccessful: notSuccessfulFn,
+            time: mockTime,
+            author: {
+              name: 'Special Cäracter'
+            }
+          }
+        };
+
+        haringGocdMapper.readHistoryAndActivity(function (result) {
+          expect(result.figures[0].initials).toBe('mmu');
+          expect(result.figures[1].initials).toBe('htn');
+          expect(result.figures[2].initials).toBe('scx');
         });
       });
 
