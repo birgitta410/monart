@@ -1,5 +1,5 @@
 
-define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'], function (_, cheerio, gocdRequestor, atomEntryParser) {
+define(['lodash', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'], function (_, gocdRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
   var MIN_NUMBER_HISTORY = 25;
@@ -88,22 +88,19 @@ define(['lodash', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/source
       return;
     }
 
-    function withoutTimestamp(data) {
-      return data.indexOf('on 2') === -1 ? data : data.slice(0, data.indexOf('on 2')).trim();
-    }
-
-    gocdRequestor.getMaterialHtml(basicData.stages[0].id, function(html) {
-      var $ = cheerio.load(html);
+    gocdRequestor.getStageDetails(basicData.stages[0].buildNumber, function(stageDetails) {
       try {
-        var modifiedBy = withoutTimestamp($('.material_tab .change .modified_by dd')[0].children[0].data);
-        var comment = $('.material_tab .change .comment p')[0].children[0].data;
+        var material = stageDetails.pipeline.materials.material;
         basicData.materials = {
-          comment: comment,
-          committer: modifiedBy
+          committer: material.modifications.changeset.user,
+          comment: material.modifications.changeset.message,
+          revision: material.modifications.changeset.revision
         };
       } catch(error) {
-        console.log('ERROR loading material', error);
+        // too lazy to make undefined checks for all this hierarchy - either it's there or it isn't
+        console.log('could not read material', stageDetails);
       }
+
     });
 
   }

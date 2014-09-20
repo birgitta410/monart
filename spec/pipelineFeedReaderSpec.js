@@ -9,9 +9,11 @@ var mockGocdRequestor = {
     var json = xml2json.toJson(xml, { object: true, sanitize: false });
     callback(json);
   },
-  getMaterialHtml: function(id, callback) {
-    var html = fs.readFileSync('spec/fixtures/materials.html');
-    callback(html);
+  getStageDetails: function(id, callback) {
+    var source = 'spec/fixtures/stage-details.xml';
+    var xml = fs.readFileSync(source);
+    var json = xml2json.toJson(xml, { object: true, sanitize: false });
+    callback(json);
   }
 };
 
@@ -121,13 +123,13 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
       });
 
       it('should not request material info again if already set in previous call', function () {
-        spyOn(mockGocdRequestor, 'getMaterialHtml').andCallThrough();
+        spyOn(mockGocdRequestor, 'getStageDetails').andCallThrough();
         thePipelineFeedReader.readHistory(function (results) {
           expect(results['1199'].materials).toBeDefined();
-          expect(mockGocdRequestor.getMaterialHtml.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
+          expect(mockGocdRequestor.getStageDetails.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
           thePipelineFeedReader.readHistory(function (results) {
             expect(results['1199'].materials).toBeDefined();
-            expect(mockGocdRequestor.getMaterialHtml.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
+            expect(mockGocdRequestor.getStageDetails.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
           });
         });
 
