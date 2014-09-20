@@ -106,6 +106,28 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           expect(result.figures[1].initials).toBeUndefined;
         });
       });
+
+      it('should return all activity figures and fill up to the maximum number of figures with history', function () {
+        var NUM_FIGURES_IN_VIS = 24;
+
+        var aHistory = { wasSuccessful: successfulFn };
+        fakePipelineHistory = {};
+        _.times(NUM_FIGURES_IN_VIS, function(n) {
+          fakePipelineHistory['' + (n + 1)] = _.clone(aHistory);
+        });
+        fakeActivity = [];
+        _.times(8, function(n) {
+          fakeActivity.push({ buildNumber: '' + n, wasSuccessful: notSuccessfulFn });
+        });
+        theGocdMapper.readHistoryAndActivity(function(result) {
+          expect(result.figures.length).toBe(NUM_FIGURES_IN_VIS);
+
+          var firstHistoryFigure = result.figures[fakeActivity.length];
+          expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
+          var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
+          expect(activityFigures.length).toBe(8);
+        });
+      });
     });
 
     describe('mapPipelineDataToFigures()', function () {

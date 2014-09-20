@@ -1,18 +1,31 @@
 
 var gocdMapper = function(_, moment, gocdReader) {
+
+  var NUM_FIGURES_IN_VIS = 24;
+
+  function compareNumbers(a, b) {
+    // JS does lexicographical sorting by default, need to sort by number
+    return a - b;
+  }
+
+  function sortAndStripDownHistory(historyData, numberOfEntries) {
+    var keysToKeep = _.keys(historyData).sort(compareNumbers).reverse().splice(0, numberOfEntries);
+    var strippedDownHistory = {};
+    _.each(keysToKeep, function(key) {
+      if(keysToKeep.indexOf(key) >= 0) {
+        strippedDownHistory[key] = data.history[key];
+      }
+    });
+    return strippedDownHistory;
+  }
+
   var readHistoryAndActivity = function(callWhenDone) {
     gocdReader.readData(function(data) {
 
       var activityHaring = mapActivityDataToFigures(data.activity);
-      var historyHaring = mapPipelineDataToFigures(data.history);
 
-//      var greatSuccess = ! _.any(data.history, function(entry) {
-//        return ! entry.wasSuccessful();
-//      });
-//      var allResults = _.map(data.history, function(entry) {
-//        return entry.wasSuccessful();
-//      });
-//      console.log('GREAT SUCCESS?', greatSuccess, allResults);
+      var numberOfHistoryFigures = NUM_FIGURES_IN_VIS - activityHaring.figures.length;
+      var historyHaring = mapPipelineDataToFigures(sortAndStripDownHistory(data.history, numberOfHistoryFigures));
 
       var historyFigures = historyHaring.figures;
       mapInitialsFromHistoryToActivity(historyFigures, activityHaring.figures);
@@ -83,11 +96,6 @@ var gocdMapper = function(_, moment, gocdReader) {
 
       return initials.toLowerCase().substr(0, 3);
     }
-  }
-
-  function compareNumbers(a, b) {
-    // JS does lexicographical sorting by default, need to sort by number
-    return a - b;
   }
 
   function mapPipelineDataToFigures(history, callWhenDone) {
