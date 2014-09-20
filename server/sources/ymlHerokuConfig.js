@@ -44,8 +44,10 @@ define(['xml2json', 'module', 'path', 'node-yaml-config', 'lodash'], function (x
         return config[id] === {} || config[id].sample === true;
       };
 
-      config[id].loggableUrl = addCredentialsToUrlInternal(config[id].url, 'user', 'password');
-      config[id].url = addCredentialsToUrl(config[id].url);
+      if(config[id].url) {
+        config[id].loggableUrl = addCredentialsToUrlInternal(config[id].url, 'user', 'password');
+        config[id].url = addCredentialsToUrl(config[id].url);
+      }
 
     }
 
@@ -54,7 +56,9 @@ define(['xml2json', 'module', 'path', 'node-yaml-config', 'lodash'], function (x
     }
 
     function addCredentialsToUrlInternal(url, user, password) {
-      if (user && password && !config[id].sampleIt()) {
+      if(config[id].sampleIt()) {
+        return 'sample';
+      } else if (user && password) {
         var urlNoHttp = url.indexOf('http') === 0 ? url.substr('http://'.length) : url;
         return 'http://' + user + ':' + password + '@' + urlNoHttp;
       } else {

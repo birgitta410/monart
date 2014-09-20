@@ -1,6 +1,5 @@
 
 var mockPipelineReader, mockCcTrayReader, fakePipelineHistory, fakeActivity, fakeBuildNumberInProgress = '1239';
-var mockTime = { format: function () { } };
 
 mockPipelineReader = {
   readHistory: function (callback, options) {
@@ -41,8 +40,8 @@ context(['lodash', 'server/miro/gocdMapper'], function(_, miroGocdMapper) {
 
       it('should set the stroke color to red if last build was unsuccessful', function () {
         fakePipelineHistory = {
-          '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
-          '124': { wasSuccessful: successfulFn, time: mockTime }
+          '125': { wasSuccessful: notSuccessfulFn },
+          '124': { wasSuccessful: successfulFn }
         };
         miroGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.stroke.color).toBe('red');
@@ -52,11 +51,46 @@ context(['lodash', 'server/miro/gocdMapper'], function(_, miroGocdMapper) {
 
       it('should set the stroke color to black if last build was successful', function () {
         fakePipelineHistory = {
-          '125': { wasSuccessful: successfulFn, time: mockTime },
-          '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
+          '125': { wasSuccessful: successfulFn },
+          '124': { wasSuccessful: notSuccessfulFn }
         };
         miroGocdMapper.readHistoryAndActivity(function (result) {
           expect(result.stroke.color).toBe('black');
+        });
+
+      });
+
+      it('should set the size of stones according to the size of changes', function () {
+        fakePipelineHistory = {
+          '125': {
+            wasSuccessful: notSuccessfulFn
+          },
+          '124': {
+            wasSuccessful: notSuccessfulFn,
+            materials: [
+              {
+                "stats": {
+                  "total": 153,
+                  "filesChanged": 10
+                }
+              }
+            ]
+          },
+          '123': {
+            wasSuccessful: notSuccessfulFn,
+            materials: [
+              {
+                "stats": {
+                  "total": 40,
+                  "filesChanged": 2
+                }
+              }
+            ]
+          }
+        };
+        miroGocdMapper.readHistoryAndActivity(function (result) {
+          expect(result.stones[0].size).toBe('large');
+          expect(result.stones[1].size).toBe('small');
         });
 
       });

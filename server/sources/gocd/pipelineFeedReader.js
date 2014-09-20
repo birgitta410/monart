@@ -181,7 +181,7 @@ define(['lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor', 'ser
           // TODO: Does this async call really fill up values before we're done?
           enrichWithCommitDetails(entry);
         });
-
+        
         pipelineHistory = _.mapValues(pipelineHistory, mapInfoText);
 
         var nextLink = _.find(result.feed.link, { rel: 'next' });
