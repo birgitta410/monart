@@ -15,9 +15,8 @@ define(['request', 'fs', 'lodash', 'server/sources/httpConfig'], function (reque
 
   var getCommitStats = function(sha, callback) {
 
-    console.log('commitstats', config.get());
-    if (config.get().fakeIt()) {
-      getFake(callback);
+    if (config.get().sampleIt()) {
+      getSampleCommitStats(callback);
     } else {
 
       console.log('Requesting', host, path + sha);
@@ -42,16 +41,16 @@ define(['request', 'fs', 'lodash', 'server/sources/httpConfig'], function (reque
     }
   };
 
-  function getFake(callback) {
-    console.log('FAKING Github API');
-    var source = 'server/sources/github/fake/github_commit.json';
+  function getSampleCommitStats(callback) {
+    var source = 'server/sources/github/sample/github_commit.json';
     var jsonString = fs.readFileSync(source);
 
     callback(createStats(jsonString));
   }
 
   return {
-    getCommitStats: getCommitStats
+    getCommitStats: getCommitStats,
+    getSampleCommitStats: getSampleCommitStats
   }
 });
 

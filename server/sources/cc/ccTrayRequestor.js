@@ -8,8 +8,8 @@ define(['request', 'xml2json', 'fs', 'server/sources/ymlHerokuConfig'], function
 
     console.log('Requesting', config.get().loggableUrl);
 
-    if (config.get().fakeIt()) {
-      getFake(callback);
+    if (config.get().sampleIt()) {
+      getSample(callback);
     } else {
 
       request(url, function (error, response, body) {
@@ -21,9 +21,8 @@ define(['request', 'xml2json', 'fs', 'server/sources/ymlHerokuConfig'], function
     }
   };
 
-  function getFake(callback) {
-    console.log('FAKING cctray.xml');
-    var xml = fs.readFileSync('server/sources/cc/fake/cctray.xml');
+  function getSample(callback) {
+    var xml = fs.readFileSync('server/sources/cc/sample/cctray.xml');
     var json = xml2json.toJson(xml, {
       object: true, sanitize: false
     });
@@ -32,7 +31,8 @@ define(['request', 'xml2json', 'fs', 'server/sources/ymlHerokuConfig'], function
   }
 
   return {
-    get: get
+    get: get,
+    getSample: getSample
   }
 });
 

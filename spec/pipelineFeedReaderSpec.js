@@ -1,32 +1,14 @@
 
-var fs = require('fs');
-var xml2json = require('xml2json');
+var context = createContext({});
 
-var mockGocdRequestor = {
-  get: function(next, callback) {
-    var source = next ? next : 'spec/fixtures/pipeline-stages.xml';
-    var xml = fs.readFileSync(source);
-    var json = xml2json.toJson(xml, { object: true, sanitize: false });
-    callback(json);
-  },
-  getStageDetails: function(id, callback) {
-    var source = 'spec/fixtures/stage-details.xml';
-    var xml = fs.readFileSync(source);
-    var json = xml2json.toJson(xml, { object: true, sanitize: false });
-    callback(json);
-  }
-};
-
-var mocks = {
-  'server/sources/gocd/gocdRequestor': mockGocdRequestor
-};
-
-var context = createContext(mocks);
-
-
-context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function(_, moment, thePipelineFeedReader) {
+context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/sources/gocd/gocdRequestor'], function(_, moment, thePipelineFeedReader, gocdRequestor) {
 
   var NUM_ENTRIES_IN_FIXTURE = 12;
+
+  beforeEach(function() {
+    gocdRequestor.get = gocdRequestor.getSample;
+    gocdRequestor.getStageDetails = gocdRequestor.getSampleStageDetails;
+  });
 
   describe('pipelineFeedReader', function () {
     beforeEach(function() {
@@ -66,20 +48,20 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
       });
 
       it('should pass no url to the requestor in initial call', function () {
-        spyOn(mockGocdRequestor, 'get');
+        spyOn(gocdRequestor, 'get');
         thePipelineFeedReader.readHistory(function (results, parameter) {
         });
-        expect(mockGocdRequestor.get.mostRecentCall.args[0]).toBeUndefined();
+        expect(gocdRequestor.get.mostRecentCall.args[0]).toBeUndefined();
       });
 
       it('should pass a next url to the requestor', function () {
-        spyOn(mockGocdRequestor, 'get');
+        spyOn(gocdRequestor, 'get');
         thePipelineFeedReader.readHistory(function (results, parameter) {
         }, {
           callbackParameter: 'aParameter',
           nextUrl: 'nextUrl'
         });
-        expect(mockGocdRequestor.get.mostRecentCall.args[0]).toBe('nextUrl');
+        expect(gocdRequestor.get.mostRecentCall.args[0]).toBe('nextUrl');
       });
 
       it('should determine the time the last stage finished', function () {
@@ -123,13 +105,13 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader'], function
       });
 
       it('should not request material info again if already set in previous call', function () {
-        spyOn(mockGocdRequestor, 'getStageDetails').andCallThrough();
+        spyOn(gocdRequestor, 'getStageDetails').andCallThrough();
         thePipelineFeedReader.readHistory(function (results) {
           expect(results['1199'].materials).toBeDefined();
-          expect(mockGocdRequestor.getStageDetails.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
+          expect(gocdRequestor.getStageDetails.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
           thePipelineFeedReader.readHistory(function (results) {
             expect(results['1199'].materials).toBeDefined();
-            expect(mockGocdRequestor.getStageDetails.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
+            expect(gocdRequestor.getStageDetails.callCount).toBe(NUM_ENTRIES_IN_FIXTURE);
           });
         });
 

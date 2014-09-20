@@ -51,13 +51,13 @@ default:
     password: xxxx
 ```
 
-If you just want to see what it looks like, setting 'fake' to true will load some static fixtures to give you an idea:
+If you just want to see what it looks like, setting 'sample' to true will load some static fixtures to give you an idea:
 ```
 default:
   gocd:
-    fake: true
+    sample: true
   cc:
-    fake: true
+    sample: true
 ```
 
 ###Filter the jobs to show from CC Tray activity
@@ -65,7 +65,7 @@ By default, all jobs from CC Tray's activity feed will be displayed. You can res
 ```
 default:
   cc:
-    fake: true
+    sample: true
     jobs:
       - 'A-PIPELINE :: build'
       - 'A-PIPELINE :: integration-test'

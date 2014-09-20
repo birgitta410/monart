@@ -8,8 +8,8 @@ define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function
 
   var get = function(next, callback) {
 
-    if (config.get().fakeIt()) {
-      getFake(next, callback);
+    if (config.get().sampleIt()) {
+      getSample(next, callback);
     } else {
 
       var url = next ? config.addCredentialsToUrl(next) : config.get().url;
@@ -27,9 +27,8 @@ define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function
     }
   };
 
-  function getFake(next, callback) {
-    console.log('FAKING Go CD Pipeline Feed');
-    var source = next ? next : 'server/sources/gocd/fake/pipeline-stages.xml';
+  function getSample(next, callback) {
+    var source = next ? next : 'server/sources/gocd/sample/pipeline-stages.xml';
     var xml = fs.readFileSync(source);
     var json = xml2json.toJson(xml, {
       object: true, sanitize: false
@@ -39,8 +38,8 @@ define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function
   }
 
   var getStageDetails = function(stageId, callback) {
-    if (config.get().fakeIt()) {
-      getFakeStageDetails(callback);
+    if (config.get().sampleIt()) {
+      getSampleStageDetails(stageId, callback);
     } else {
 
       var url = config.get().url + PIPELINE_BASE + '/' + stageId + '.xml';
@@ -58,8 +57,8 @@ define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function
     }
   };
 
-  function getFakeStageDetails(callback) {
-    var source = 'server/sources/gocd/fake/stage-details.xml';
+  function getSampleStageDetails(stageId, callback) {
+    var source = 'server/sources/gocd/sample/stage-details.xml';
     var xml = fs.readFileSync(source);
     var json = xml2json.toJson(xml, {
       object: true, sanitize: false
@@ -70,7 +69,9 @@ define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function
 
   return {
     get: get,
-    getStageDetails: getStageDetails
+    getSample: getSample,
+    getStageDetails: getStageDetails,
+    getSampleStageDetails: getSampleStageDetails
   }
 });
 

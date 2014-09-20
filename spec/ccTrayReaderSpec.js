@@ -1,13 +1,4 @@
 
-var xml = require('fs').readFileSync('spec/fixtures/cctray.xml');
-var json = require('xml2json').toJson(xml, { object: true, sanitize: false });
-
-var mockCcTrayRequestor = {
-  get: function (callback) {
-    callback(json);
-  }
-};
-
 var configuration = {};
 var mockConfig = {
   create: function() {
@@ -20,14 +11,17 @@ var mockConfig = {
 };
 
 var mocks = {
-  'server/sources/cc/ccTrayRequestor': mockCcTrayRequestor,
   'server/sources/ymlHerokuConfig': mockConfig
 };
 
 var context = createContext(mocks);
 
+context(['lodash', 'server/sources/cc/ccTrayReader', 'server/sources/cc/ccTrayRequestor', 'server/sources/ymlHerokuConfig'], function(_, theCcTrayReader, ccTrayRequestor, config) {
 
-context(['lodash', 'server/sources/cc/ccTrayReader'], function(_, theCcTrayReader) {
+  beforeEach(function() {
+    ccTrayRequestor.get = ccTrayRequestor.getSample;
+  });
+
   describe('ccTrayReader', function () {
     describe('init()', function () {
 

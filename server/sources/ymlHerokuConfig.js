@@ -33,15 +33,15 @@ define(['xml2json', 'module', 'path', 'node-yaml-config', 'lodash'], function (x
           config[id].jobs = config[id].jobs.split(',');
         }
 
-        if (!config[id].user || !config[id].password || (!config[id].url && !config[id].url === FAKE)) {
+        if (!config[id].user || !config[id].password || !config[id].url) {
           console.log('ERROR: Not enough values in ' + id + ' config, cannot get data');
         }
 
       }
 
-      config[id] = config[id] || { fake: true };
-      config[id].fakeIt = function () {
-        return config[id] === {} || config[id].fake === true;
+      config[id] = config[id] || { sample: true };
+      config[id].sampleIt = function () {
+        return config[id] === {} || config[id].sample === true;
       };
 
       config[id].loggableUrl = addCredentialsToUrlInternal(config[id].url, 'user', 'password');
@@ -50,15 +50,11 @@ define(['xml2json', 'module', 'path', 'node-yaml-config', 'lodash'], function (x
     }
 
     function addCredentialsToUrl(url) {
-      if (!config[id].fakeIt()) {
-        return addCredentialsToUrlInternal(url, config[id].user, config[id].password);
-      } else {
-        return url;
-      }
+      return addCredentialsToUrlInternal(url, config[id].user, config[id].password);
     }
 
     function addCredentialsToUrlInternal(url, user, password) {
-      if (user && password) {
+      if (user && password && !config[id].sampleIt()) {
         var urlNoHttp = url.indexOf('http') === 0 ? url.substr('http://'.length) : url;
         return 'http://' + user + ':' + password + '@' + urlNoHttp;
       } else {
