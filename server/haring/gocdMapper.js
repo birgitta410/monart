@@ -28,7 +28,6 @@ var gocdMapper = function(_, moment, gocdReader) {
         color: 'blue',
         type: 'crawling_takeoff',
         border: 'dotted',
-        info: 'Text to explain the announcement',
         word1: 'great',
         word2: 'success'
       };

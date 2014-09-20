@@ -11,9 +11,21 @@ Expects sets of figure descriptions, with attributes
 
 Visualisation will iterate over the array of figures and put them into rows, left to right.
 
+Global visualisation attributes:
+- background { 'red', 'yellow', 'pink', 'orange', 'blue', 'dark-blue', 'green', 'dark-green' } = background color
+- announcementFigure = a large figure that will appear as overlay over the visualisation (careful with the words, if they are too long they might screw up the layout)
+
+
 ```
 {
   background: <a-color>,
+  announcementFigure: {
+    color: 'green',
+    type: 'crawling_takeoff',
+    border: 'dotted',
+    word1: 'great',
+    word2: 'success'
+  },
   figures: [
     {
       color: 'blue',

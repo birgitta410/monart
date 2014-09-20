@@ -100,7 +100,7 @@
   margin-left: 15%;
 }
 
-.great-success {
+.announcement-figure {
   position: absolute;
   bottom: -5%;
   left: 25%;
@@ -108,16 +108,16 @@
   height: 85%;
   display: none;
 }
-.great-success >img {
+.announcement-figure >img {
   width: 70%;
 }
-.great-success >.top-left {
+.announcement-figure >.top-left {
   top: 4%;
 }
-.great-success >.bottom-right {
+.announcement-figure >.bottom-right {
   bottom: 34%;
 }
-.great-success >.letters img {
+.announcement-figure >.letters img {
   max-height: 45%;
 }
 

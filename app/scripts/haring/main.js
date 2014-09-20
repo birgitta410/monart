@@ -22,18 +22,20 @@ function randomColdColor() {
 
 function buildInitialGrid() {
   var container = $('.container');
+  var figureContentHtml = '<div class="bg"></div>' +
+    '<img src="images/haring/dog.png" class="grey">' +
+    '<div class="letters top-left"></div>' +
+    '<div class="letters bottom-right"></div>';
   for(var r = 0; r < NUM_ROWS; r++) {
     var rowDiv = $('<div class="figure-row flexbox"></div>').appendTo(container);
     for (var c = 0; c < COLS_PER_ROW; c++) {
       rowDiv.append(
       '<div class="figure-wrapper"><div class="figure solid">' +
-          '<div class="bg"></div>' +
-          '<img src="images/haring/dog.png" class="grey">' +
-          '<div class="letters top-left"></div>' +
-          '<div class="letters bottom-right"></div>' +
+          figureContentHtml +
       '</div></div>');
     }
   }
+  container.append('<div class="figure announcement-figure">' + figureContentHtml + '</div>');
 }
 
 function Chardiner() {
@@ -117,16 +119,70 @@ buildInitialGrid();
 var chardiner = new Chardiner();
 
 
-function iterateData(historyData, callback) {
+function iterateFigures(haringDescription, callback) {
   var rowIndex = -1;
-  for(var i = 0; i < historyData.figures.length; i++) {
-    var entry = historyData.figures[i];
+  for(var i = 0; i < haringDescription.figures.length; i++) {
+    var entry = haringDescription.figures[i];
 
     var colIndex = i % COLS_PER_ROW;
     if (i % COLS_PER_ROW === 0) rowIndex++;
 
     callback(i, entry, colIndex, rowIndex);
 
+  }
+}
+
+function configureFigureDiv(entry, figureDiv) {
+  if (entry.border === 'dotted') {
+    figureDiv.addClass('dotted');
+  } else {
+    figureDiv.addClass('solid');
+  }
+  console.log('classes', figureDiv, figureDiv.attr('class'));
+
+  figureDiv.tooltip({ placement: 'bottom'})
+    .tooltip('hide')
+    .attr('data-original-title', entry.info)
+    .tooltip('fixTitle');
+
+  if (entry.showInfo) {
+    figureDiv.tooltip('show');
+  }
+
+  var imgTag = $(figureDiv.find('> img'));
+  var imgExtension = entry.type === 'skating' ? '.gif' : '.png';
+  imgTag.attr('src', 'images/haring/' + entry.type + imgExtension);
+  imgTag.removeClass();
+
+  if (entry.color === 'WARM') {
+    imgTag.addClass(randomWarmColor());
+  } else if (entry.color === 'COLD') {
+    imgTag.addClass(randomColdColor());
+  } else {
+    imgTag.addClass(entry.color);
+  }
+
+  if (entry.type === 'skating') {
+    imgTag.addClass('skating');
+    figureDiv.append('<div class="changer"></div>')
+  }
+
+  var topLeftLettersDiv = $(figureDiv.find('.letters.top-left'));
+  var topLeftText = entry.word1;
+  addLetters(topLeftLettersDiv, topLeftText);
+
+  var bottomRightLettersDiv = $(figureDiv.find('.letters.bottom-right'));
+  var bottomRightText = entry.initials || entry.word2;
+  addLetters(bottomRightLettersDiv, bottomRightText);
+
+}
+
+function addLetters(lettersDiv, text) {
+  lettersDiv.empty();
+  if (text) {
+    for (var l = 0; l < text.length; l++) {
+      $('<img src="images/haring/alphabet/' + text[l].toLowerCase() + '.svg">').appendTo(lettersDiv);
+    }
   }
 }
 
@@ -147,47 +203,8 @@ function processFigure(index, entry, colIndex, rowIndex) {
 
     figureDiv.removeClass();
     figureDiv.addClass('figure');
-    if(entry.border === 'dotted') {
-      figureDiv.addClass('dotted');
-    } else {
-      figureDiv.addClass('solid');
-    }
 
-    figureDiv.tooltip({ placement: 'bottom'})
-      .tooltip('hide')
-      .attr('data-original-title', entry.info)
-      .tooltip('fixTitle');
-
-    if(entry.showInfo) {
-      figureDiv.tooltip('show');
-    }
-
-    var imgTag = $(figureDiv.find('> img'));
-    var imgExtension = entry.type === 'skating' ? '.gif' : '.png';
-    imgTag.attr('src', 'images/haring/' + entry.type + imgExtension);
-    imgTag.removeClass();
-
-    if(entry.color === 'WARM') {
-      imgTag.addClass(randomWarmColor());
-    } else if(entry.color === 'COLD') {
-      imgTag.addClass(randomColdColor());
-    } else {
-      imgTag.addClass(entry.color);
-    }
-
-    if(entry.type === 'skating') {
-      imgTag.addClass('skating');
-      figureDiv.append('<div class="changer"></div>')
-    }
-
-    var lettersDiv = $(figureDiv.find('.letters.bottom-right'));
-    lettersDiv.empty();
-    if(entry.initials) {
-      for (var l = 0; l < entry.initials.length; l++) {
-        $('<img src="images/haring/alphabet/' + entry.initials[l].toLowerCase() + '.svg">').appendTo(lettersDiv);
-      }
-    }
-
+    configureFigureDiv(entry, figureDiv);
 
   } else {
     console.log('not enough rows');
@@ -206,24 +223,22 @@ ws.onmessage = function (event) {
   var data = JSON.parse(event.data);
   if(data.haring) {
 
-    var historyData = data.haring;
+    var haringDescription = data.haring;
 
-    setBackgroundStyle(historyData.background);
+    setBackgroundStyle(haringDescription.background);
 
-    iterateData(historyData, processFigure);
+    iterateFigures(haringDescription, processFigure);
 
-    var greatSuccess = ! _.any(historyData.figures, function(entry) {
-      return entry.color === 'WARM';
-    });
-    console.log('greatSuccess?', greatSuccess);
+    var announcementDiv = $('.announcement-figure');
+    if(haringDescription.announcementFigure !== undefined) {
 
-    if(greatSuccess === true) {
-      $('.great-success').show();
+      configureFigureDiv(haringDescription.announcementFigure, announcementDiv);
+      announcementDiv.show();
     } else {
-      $('.great-success').hide();
+      announcementDiv.hide();
     }
 
-    DATA = historyData;
+    DATA = haringDescription;
   } else if(data.ping) {
     LAST_PING = new Date();
     console.log('ping success - still connected to server', LAST_PING);
