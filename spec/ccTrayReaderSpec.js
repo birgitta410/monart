@@ -21,7 +21,7 @@ var mockConfig = {
 
 var mocks = {
   'server/sources/cc/ccTrayRequestor': mockCcTrayRequestor,
-  'server/sources/httpConfig': mockConfig
+  'server/sources/ymlHerokuConfig': mockConfig
 };
 
 var context = createContext(mocks);
