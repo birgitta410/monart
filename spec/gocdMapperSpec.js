@@ -107,18 +107,31 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
         });
       });
 
+      function preparePipelineAndActivity(numFailingHistory, numSuccessfulHistory, numSuccessfulActivity, numFailingActivity) {
+        fakePipelineHistory = {};
+        _.times(numFailingHistory, function(n) {
+          fakePipelineHistory[n + 1] = { wasSuccessful: notSuccessfulFn, 'test': 'not successful', key: n+1 };
+        });
+        var offset = parseInt(_.findLastKey(fakePipelineHistory)) || 0;
+        _.times(numSuccessfulHistory, function(n) {
+          fakePipelineHistory[offset + n + 1] = { wasSuccessful: successfulFn, 'test': 'successful', key:  offset + n + 1};
+        });
+
+        fakeActivity = [];
+        _.times(numSuccessfulActivity, function(n) {
+          fakeActivity.push({ buildNumber: n, wasSuccessful: successfulFn, 'test': 'successful' });
+        });
+        var activityOffset = fakeActivity.length || 0;
+        _.times(numFailingActivity, function(n) {
+          fakeActivity.push({ buildNumber: activityOffset, wasSuccessful: notSuccessfulFn, 'test': 'not successful' });
+        });
+      }
+
       it('should return all activity figures and fill up to the maximum number of figures with history', function () {
         var NUM_FIGURES_IN_VIS = 24;
 
-        var aHistory = { wasSuccessful: successfulFn };
-        fakePipelineHistory = {};
-        _.times(NUM_FIGURES_IN_VIS, function(n) {
-          fakePipelineHistory['' + (n + 1)] = _.clone(aHistory);
-        });
-        fakeActivity = [];
-        _.times(8, function(n) {
-          fakeActivity.push({ buildNumber: '' + n, wasSuccessful: notSuccessfulFn });
-        });
+        preparePipelineAndActivity(NUM_FIGURES_IN_VIS, 0, 8, 0);
+
         theGocdMapper.readHistoryAndActivity(function(result) {
           expect(result.figures.length).toBe(NUM_FIGURES_IN_VIS);
 
@@ -126,6 +139,32 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, theGocdMapper) {
           expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
           var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
           expect(activityFigures.length).toBe(8);
+        });
+      });
+
+      it('should make a "great success" announcement if all visible history is successful', function () {
+        var NUM_FIGURES_IN_VIS = 24;
+        var numActivity = 8;
+        var numSuccessfulVisibleHistory = NUM_FIGURES_IN_VIS - numActivity; // 16
+        var numFailingInvisibleHistory = 5;
+
+        preparePipelineAndActivity(numFailingInvisibleHistory, numSuccessfulVisibleHistory, numActivity, 0);
+
+        theGocdMapper.readHistoryAndActivity(function(result) {
+          expect(result.announcementFigure).toBeDefined();
+          expect(result.announcementFigure.word1).toBe('great');
+          expect(result.announcementFigure.word2).toBe('success');
+          expect(result.announcementFigure.type).toBe('crawling_takeoff');
+          expect(result.announcementFigure.color).toBe('blue');
+        });
+      });
+
+      it('should not make a "great success" announcement if there are failing entries in history', function () {
+
+        preparePipelineAndActivity(2, 8, 3, 0);
+
+        theGocdMapper.readHistoryAndActivity(function(result) {
+          expect(result.announcementFigure).toBeUndefined();
         });
       });
     });

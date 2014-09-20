@@ -13,19 +13,37 @@ var gocdMapper = function(_, moment, gocdReader) {
     var strippedDownHistory = {};
     _.each(keysToKeep, function(key) {
       if(keysToKeep.indexOf(key) >= 0) {
-        strippedDownHistory[key] = data.history[key];
+        strippedDownHistory[key] = historyData[key];
       }
     });
     return strippedDownHistory;
   }
 
+  function getSpecialAnnouncementFigure(historyData) {
+    var greatSuccess = ! _.any(_.keys(historyData), function(key) {
+      return historyData[key].wasSuccessful() === false;
+    });
+    if(greatSuccess) {
+      return {
+        color: 'blue',
+        type: 'crawling_takeoff',
+        border: 'dotted',
+        info: 'Text to explain the announcement',
+        word1: 'great',
+        word2: 'success'
+      };
+    }
+  }
+
   var readHistoryAndActivity = function(callWhenDone) {
+
     gocdReader.readData(function(data) {
 
       var activityHaring = mapActivityDataToFigures(data.activity);
 
       var numberOfHistoryFigures = NUM_FIGURES_IN_VIS - activityHaring.figures.length;
-      var historyHaring = mapPipelineDataToFigures(sortAndStripDownHistory(data.history, numberOfHistoryFigures));
+      var onlyHistoryWeNeed = sortAndStripDownHistory(data.history, numberOfHistoryFigures);
+      var historyHaring = mapPipelineDataToFigures(onlyHistoryWeNeed);
 
       var historyFigures = historyHaring.figures;
       mapInitialsFromHistoryToActivity(historyFigures, activityHaring.figures);
@@ -33,6 +51,7 @@ var gocdMapper = function(_, moment, gocdReader) {
       var finalFigures = {  };
       finalFigures.figures = activityHaring.figures.concat(historyFigures);
       finalFigures.background = activityHaring.background || historyHaring.background;
+      finalFigures.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
 
       callWhenDone(finalFigures);
 
