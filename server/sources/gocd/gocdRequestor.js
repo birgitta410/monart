@@ -1,7 +1,8 @@
 
-define(['xml2json', 'request', 'fs', 'server/sources/httpConfig'], function (xml2json, request, fs, httpConfig) {
+define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function (xml2json, request, fs, configReader) {
 
-  var config = httpConfig.create('gocd');
+  var config = configReader.create('gocd');
+
   var PIPELINE_BASE = '/go/api/pipelines/' + config.get().pipeline;
   var STAGES_ENDPOINT = PIPELINE_BASE + '/stages.xml';
 
@@ -13,7 +14,8 @@ define(['xml2json', 'request', 'fs', 'server/sources/httpConfig'], function (xml
 
       var url = next ? config.addCredentialsToUrl(next) : config.get().url;
 
-      console.log('Requesting', url + STAGES_ENDPOINT);
+      var loggableUrl = next ? next : config.get().loggableUrl;
+      console.log('Requesting', loggableUrl + STAGES_ENDPOINT);
 
       request(url + STAGES_ENDPOINT, function (error, response, body) {
         var json = xml2json.toJson(body, {
@@ -43,7 +45,8 @@ define(['xml2json', 'request', 'fs', 'server/sources/httpConfig'], function (xml
 
       var url = config.get().url + PIPELINE_BASE + '/' + stageId + '.xml';
 
-      console.log('Requesting', url);
+      var loggableUrl = config.get().loggableUrl + PIPELINE_BASE + '/' + stageId + '.xml';
+      console.log('Requesting', loggableUrl);
 
       request(url, function (error, response, body) {
         var json = xml2json.toJson(body, {

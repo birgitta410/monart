@@ -1,12 +1,12 @@
 
-define(['request', 'xml2json', 'fs', 'server/sources/httpConfig'], function (request, xml2json, fs, httpConfig) {
+define(['request', 'xml2json', 'fs', 'server/sources/ymlHerokuConfig'], function (request, xml2json, fs, configReader) {
 
-  var config = httpConfig.create('cc');
+  var config = configReader.create('cc');
   var url = config.get().url; // ccTray file URL from config file
 
   var get = function(callback) {
 
-    console.log('Requesting', url);
+    console.log('Requesting', config.get().loggableUrl);
 
     if (config.get().fakeIt()) {
       getFake(callback);

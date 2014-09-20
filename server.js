@@ -4,8 +4,11 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
   var WebSocketServer = ws.Server
     , app = express();
 
-  app.use(express.static(path.dirname(module.uri) + '/'));
+  var rootDir = path.resolve(path.dirname(module.uri));
+  app.use(express.static(rootDir + '/app/'));
   var server = http.createServer(app);
+
+  var UPDATE_INTERVAL_HARING = 10000;
 
   function listenToHaring() {
     var wssHaring = new WebSocketServer({server: server, path: '/haring'});
@@ -23,7 +26,7 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
         }
 
         getActivityAndUpdateClients();
-        var clientId = setInterval(getActivityAndUpdateClients, 5000);
+        var clientId = setInterval(getActivityAndUpdateClients, UPDATE_INTERVAL_HARING);
         return clientId;
       }
 

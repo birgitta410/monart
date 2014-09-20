@@ -1,7 +1,7 @@
 
-define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atomEntryParser', 'server/sources/httpConfig'], function (_, ccTrayRequestor, goCdAtomEntryParser, config) {
+define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atomEntryParser', 'server/sources/ymlHerokuConfig'], function (_, ccTrayRequestor, goCdAtomEntryParser, configReader) {
 
-  var configValues = config.create('cc').get();
+  var configValues = configReader.create('cc').get();
 
   var requestActivity = function (callback) {
     ccTrayRequestor.get(function(json) {

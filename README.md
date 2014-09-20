@@ -6,20 +6,38 @@ artwise
 npm install
 ```
 
+Run tests
+```
+sh ./run_spec.sh
+```
+
 Start server
 ```
 node app
 ```
 
-Application URL
+Local application URL
 ```
 http://localhost:5000
 ```
 
-###Add configuration for Go CD and CC tray
-Create file `server/sources/config.yml`. Currently takes variables for requests to CI servers that provide a cctray.xml file, and Go CD servers.
+##Configure for your own data sources
+Create file `config.yml` in the root of the project and configure as described below.
 
-Content:
+Also supports deployment to Heroku - for each value in the config file, you can create a respective Heroku variable so you won't have to push config.yml to the git repository.
+
+Also supports Heroku config vars instead of the config files. Convention is CAPITALIZEDNAMEOFCONFIGCATEGORY_CAPITALIZEDVARIABLENAME.
+
+For example:
+```
+heroku config:set GOCD_PIPELINE=mypipeline
+heroku config:set GOCD_USER=admin
+heroku config:set GOCD_PASSWORD=somepassword
+```
+
+###Access to Go CD and CC tray
+Currently takes variables for requests to CI servers that provide a cctray.xml file, and Go CD servers.
+
 ```
 default:
   gocd:
@@ -42,7 +60,7 @@ default:
     fake: true
 ```
 
-###Configure the jobs to show from CC Tray activity
+###Filter the jobs to show from CC Tray activity
 By default, all jobs from CC Tray's activity feed will be displayed. You can restrict that by providing a list of jobs. The application will use the strings in that list to check if a job name STARTS WITH that.
 ```
 default:
@@ -54,34 +72,12 @@ default:
       - 'A-PIPELINE :: deploy-dev'
 ```
 
+###ContextIO email reader
 
-Also supports Heroku config vars instead of the config files (`heroku config:set GOCD_PIPELINE=mypipeline`).
-
-```
-GOCD_USER
-GOCD_PASSWORD
-GOCD_URL
-GOCD_PIPELINE
-
-CC_USER
-CC_PASSWORD
-CC_URL
-CC_JOBS
-```
-
-###Add credentials for contextIO email reader
-Create file `server/sources/email/contextio.yml`
-
-Content:
 ```
 default:
   contextIo:
+    account: xx123accountnumber123xx
     key: xxx
     secret: xxxx
-```
-
-
-Run tests
-```
-sh ./run_spec.sh
 ```
