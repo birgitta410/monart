@@ -138,7 +138,6 @@ function configureFigureDiv(entry, figureDiv) {
   } else {
     figureDiv.addClass('solid');
   }
-  console.log('classes', figureDiv, figureDiv.attr('class'));
 
   figureDiv.tooltip({ placement: 'bottom'})
     .tooltip('hide')

@@ -3,7 +3,7 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
   var readData = function(callWhenDone) {
     ccTrayReader.readActivity(function(activity) {
 
-      pipelineReader.readHistory(function(history) {
+      pipelineReader.readHistory({ exclude: [ activity.buildNumberInProgress] }).then(function(history) {
 
         var result = {
           activity: activity,
@@ -12,7 +12,7 @@ var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
 
         callWhenDone(result);
 
-      }, { exclude: [ activity.buildNumberInProgress] } );
+      });
 
     });
   };

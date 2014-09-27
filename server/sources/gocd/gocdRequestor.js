@@ -1,15 +1,16 @@
 
-define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function (xml2json, request, fs, configReader) {
+define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function (Q, xml2json, request, fs, configReader) {
 
   var config = configReader.create('gocd');
 
   var PIPELINE_BASE = '/go/api/pipelines/' + config.get().pipeline;
   var STAGES_ENDPOINT = PIPELINE_BASE + '/stages.xml';
 
-  var get = function(next, callback) {
+  var get = function(next) {
+    var defer = Q.defer();
 
     if (config.get().sampleIt()) {
-      getSample(next, callback);
+      return getSample(next);
     } else {
 
       var url = next ? config.addCredentialsToUrl(next) : config.get().url;
@@ -21,20 +22,31 @@ define(['xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function
         var json = xml2json.toJson(body, {
           object: true, sanitize: false
         });
-        callback(json);
+        defer.resolve(json);
       });
 
+      return defer.promise;
     }
+
   };
 
-  function getSample(next, callback) {
-    var source = next ? next : 'server/sources/gocd/sample/pipeline-stages.xml';
-    var xml = fs.readFileSync(source);
-    var json = xml2json.toJson(xml, {
-      object: true, sanitize: false
-    });
+  function getSample(next) {
+    var defer = Q.defer();
 
-    callback(json);
+    var source = next ? next : 'server/sources/gocd/sample/pipeline-stages.xml';
+    try {
+      var xml = fs.readFileSync(source);
+
+      var json = xml2json.toJson(xml, {
+        object: true, sanitize: false
+      });
+      defer.resolve(json);
+    } catch (err) {
+      console.log('ERROR reading file', source, err);
+      defer.reject();
+    }
+
+    return defer.promise;
   }
 
   var getStageDetails = function(stageId, callback) {

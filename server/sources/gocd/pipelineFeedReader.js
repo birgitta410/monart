@@ -1,17 +1,21 @@
 
-define(['lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/github/githubRequestor', 'server/sources/gocd/atomEntryParser'],
-  function (_, moment, cheerio, gocdRequestor, githubRequestor, atomEntryParser) {
+define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/github/githubRequestor', 'server/sources/gocd/atomEntryParser'],
+  function (Q, _, moment, cheerio, gocdRequestor, githubRequestor, atomEntryParser) {
 
   var pipelineHistory = { };
   var MIN_NUMBER_HISTORY = 25;
 
-  var requestStages = function (next, callback) {
-    gocdRequestor.get(next, function(json) {
+  var requestStages = function (next) {
+    var defer = Q.defer();
+
+    gocdRequestor.get(next).then(function(json) {
       json.feed.entry = _.map(json.feed.entry, function(entry) {
         return atomEntryParser.withData(entry);
       });
-      callback(json);
-    });
+      defer.resolve(json);
+    }, defer.reject);
+
+    return defer.promise;
   };
 
   function pushEntryToPipelineHistory(entry) {
@@ -163,38 +167,46 @@ define(['lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor', 'ser
 
   }
 
-  var readHistory = function (callback, options) {
+  var readHistory = function (options, originalDefer) {
+
+    var defer = originalDefer || Q.defer();
+
     options = options || {};
     options.exclude = options.exclude || [];
 
-    requestStages(options.nextUrl, function (result) {
-      if(result !== undefined) {
+    requestStages(options.nextUrl).then(function (result) {
+
+      if (result !== undefined) {
         _.each(result.feed.entry, pushEntryToPipelineHistory);
-        pipelineHistory = _.omit(pipelineHistory, function(value, key) {
+        pipelineHistory = _.omit(pipelineHistory, function (value, key) {
           return _.contains(options.exclude, key);
         });
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineFinishTime);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineResult);
         pipelineHistory = _.mapValues(pipelineHistory, mapPipelineAuthor);
 
-        _.each(pipelineHistory, function(entry) {
+        _.each(pipelineHistory, function (entry) {
           // TODO: Does this async call really fill up values before we're done?
           enrichWithCommitDetails(entry);
         });
-        
+
         pipelineHistory = _.mapValues(pipelineHistory, mapInfoText);
 
         var nextLink = _.find(result.feed.link, { rel: 'next' });
 
         if (nextLink && _.keys(pipelineHistory).length < MIN_NUMBER_HISTORY) {
           var nextUrl = nextLink.href;
-          readHistory(callback, _.extend(options, { nextUrl: nextUrl }));
+          readHistory(_.extend(options, { nextUrl: nextUrl }), defer);
         } else {
-          callback(pipelineHistory, options.callbackParameter);
+          defer.resolve(pipelineHistory);
         }
+      } else {
+        defer.resolve({});
       }
 
-    });
+    }, defer.reject);
+
+    return defer.promise;
 
   };
 
