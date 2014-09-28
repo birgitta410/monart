@@ -4,7 +4,7 @@ var mockPipelineReader, mockCcTrayReader, fakePipelineHistory, fakeActivity, fak
 var mockTime = { format: function () { } };
 
 mockPipelineReader = {
-  readHistory: function () {
+  readPipelineRuns: function () {
     var defer = Q.defer();
     defer.resolve(fakePipelineHistory);
     return defer.promise;
@@ -262,9 +262,9 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
       });
 
       it('should exclude the currently active build from the history', function (done) {
-        spyOn(mockPipelineReader, 'readHistory').andCallThrough();
+        spyOn(mockPipelineReader, 'readPipelineRuns').andCallThrough();
         haringGocdMapper.readHistoryAndActivity().then(function () {
-          var optionsReadHistory = mockPipelineReader.readHistory.mostRecentCall.args[0];
+          var optionsReadHistory = mockPipelineReader.readPipelineRuns.mostRecentCall.args[0];
           expect(optionsReadHistory.exclude).toEqual([ fakeBuildNumberInProgress ]);
           done();
         });

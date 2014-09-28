@@ -1,11 +1,11 @@
 
-define(['q', 'lodash', 'server/sources/gocd/historyEntry', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'],
-  function (Q, _, historyEntryCreator, gocdRequestor, atomEntryParser) {
+define(['q', 'lodash', 'server/sources/gocd/pipelineRun', 'server/sources/gocd/gocdRequestor', 'server/sources/gocd/atomEntryParser'],
+  function (Q, _, pipelineRunCreator, gocdRequestor, atomEntryParser) {
 
-  var pipelineHistory = { };
+  var pipelineRuns = { };
   var alreadyPromised = [];
 
-  var MIN_NUMBER_HISTORY = 25;
+  var MIN_NUMBER_PIPELINE_RUNS = 25;
 
   var requestStages = function (next) {
 
@@ -18,7 +18,7 @@ define(['q', 'lodash', 'server/sources/gocd/historyEntry', 'server/sources/gocd/
 
   };
 
-  var readHistory = function (options, originalDefer) {
+  var readPipelineRuns = function (options, originalDefer) {
 
     var defer = originalDefer || Q.defer();
 
@@ -29,34 +29,34 @@ define(['q', 'lodash', 'server/sources/gocd/historyEntry', 'server/sources/gocd/
 
       if (result !== undefined) {
 
-        var historyPromises = _.map(result.feed.entry, function getHistoryPromise(entry) {
+        var pipelineRunPromises = _.map(result.feed.entry, function (entry) {
             if(!_.contains(alreadyPromised, entry.buildNumber)) {
               alreadyPromised.push(entry.buildNumber);
-              return historyEntryCreator.createNew(entry);
+              return pipelineRunCreator.createNew(entry);
             } else {
               return undefined;
             }
           }
         );
 
-        historyPromises = _.compact(historyPromises);
+        pipelineRunPromises = _.compact(pipelineRunPromises);
 
-        Q.all(historyPromises).then(function(historyEntries) {
-          _.each(historyEntries, function(historyEntry) {
-            pipelineHistory[historyEntry.buildNumber] = pipelineHistory[historyEntry.buildNumber] || historyEntry;
+        Q.all(pipelineRunPromises).then(function(pipelineRunResults) {
+          _.each(pipelineRunResults, function(pipelineRun) {
+            pipelineRuns[pipelineRun.buildNumber] = pipelineRuns[pipelineRun.buildNumber] || pipelineRun;
           });
 
-          pipelineHistory = _.omit(pipelineHistory, function (value, key) {
+          pipelineRuns = _.omit(pipelineRuns, function (value, key) {
             return _.contains(options.exclude, key);
           });
 
           var nextLink = _.find(result.feed.link, { rel: 'next' });
 
-          if (nextLink && _.keys(pipelineHistory).length < MIN_NUMBER_HISTORY) {
+          if (nextLink && _.keys(pipelineRuns).length < MIN_NUMBER_PIPELINE_RUNS) {
             var nextUrl = nextLink.href;
-            readHistory(_.extend(options, { nextUrl: nextUrl }), defer);
+            readPipelineRuns(_.extend(options, { nextUrl: nextUrl }), defer);
           } else {
-            defer.resolve(pipelineHistory);
+            defer.resolve(pipelineRuns);
           }
 
         }, defer.reject);
@@ -72,12 +72,12 @@ define(['q', 'lodash', 'server/sources/gocd/historyEntry', 'server/sources/gocd/
   };
 
   var clear = function() {
-    pipelineHistory = {};
+    pipelineRuns = {};
     alreadyPromised = [];
   };
 
   return {
-    readHistory: readHistory,
+    readPipelineRuns: readPipelineRuns,
     clear: clear
   };
 

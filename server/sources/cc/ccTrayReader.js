@@ -15,7 +15,6 @@ define(['q', 'lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd
 
   var readActivity = function() {
 
-//    options = options || {};
     var activity = { jobs: [] };
 
     return requestActivity().then(function (result) {

@@ -2,44 +2,44 @@
 define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor', 'server/sources/github/githubRequestor'],
   function (Q, _, moment, cheerio, gocdRequestor, githubRequestor) {
 
-  var HistoryEntryCreator = {};
+  var PipelineRunCreator = {};
 
-  HistoryEntryCreator.createNew = function (feedEntry) {
+  PipelineRunCreator.createNew = function (feedEntry) {
     var defer = Q.defer();
 
-    var historyEntry = {};
-    historyEntry.buildNumber = feedEntry.buildNumber;
-    historyEntry.stages = historyEntry.stages || [];
-    historyEntry.stages.push(feedEntry);
+    var pipelineRun = {};
+    pipelineRun.buildNumber = feedEntry.buildNumber;
+    pipelineRun.stages = pipelineRun.stages || [];
+    pipelineRun.stages.push(feedEntry);
 
-    historyEntry.mapPipelineFinishTime = function () {
-      if (historyEntry.time !== undefined) {
+    pipelineRun.mapPipelineFinishTime = function () {
+      if (pipelineRun.time !== undefined) {
         return;
       }
 
-      var lastFinishedStage = _.sortBy(historyEntry.stages, function (stage) {
+      var lastFinishedStage = _.sortBy(pipelineRun.stages, function (stage) {
         return stage.updated;
-      })[historyEntry.stages.length - 1];
-      historyEntry.time = lastFinishedStage.updated;
+      })[pipelineRun.stages.length - 1];
+      pipelineRun.time = lastFinishedStage.updated;
     };
 
-    historyEntry.mapInfoText = function () {
-      if (historyEntry.info !== undefined) {
+    pipelineRun.mapInfoText = function () {
+      if (pipelineRun.info !== undefined) {
         return;
       }
 
-      var lastCommitMaterial = _.last(historyEntry.materials);
+      var lastCommitMaterial = _.last(pipelineRun.materials);
 
       var theCommit = lastCommitMaterial ? lastCommitMaterial.comment : 'Unknown change';
-      var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
-      var theAuthor = historyEntry.author ? historyEntry.author.name : 'Unknown author';
-      var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed;
-      historyEntry.info = '[' + historyEntry.buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit + ' | ' + theAuthor;
+      var theTime = moment(pipelineRun.time).format('MMMM Do YYYY, h:mm:ss a');
+      var theAuthor = pipelineRun.author ? pipelineRun.author.name : 'Unknown author';
+      var theResult = pipelineRun.wasSuccessful() ? 'Success' : pipelineRun.stageFailed;
+      pipelineRun.info = '[' + pipelineRun.buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit + ' | ' + theAuthor;
 
     };
 
-    historyEntry.getLatestRunsOfStages = function () {
-      var stages = historyEntry.stages;
+    pipelineRun.getLatestRunsOfStages = function () {
+      var stages = pipelineRun.stages;
       var allStageNames = _.unique(_.map(stages, function (stage) {
         return stage.stageName;
       }));
@@ -50,9 +50,9 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
       });
     };
 
-    historyEntry.mapPipelineAuthor = function () {
+    pipelineRun.mapPipelineAuthor = function () {
 
-      if (historyEntry.author !== undefined) {
+      if (pipelineRun.author !== undefined) {
         return;
       }
 
@@ -82,41 +82,41 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
         }
       }
 
-      var firstStage = _.first(historyEntry.stages);
+      var firstStage = _.first(pipelineRun.stages);
 
-      _.extend(historyEntry, {
+      _.extend(pipelineRun, {
         author: firstStage.author
       });
-      historyEntry.author.initials = getInitialsOfAuthor(firstStage.author);
+      pipelineRun.author.initials = getInitialsOfAuthor(firstStage.author);
 
     };
 
-    historyEntry.mapPipelineResult = function () {
-      if (historyEntry.result !== undefined) {
+    pipelineRun.mapPipelineResult = function () {
+      if (pipelineRun.result !== undefined) {
         return;
       }
 
-      var lastRuns = historyEntry.getLatestRunsOfStages();
+      var lastRuns = pipelineRun.getLatestRunsOfStages();
 
       var failedStages = _.where(lastRuns, { result: 'failed' });
 
       if (failedStages.length > 0) {
-        _.extend(historyEntry, {
+        _.extend(pipelineRun, {
           result: 'failed',
           stageFailed: failedStages[0].stageName
         });
       } else {
-        historyEntry.result = 'passed';
+        pipelineRun.result = 'passed';
       }
-      historyEntry.wasSuccessful = function () {
-        return historyEntry.result === 'passed';
+      pipelineRun.wasSuccessful = function () {
+        return pipelineRun.result === 'passed';
       };
 
     };
 
-    historyEntry.enrichWithCommitDetails = function () {
+    pipelineRun.enrichWithCommitDetails = function () {
 
-      if (historyEntry.materials !== undefined) {
+      if (pipelineRun.materials !== undefined) {
         return;
       }
 
@@ -142,7 +142,7 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
               var comment = $(change).find('.comment p')[0].children[0].data;
               var sha = $(change).find('.revision dd')[0].children[0].data;
               return {
-                buildNumber: historyEntry.buildNumber,
+                buildNumber: pipelineRun.buildNumber,
                 comment: comment,
                 committer: modifiedBy,
                 sha: sha
@@ -155,7 +155,7 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
         });
       }
 
-      return getMaterials(historyEntry.stages[0].id)
+      return getMaterials(pipelineRun.stages[0].id)
         .then(function (materials) {
           var commitPromises = _.map(materials, function (material) {
             return addCommitDetails(material);
@@ -166,22 +166,22 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
     };
 
     try {
-      historyEntry.mapPipelineFinishTime();
-      historyEntry.mapPipelineResult();
-      historyEntry.mapPipelineAuthor();
+      pipelineRun.mapPipelineFinishTime();
+      pipelineRun.mapPipelineResult();
+      pipelineRun.mapPipelineAuthor();
 
-      var commitDetailsPromises = historyEntry.enrichWithCommitDetails();
+      var commitDetailsPromises = pipelineRun.enrichWithCommitDetails();
       Q.all(commitDetailsPromises).then(function (details) {
-        historyEntry.materials = details;
-        historyEntry.mapInfoText();
+        pipelineRun.materials = details;
+        pipelineRun.mapInfoText();
 
-        defer.resolve(historyEntry);
+        defer.resolve(pipelineRun);
 
       }, function (err) {
-        console.log('could not resolve details, returning without |', historyEntry.buildNumber, err);
+        console.log('could not resolve details, returning without |', pipelineRun.buildNumber, err);
 
-        historyEntry.mapInfoText();
-        defer.resolve(historyEntry);
+        pipelineRun.mapInfoText();
+        defer.resolve(pipelineRun);
       });
     } catch(err) {
       console.log('ERROR', err);
@@ -192,6 +192,6 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
 
   };
 
-  return HistoryEntryCreator;
+  return PipelineRunCreator;
 
 });
