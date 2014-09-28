@@ -21,7 +21,7 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
       function newClient() {
 
         function getActivityAndUpdateClients() {
-          haringGocdMapper.readHistoryAndActivity(function(activityHaring) {
+          haringGocdMapper.readHistoryAndActivity().then(function(activityHaring) {
             ws.send(JSON.stringify({ haring: activityHaring }), function() {  });
           });
         }
@@ -63,7 +63,7 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
       function newClient() {
 
         function getActivityAndUpdateClients() {
-          miroGocdMapper.readHistoryAndActivity(function(activityMiro) {
+          miroGocdMapper.readHistoryAndActivity().then(function(activityMiro) {
             ws.send(JSON.stringify({ miro: activityMiro }), function() {  });
           });
         }

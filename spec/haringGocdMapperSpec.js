@@ -4,16 +4,18 @@ var mockPipelineReader, mockCcTrayReader, fakePipelineHistory, fakeActivity, fak
 var mockTime = { format: function () { } };
 
 mockPipelineReader = {
-  readHistory: function (options) {
+  readHistory: function () {
     var defer = Q.defer();
-    defer.resolve(fakePipelineHistory, options);
+    defer.resolve(fakePipelineHistory);
     return defer.promise;
   }
 };
 
 mockCcTrayReader = {
-  readActivity: function (callback, options) {
-    callback({ jobs: fakeActivity, buildNumberInProgress: fakeBuildNumberInProgress }, options ? options.callbackParameter : undefined);
+  readActivity: function () {
+    var defer = Q.defer();
+    defer.resolve({ jobs: fakeActivity, buildNumberInProgress: fakeBuildNumberInProgress });
+    return defer.promise;
   }
 };
 
@@ -42,7 +44,7 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
         fakePipelineHistory = {};
       });
 
-      it('should set the background colour to green if successful', function() {
+      it('should set the background colour to green if successful', function(done) {
         fakePipelineHistory = {
           '125': { wasSuccessful: successfulFn, time: mockTime }
         };
@@ -51,11 +53,12 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
             wasSuccessful: successfulFn
           }
         ];
-        haringGocdMapper.readHistoryAndActivity(function(result) {
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.background).toBe('green');
+          done();
         });
       });
-      it('should set the background colour to orange if unsuccessful', function() {
+      it('should set the background colour to orange if unsuccessful', function(done) {
         fakePipelineHistory = {
           '125': { wasSuccessful: notSuccessfulFn, time: mockTime }
         };
@@ -64,11 +67,12 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
             wasSuccessful: notSuccessfulFn
           }
         ];
-        haringGocdMapper.readHistoryAndActivity(function(result) {
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.background).toBe('orange');
+          done();
         });
       });
-      it('should set the background colour to blue if building', function() {
+      it('should set the background colour to blue if building', function(done) {
         fakePipelineHistory = {
           '125': { wasSuccessful: successfulFn, time: mockTime }
         };
@@ -78,12 +82,13 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
             wasSuccessful: notSuccessfulFn
           }
         ];
-        haringGocdMapper.readHistoryAndActivity(function(result) {
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.background).toBe('blue');
+          done();
         });
       });
 
-      it('should add info about author to activity from history, even if history failed', function () {
+      it('should add info about author to activity from history, even if history failed', function (done) {
         fakePipelineHistory = {
           '125': {
             wasSuccessful: successfulFn,
@@ -99,9 +104,10 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
             wasSuccessful: notSuccessfulFn
           }
         ];
-        haringGocdMapper.readHistoryAndActivity(function(result) {
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.figures[0].initials).toBe('mmu');
-          expect(result.figures[1].initials).toBeUndefined;
+          expect(result.figures[1].initials).toBeUndefined();
+          done();
         });
       });
 
@@ -120,17 +126,17 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
           fakeActivity.push({ buildNumber: n, wasSuccessful: successfulFn, 'test': 'successful' });
         });
         var activityOffset = fakeActivity.length || 0;
-        _.times(numFailingActivity, function(n) {
+        _.times(numFailingActivity, function() {
           fakeActivity.push({ buildNumber: activityOffset, wasSuccessful: notSuccessfulFn, 'test': 'not successful' });
         });
       }
 
-      it('should return all activity figures and fill up to the maximum number of figures with history', function () {
+      it('should return all activity figures and fill up to the maximum number of figures with history', function (done) {
         var NUM_FIGURES_IN_VIS = 24;
 
         preparePipelineAndActivity(NUM_FIGURES_IN_VIS, 0, 8, 0);
 
-        haringGocdMapper.readHistoryAndActivity(function(result) {
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.figures.length).toBe(NUM_FIGURES_IN_VIS);
 
           // FIXME: Why is this not working anymore?
@@ -139,10 +145,11 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
 
           var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
           expect(activityFigures.length).toBe(8);
+          done();
         });
       });
 
-      it('should make a "great success" announcement if all visible history is successful', function () {
+      it('should make a "great success" announcement if all visible history is successful', function (done) {
         var NUM_FIGURES_IN_VIS = 24;
         var numActivity = 8;
         var numSuccessfulVisibleHistory = NUM_FIGURES_IN_VIS - numActivity; // 16
@@ -150,21 +157,23 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
 
         preparePipelineAndActivity(numFailingInvisibleHistory, numSuccessfulVisibleHistory, numActivity, 0);
 
-        haringGocdMapper.readHistoryAndActivity(function(result) {
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.announcementFigure).toBeDefined();
           expect(result.announcementFigure.word1).toBe('great');
           expect(result.announcementFigure.word2).toBe('success');
           expect(result.announcementFigure.type).toBe('crawling_takeoff');
           expect(result.announcementFigure.color).toBe('blue');
+          done();
         });
       });
 
-      it('should not make a "great success" announcement if there are failing entries in history', function () {
+      it('should not make a "great success" announcement if there are failing entries in history', function (done) {
 
         preparePipelineAndActivity(2, 8, 3, 0);
 
-        haringGocdMapper.readHistoryAndActivity(function(result) {
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.announcementFigure).toBeUndefined();
+          done();
         });
       });
     });
@@ -176,85 +185,93 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
         fakePipelineHistory = {};
       });
 
-      it('should set crawling type if failed and previous one was failure as well', function () {
+      it('should set crawling type if failed and previous one was failure as well', function (done) {
         fakePipelineHistory = {
           '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
         };
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(_.keys(result.figures).length).toBe(2);
           expect(result.figures[0].type).toBe('crawling');
+          done();
         });
 
       });
 
-      it('should set flying type if previous failed, current is success', function () {
+      it('should set flying type if previous failed, current is success', function (done) {
         // descending order, newest first
         fakePipelineHistory = {
           '124': { wasSuccessful: successfulFn, time: mockTime },
           '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
         };
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(_.keys(result.figures).length).toBe(2);
           expect(result.figures[0].type).toBe('flying');
+          done();
         });
 
       });
 
-      it('should set stumbling type if previous was successful', function () {
+      it('should set stumbling type if previous was successful', function (done) {
         // descending order, newest first
         fakePipelineHistory = {
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
           '123': { wasSuccessful: successfulFn, time: mockTime }
         };
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(_.keys(result.figures).length).toBe(2);
           expect(result.figures[0].type).toBe('stumbling');
+          done();
         });
 
       });
 
-      it('should set color to WARM if failed, COLD if successful', function () {
+      it('should set color to WARM if failed, COLD if successful', function (done) {
         fakePipelineHistory = {
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
           '123': { wasSuccessful: successfulFn, time: mockTime }
         };
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.figures[0].color).toBe('WARM');
           expect(result.figures[1].color).toBe('COLD');
+          done();
         });
 
       });
 
-      it('should set orange background colour if latest build failed', function () {
+      it('should set orange background colour if latest build failed', function (done) {
         fakePipelineHistory = {
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
           '123': { wasSuccessful: successfulFn, time: mockTime }
         };
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.background).toBe('orange');
+          done();
         });
       });
 
-      it('should set green background colour if latest build successful', function () {
+      it('should set green background colour if latest build successful', function (done) {
         fakePipelineHistory = {
           '124': { wasSuccessful: successfulFn, time: mockTime },
           '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
         };
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.background).toBe('green');
+          done();
         });
       });
 
-      it('should exclude the currently active build from the history', function () {
+      it('should exclude the currently active build from the history', function (done) {
         spyOn(mockPipelineReader, 'readHistory').andCallThrough();
-        haringGocdMapper.readHistoryAndActivity(function (result) { });
+        haringGocdMapper.readHistoryAndActivity().then(function () {
+          var optionsReadHistory = mockPipelineReader.readHistory.mostRecentCall.args[0];
+          expect(optionsReadHistory.exclude).toEqual([ fakeBuildNumberInProgress ]);
+          done();
+        });
 
-        var optionsReadHistory = mockPipelineReader.readHistory.mostRecentCall.args[0];
-        expect(optionsReadHistory.exclude).toEqual([ fakeBuildNumberInProgress ]);
       });
 
-      it('should not add initials of authors of passed jobs', function () {
+      it('should not add initials of authors of passed jobs', function (done) {
         fakePipelineHistory = {
           '124': {
             wasSuccessful: successfulFn,
@@ -269,9 +286,10 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
             }
           }
         };
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.figures[0].initials).toBeUndefined();
           expect(result.figures[1].initials).toBe('mmu');
+          done();
         });
       });
 
@@ -284,53 +302,55 @@ context(['lodash', 'server/haring/gocdMapper'], function(_, haringGocdMapper) {
         fakePipelineHistory = {};
       });
 
-      it('should set dotted border for all activity entries', function () {
+      it('should set dotted border for all activity entries', function (done) {
         fakeActivity = [
           { name: 'A-PIPELINE :: integration-test :: backend-integration',
             activity: 'Building',
             wasSuccessful: successfulFn
           }
         ];
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.figures[0].border).toBe('dotted');
+          done();
         });
       });
 
-      it('should set skating type if currently building', function () {
+      it('should set skating type if currently building', function (done) {
         fakeActivity = [
           { name: 'A-PIPELINE :: integration-test :: backend-integration',
             activity: 'Building',
             wasSuccessful: successfulFn
           }
         ];
-        console.log('++++++++++++++++++++++++++++++++++++++++++++');
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.figures.length).toBe(1);
           expect(result.figures[0].type).toBe('skating');
+          done();
         });
-        console.log('++++++++++++++++++++++++++++++++++++++++++++');
       });
 
-      it('should set type according to last build status if sleeping', function () {
+      it('should set type according to last build status if sleeping', function (done) {
         fakeActivity = [
           { name: 'A-PIPELINE :: integration-test :: backend-integration', wasSuccessful: successfulFn, activity: 'Sleeping' },
           { name: 'A-PIPELINE :: deploy-dev :: backend', wasSuccessful: notSuccessfulFn, activity: 'Sleeping' }
         ];
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.figures.length).toBe(2);
           expect(result.figures[0].type).toBe('walking');
           expect(result.figures[1].type).toBe('stumbling');
+          done();
         });
       });
 
-      it('should show info by default if a stage fails', function () {
+      it('should show info by default if a stage fails', function (done) {
         fakeActivity = [
           {
             wasSuccessful: notSuccessfulFn
           }
         ];
-        haringGocdMapper.readHistoryAndActivity(function (result) {
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.figures[0].showInfo).toBe(true);
+          done();
         });
       });
 

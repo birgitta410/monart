@@ -11,8 +11,10 @@ mockPipelineReader = {
 };
 
 mockCcTrayReader = {
-  readActivity: function (callback, options) {
-    callback({ jobs: fakeActivity, buildNumberInProgress: fakeBuildNumberInProgress }, options ? options.callbackParameter : undefined);
+  readActivity: function () {
+    var defer = Q.defer();
+    defer.resolve({ jobs: fakeActivity, buildNumberInProgress: fakeBuildNumberInProgress });
+    return defer.promise;
   }
 };
 
@@ -41,29 +43,31 @@ context(['lodash', 'server/miro/gocdMapper'], function(_, miroGocdMapper) {
         fakePipelineHistory = {};
       });
 
-      it('should set the stroke color to red if last build was unsuccessful', function () {
+      it('should set the stroke color to red if last build was unsuccessful', function (done) {
         fakePipelineHistory = {
           '125': { wasSuccessful: notSuccessfulFn },
           '124': { wasSuccessful: successfulFn }
         };
-        miroGocdMapper.readHistoryAndActivity(function (result) {
+        miroGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.stroke.color).toBe('red');
+          done();
         });
 
       });
 
-      it('should set the stroke color to black if last build was successful', function () {
+      it('should set the stroke color to black if last build was successful', function (done) {
         fakePipelineHistory = {
           '125': { wasSuccessful: successfulFn },
           '124': { wasSuccessful: notSuccessfulFn }
         };
-        miroGocdMapper.readHistoryAndActivity(function (result) {
+        miroGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.stroke.color).toBe('black');
+          done();
         });
 
       });
 
-      it('should set the size of stones according to the size of changes', function () {
+      it('should set the size of stones according to the size of changes', function (done) {
         fakePipelineHistory = {
           '125': {
             wasSuccessful: notSuccessfulFn
@@ -91,9 +95,10 @@ context(['lodash', 'server/miro/gocdMapper'], function(_, miroGocdMapper) {
             ]
           }
         };
-        miroGocdMapper.readHistoryAndActivity(function (result) {
+        miroGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.stones[0].size).toBe('large');
           expect(result.stones[1].size).toBe('small');
+          done();
         });
 
       });

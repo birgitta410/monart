@@ -1,23 +1,24 @@
 
-define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atomEntryParser', 'server/sources/ymlHerokuConfig'], function (_, ccTrayRequestor, goCdAtomEntryParser, configReader) {
+define(['q', 'lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atomEntryParser', 'server/sources/ymlHerokuConfig'],
+  function (Q, _, ccTrayRequestor, goCdAtomEntryParser, configReader) {
 
   var configValues = configReader.create('cc').get();
 
-  var requestActivity = function (callback) {
-    ccTrayRequestor.get(function(json) {
+  var requestActivity = function () {
+    return ccTrayRequestor.get(function(json) {
       json.Projects.Project = _.map(json.Projects.Project, function(entry) {
         return entry;
       });
-      callback(json);
+      return json;
     });
   };
 
-  var readActivity = function(callback, options) {
+  var readActivity = function() {
 
-    options = options || {};
+//    options = options || {};
     var activity = { jobs: [] };
 
-    requestActivity(function (result) {
+    return requestActivity().then(function (result) {
 
       // Assumption (Go CD): Jobs are the ones with 3 path elements
       // 'PIPELINE-NAME :: stage-name :: job-name'
@@ -86,7 +87,7 @@ define(['lodash', 'server/sources/cc/ccTrayRequestor', 'server/sources/gocd/atom
 
       activity.buildNumberInProgress = parseGoCdBuildingPipeline();
 
-      callback(activity, options.callbackParameter);
+      return activity;
 
     });
 

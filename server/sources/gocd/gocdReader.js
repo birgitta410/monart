@@ -1,17 +1,14 @@
 
 var gocdMapper = function(_, moment, pipelineReader, ccTrayReader) {
-  var readData = function(callWhenDone) {
-    ccTrayReader.readActivity(function(activity) {
 
-      pipelineReader.readHistory({ exclude: [ activity.buildNumberInProgress] }).then(function(history) {
+  var readData = function() {
+    return ccTrayReader.readActivity().then(function(activity) {
 
-        var result = {
+      return pipelineReader.readHistory({ exclude: [ activity.buildNumberInProgress] }).then(function(history) {
+        return {
           activity: activity,
           history: history
         };
-
-        callWhenDone(result);
-
       });
 
     });

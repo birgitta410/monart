@@ -46,8 +46,8 @@ var miroGocdMapper = function(_, moment, gocdReader) {
     };
   };
 
-  var readHistoryAndActivity = function(callWhenDone) {
-    gocdReader.readData(function(data) {
+  var readHistoryAndActivity = function() {
+    return gocdReader.readData().then(function(data) {
 
       var history = data.history;
       var changeSizer = createChangeSizer(history);
@@ -74,7 +74,7 @@ var miroGocdMapper = function(_, moment, gocdReader) {
         };
       });
 
-      callWhenDone(finalShapes);
+      return finalShapes;
 
     });
   };

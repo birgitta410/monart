@@ -34,9 +34,9 @@ var haringGocdMapper = function(_, moment, gocdReader) {
     }
   }
 
-  var readHistoryAndActivity = function(callWhenDone) {
+  var readHistoryAndActivity = function() {
 
-    gocdReader.readData(function(data) {
+    return gocdReader.readData().then(function(data) {
 
       var activityHaring = mapActivityDataToFigures(data.activity);
 
@@ -52,7 +52,7 @@ var haringGocdMapper = function(_, moment, gocdReader) {
       finalFigures.background = activityHaring.background || historyHaring.background;
       finalFigures.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
 
-      callWhenDone(finalFigures);
+      return finalFigures;
 
     });
 
@@ -90,45 +90,7 @@ var haringGocdMapper = function(_, moment, gocdReader) {
     }
   }
 
-  function getInitialsOfAuthor(entry) {
-
-    function onlyAtoZ(character) {
-      var isLetter = character.toLowerCase() >= "a" && character.toLowerCase() <= "z";
-      if (! isLetter) {
-        return 'x';
-      } else {
-        return character;
-      }
-    }
-
-    if(entry.author !== undefined && entry.author.name !== undefined) {
-      var nameParts = entry.author.name.split(' ');
-
-      var initials = _.map(nameParts, function(namePart, index) {
-        if (index !== nameParts.length - 1) {
-          return onlyAtoZ(namePart[0]);
-        } else {
-          return onlyAtoZ(namePart[0]) + onlyAtoZ(namePart[1]);
-        }
-      }).join('');
-
-      return initials.toLowerCase().substr(0, 3);
-    }
-  }
-
   function mapPipelineDataToFigures(history) {
-
-    function getChangesByInfo(historyEntry) {
-      return 'changes by ' + (historyEntry.author ? historyEntry.author.name : 'UNKNOWN');
-    }
-
-    function getInfo(historyEntry, buildNumber) {
-      var theTime = moment(historyEntry.time).format('MMMM Do YYYY, h:mm:ss a');
-      var theCommit = historyEntry.materials ? historyEntry.materials.comment : 'Unknown change';
-      var theAuthor = historyEntry.author ? historyEntry.author.name : 'Unknown author';
-      var theResult = historyEntry.wasSuccessful() ? 'Success' : historyEntry.stageFailed + ' | ' + getChangesByInfo(historyEntry);
-      return '[' + buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit + ' | ' + theAuthor;
-    }
 
     var keysDescending = _.keys(history).sort(compareNumbers).reverse();
     if(keysDescending.length === 0) {
@@ -152,12 +114,10 @@ var haringGocdMapper = function(_, moment, gocdReader) {
 
     var lastBuildSuccessful = history[keysDescending[0]].wasSuccessful();
 
-    var result = {
+    return {
       background: lastBuildSuccessful ? 'green' : 'orange',
       figures: figures
     };
-
-    return result;
 
   }
 
