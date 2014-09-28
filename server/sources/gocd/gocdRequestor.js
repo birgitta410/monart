@@ -7,11 +7,10 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
   var STAGES_ENDPOINT = PIPELINE_BASE + '/stages.xml';
 
   var get = function(next) {
-    var defer = Q.defer();
-
     if (config.get().sampleIt()) {
       return getSample(next);
     } else {
+      var defer = Q.defer();
 
       var url = next ? config.addCredentialsToUrl(next) : config.get().url;
 
@@ -49,10 +48,11 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
     return defer.promise;
   }
 
-  var getStageDetails = function(stageId, callback) {
+  var getStageDetails = function(stageId) {
     if (config.get().sampleIt()) {
-      getSampleStageDetails(stageId, callback);
+      return getSampleStageDetails(stageId);
     } else {
+      var defer = Q.defer();
 
       var url = config.get().url + PIPELINE_BASE + '/' + stageId + '.xml';
 
@@ -63,38 +63,50 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
         var json = xml2json.toJson(body, {
           object: true, sanitize: false
         });
-        callback(json);
+        defer.resolve(json);
       });
 
+      return defer.promise;
     }
   };
 
-  function getSampleStageDetails(stageId, callback) {
+  function getSampleStageDetails() {
+    var defer = Q.defer();
+
     var source = 'server/sources/gocd/sample/stage-details.xml';
     var xml = fs.readFileSync(source);
     var json = xml2json.toJson(xml, {
       object: true, sanitize: false
     });
 
-    callback(json);
+    defer.resolve(json);
+
+    return defer.promise;
   }
 
-  var getMaterialHtml = function(jobId, callback) {
+  var getMaterialHtml = function(jobId) {
+
     if (config.get().sampleIt()) {
-      getSampleMaterialHtml(jobId, callback);
+      return getSampleMaterialHtml(jobId);
     } else {
+      var defer = Q.defer();
+
       var url = config.addCredentialsToUrl(jobId + '/materials');
       console.log('Requesting', jobId + '/materials');
       request(url, function(error, response, body) {
-        callback(body);
+        defer.resolve(body);
       });
+
+      return defer.promise;
     }
   };
 
-  function getSampleMaterialHtml(jobId, callback) {
+  function getSampleMaterialHtml() {
+    var defer = Q.defer();
     var html = fs.readFileSync('server/sources/gocd/sample/materials.html');
 
-    callback(html);
+    defer.resolve(html);
+    return defer.promise;
   }
 
   return {

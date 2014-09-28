@@ -1,5 +1,5 @@
 
-define(['request', 'fs', 'lodash', 'server/sources/ymlHerokuConfig'], function (request, fs, _, configReader) {
+define(['q', 'request', 'fs', 'lodash', 'server/sources/ymlHerokuConfig'], function (Q, request, fs, _, configReader) {
 
   var config = configReader.create('github');
 
@@ -13,11 +13,12 @@ define(['request', 'fs', 'lodash', 'server/sources/ymlHerokuConfig'], function (
     });
   }
 
-  var getCommitStats = function(sha, callback) {
+  var getCommitStats = function(sha) {
 
     if (config.get().sampleIt()) {
-      getSampleCommitStats(sha, callback);
+      return getSampleCommitStats(sha);
     } else {
+      var defer = Q.defer();
 
       console.log('Requesting', host, path + sha);
 
@@ -32,21 +33,27 @@ define(['request', 'fs', 'lodash', 'server/sources/ymlHerokuConfig'], function (
       options.headers['user-agent'] = config.get().user;
       request(options, function (error, response, body) {
         if(! error) {
-          callback(createStats(body));
+          defer.resolve(createStats(body));
         } else {
           console.log('Error requesting commit stats from git', error);
         }
       });
 
+      return defer.promise;
+
     }
   };
 
 
-  function getSampleCommitStats(sha, callback) {
+  function getSampleCommitStats() {
+    var defer = Q.defer();
+
     var source = 'server/sources/github/sample/github_commit.json';
     var jsonString = fs.readFileSync(source);
 
-    callback(createStats(jsonString));
+    defer.resolve(createStats(jsonString));
+
+    return defer.promise;
   }
 
   return {

@@ -3,7 +3,7 @@ var Q = require('q');
 var mockPipelineReader, mockCcTrayReader, fakePipelineHistory, fakeActivity, fakeBuildNumberInProgress = '1239';
 
 mockPipelineReader = {
-  readHistory: function (callback, options) {
+  readHistory: function (options) {
     var defer = Q.defer();
     defer.resolve(fakePipelineHistory, options);
     return defer.promise;
