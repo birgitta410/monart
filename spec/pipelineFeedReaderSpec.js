@@ -1,7 +1,8 @@
 
 var context = createContext({});
 
-context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/sources/gocd/gocdRequestor', 'server/sources/github/githubRequestor'], function(_, moment, thePipelineFeedReader, gocdRequestor, githubRequestor) {
+context(['lodash', 'moment', 'server/sources/gocd/historyEntry', 'server/sources/gocd/pipelineFeedReader', 'server/sources/gocd/gocdRequestor', 'server/sources/github/githubRequestor'],
+  function(_, moment, historyEntryCreator, thePipelineFeedReader, gocdRequestor, githubRequestor) {
 
   var NUM_ENTRIES_IN_FIXTURE = 12;
 
@@ -162,39 +163,6 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
           done();
         });
       });
-
-//      xit('should create initials of person that broke the pipeline run', function(done) {
-//        // TODO: Rewrite this test to work here
-//        fakePipelineHistory = {
-//          '123': {
-//            wasSuccessful: notSuccessfulFn,
-//            time: mockTime,
-//            author: {
-//              name: 'Max Mustermann'
-//            }
-//          },
-//          '122': {
-//            wasSuccessful: notSuccessfulFn,
-//            time: mockTime,
-//            author: {
-//              name: 'Has Three Names'
-//            }
-//          },
-//          '121': {
-//            wasSuccessful: notSuccessfulFn,
-//            time: mockTime,
-//            author: {
-//              name: 'Special Cäracter'
-//            }
-//          }
-//        };
-//
-//        haringGocdMapper.readHistoryAndActivity(function (result) {
-//          expect(result.figures[0].initials).toBe('mmu');
-//          expect(result.figures[1].initials).toBe('htn');
-//          expect(result.figures[2].initials).toBe('scx');
-//        });
-//      });
 
     });
   });
