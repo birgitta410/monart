@@ -11,7 +11,7 @@ var PING_INTERVAL = 5 * 60 * 1000;
 function buildInitialGrid() {
   var container = $('.container');
   for(var r = 0; r < NUM_STONES; r++) {
-    $('<div class="stone medium"><img src="images/miro/medium_black.png"></div>').appendTo(container);
+    $('<div class="stone"><img src="images/miro/medium_black.png"></div>').appendTo(container);
   }
 }
 
@@ -35,6 +35,8 @@ function processStone(index, entry) {
 
   var allStones = $('.stone');
   var stoneDiv = $(allStones[index]);
+
+  stoneDiv.addClass(entry.size);
 
   stoneDiv.tooltip({ placement: 'right'})
     .tooltip('hide')

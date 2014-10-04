@@ -44,11 +44,12 @@ define(['q', 'request', 'fs', 'lodash', 'server/sources/ymlHerokuConfig'], funct
     }
   };
 
-
+  var COMMIT_SAMPLES = ['github_commit.json', 'github_commit_large.json', 'github_commit_small.json'];
   function getSampleCommitStats() {
     var defer = Q.defer();
 
-    var source = 'server/sources/github/sample/github_commit.json';
+    var randomSample = COMMIT_SAMPLES[Math.floor(Math.random() * COMMIT_SAMPLES.length)]
+    var source = 'server/sources/github/sample/' + randomSample;
     var jsonString = fs.readFileSync(source);
 
     defer.resolve(createStats(jsonString));

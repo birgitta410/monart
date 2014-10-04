@@ -34,9 +34,19 @@ body {
 
 .stone {
   position: relative;
+  padding-left: 2%;
+  padding-right: 2%;
 }
 
 .large {
+  -webkit-box-flex: 3;
+  -moz-box-flex: 3;
+  -webkit-flex: 3;
+  -ms-flex: 3;
+  flex: 3;
+}
+
+.medium {
   -webkit-box-flex: 2;
   -moz-box-flex: 2;
   -webkit-flex: 2;
@@ -44,7 +54,7 @@ body {
   flex: 2;
 }
 
-.small, .medium {
+.small {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   -webkit-flex: 1;

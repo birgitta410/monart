@@ -67,10 +67,11 @@ var miroGocdMapper = function(_, moment, gocdReader) {
       finalShapes.stones = _.map(keysDescending.splice(1), function(key) {
         var entry = history[key];
 
+        var size = changeSizer.getSize(entry.changeSize);
         return {
-          size: changeSizer.getSize(entry.changeSize),
+          size: size,
           color: entry.wasSuccessful() ? 'black' : 'red',
-          info: entry.info
+          info: entry.info + ' ' + size
         };
       });
 
