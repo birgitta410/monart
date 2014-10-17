@@ -1,5 +1,6 @@
 
-define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper', 'server/miro/gocdMapper'], function (ws, http, express, module, path, _, haringGocdMapper, miroGocdMapper) {
+define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper', 'server/miro/gocdMapper', 'server/sources/gocd/gocdReader'],
+  function (ws, http, express, module, path, _, haringGocdMapper, miroGocdMapper, gocdReader) {
 
   var WebSocketServer = ws.Server
     , app = express();
@@ -142,6 +143,16 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
     function(req, res) {
       console.log('life sign');
       res.send('OK');
+    });
+
+  app.get('/data/gocd',
+    function(req, res) {
+      gocdReader.readData().then(function(data) {
+        res.set({
+          'Content-Type': 'application/json'
+        });
+        res.send(JSON.stringify(data));
+      });
     });
 
   return server;
