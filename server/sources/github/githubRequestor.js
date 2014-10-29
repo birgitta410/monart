@@ -9,7 +9,7 @@ define(['q', 'request', 'fs', 'lodash', 'server/sources/ymlHerokuConfig'], funct
   function createStats(responseBody) {
     var commitData = JSON.parse(responseBody);
     return _.extend(commitData.stats, {
-      filesChanged: commitData.files.length
+      filesChanged: commitData.files ? commitData.files.length : 0
     });
   }
 
