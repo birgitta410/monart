@@ -71,13 +71,3 @@ default:
       - 'A-PIPELINE :: integration-test'
       - 'A-PIPELINE :: deploy-dev'
 ```
-
-###ContextIO email reader
-
-```
-default:
-  contextIo:
-    account: xx123accountnumber123xx
-    key: xxx
-    secret: xxxx
-```

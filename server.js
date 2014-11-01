@@ -94,50 +94,7 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
 
   listenToMiro();
 
-  /** MONDRIAN ************************/
-  var mondrianEmailMapper = require('./server/mondrian/emailMapper.js');
-
-  var wssMondrian = new WebSocketServer({server: server, path: '/mondrian'});
-  console.log('mondrian websocket server created');
-
-  wssMondrian.on('connection', function(ws) {
-
-    function newClient() {
-      var numberOfUpdatesMade = 0;
-
-      function getEmailsAndUpdateClients() {
-        numberOfUpdatesMade ++;
-
-        // if (numberOfUpdatesMade < 5) {
-        console.log('checking for updates (' + numberOfUpdatesMade + ')');
-        mondrianEmailMapper.readEmail(function(emailData, doChangesExist) {
-          if(doChangesExist || numberOfUpdatesMade <= 2) {
-            console.log('CHANGES!');
-            ws.send(JSON.stringify(emailData), function() {  });
-          } else {
-            console.log('no changes');
-          }
-        });
-        // }
-      }
-
-      getEmailsAndUpdateClients();
-      var clientId = setInterval(getEmailsAndUpdateClients, 5000);
-      return clientId;
-    }
-
-    var clientId = newClient();
-
-    console.log('websocket connection open on /mondrian');
-
-    ws.on('close', function() {
-      console.log('websocket connection close on /mondrian');
-      clearInterval(clientId);
-    });
-  });
-
-  GLOBAL.TODAY_EXTERNAL = 20;
-  GLOBAL.TODAY_INTERNAL = 20;
+  /** ENDPOINTS ************************/
 
   function respondWithJson(response, data) {
     response.set({
