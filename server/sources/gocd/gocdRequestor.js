@@ -6,6 +6,8 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
   var PIPELINE_BASE = '/go/api/pipelines/' + config.get().pipeline;
   var STAGES_ENDPOINT = PIPELINE_BASE + '/stages.xml';
 
+  var pipelineFeedEtag;
+
   var get = function(next) {
     if (config.get().sampleIt()) {
       return getSample(next);
@@ -17,12 +19,16 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
       var loggableUrl = next ? next : config.get().loggableUrl;
       console.log('Requesting', loggableUrl + STAGES_ENDPOINT);
 
-      request(url + STAGES_ENDPOINT, function (error, response, body) {
-        var json = xml2json.toJson(body, {
-          object: true, sanitize: false
-        });
-        defer.resolve(json);
-      });
+      request({ method: 'GET', url: url + STAGES_ENDPOINT, headers: {'If-None-Match': pipelineFeedEtag } },
+        function (error, response, body) {
+          pipelineFeedEtag = response.headers.etag;
+
+          var json = xml2json.toJson(body, {
+            object: true, sanitize: false
+          });
+          defer.resolve(json);
+        }
+      );
 
       return defer.promise;
     }
