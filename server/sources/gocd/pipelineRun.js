@@ -23,7 +23,7 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
         return;
       }
 
-      var lastCommitMaterial = _.last(pipelineRun.materials);
+      var lastCommitMaterial = _.first(pipelineRun.materials);
 
       var theCommit = lastCommitMaterial ? lastCommitMaterial.comment : 'Unknown change';
       var theTime = moment(pipelineRun.time).format('MMMM Do YYYY, h:mm:ss a');

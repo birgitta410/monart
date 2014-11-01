@@ -136,7 +136,7 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
         thePipelineFeedReader.readPipelineRuns().then(function (results) {
           expect(results['1199'].materials.length).toBe(2);
           expect(results['1199'].materials[0].committer).toContain('Max Mustermann');
-          expect(results['1199'].materials[0].comment).toContain('awesome');
+          expect(results['1199'].materials[0].comment).toContain('latest change');
           expect(results['1199'].materials[0].sha).toBe('074cc70d464ad708c82bc6316f6c21ee35cffdcf');
           expect(results['1199'].materials[1].sha).toBe('185cc70d464ad708c82bc6316f6c21ee35cffdcf');
 
@@ -168,10 +168,10 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
 
       });
 
-      it('should put author and commit message into info text, if present', function(done) {
+      it('should put author and commit message of the latest change into info text, if present', function(done) {
         thePipelineFeedReader.readPipelineRuns().then(function (results) {
           expect(results['1199'].info).toContain('Mustermann');
-          expect(results['1199'].info).toContain('second change');
+          expect(results['1199'].info).toContain('latest change');
 
           done();
         });
