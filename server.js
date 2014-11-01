@@ -1,6 +1,6 @@
 
-define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper', 'server/miro/gocdMapper', 'server/sources/gocd/gocdReader'],
-  function (ws, http, express, module, path, _, haringGocdMapper, miroGocdMapper, gocdReader) {
+define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper', 'server/miro/gocdMapper', 'server/sources/gocd/gocdReader', 'server/sources/cc/ccTrayReader'],
+  function (ws, http, express, module, path, _, haringGocdMapper, miroGocdMapper, gocdReader, ccTrayReader) {
 
   var WebSocketServer = ws.Server
     , app = express();
@@ -139,21 +139,42 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
   GLOBAL.TODAY_EXTERNAL = 20;
   GLOBAL.TODAY_INTERNAL = 20;
 
+  function respondWithJson(response, data) {
+    response.set({
+      'Content-Type': 'application/json'
+    });
+    response.send(JSON.stringify(data));
+  }
+
   app.get('/alive',
     function(req, res) {
       console.log('life sign');
       res.send('OK');
     });
 
-  app.get('/data/gocd',
-    function(req, res) {
-      gocdReader.readData().then(function(data) {
-        res.set({
-          'Content-Type': 'application/json'
-        });
-        res.send(JSON.stringify(data));
-      });
+  app.get('/data/gocd', function(req, res) {
+    gocdReader.readData().then(function(data) {
+      respondWithJson(res, data);
     });
+  });
+
+  app.get('/data/gocd/haring', function(req, res) {
+    haringGocdMapper.readHistoryAndActivity().then(function(data) {
+      respondWithJson(res, data);
+    });
+  });
+
+  app.get('/data/gocd/miro', function(req, res) {
+    miroGocdMapper.readHistoryAndActivity().then(function(data) {
+      respondWithJson(res, data);
+    });
+  });
+
+  app.get('/data/cctray', function(req, res) {
+    ccTrayReader.readActivity().then(function(data) {
+      respondWithJson(res, data);
+    });
+  });
 
   return server;
 
