@@ -46,17 +46,17 @@ define(['q', 'lodash', 'server/sources/gocd/pipelineRun', 'server/sources/gocd/g
             pipelineRuns[pipelineRun.buildNumber] = pipelineRuns[pipelineRun.buildNumber] || pipelineRun;
           });
 
-          pipelineRuns = _.omit(pipelineRuns, function (value, key) {
-            return _.contains(options.exclude, key);
-          });
-
           var nextLink = _.find(result.feed.link, { rel: 'next' });
 
           if (nextLink && _.keys(pipelineRuns).length < MIN_NUMBER_PIPELINE_RUNS) {
             var nextUrl = nextLink.href;
             readPipelineRuns(_.extend(options, { nextUrl: nextUrl }), defer);
           } else {
-            defer.resolve(pipelineRuns);
+            var filteredResults = _.omit(pipelineRuns, function (value, key) {
+              return _.contains(options.exclude, key);
+            });
+
+            defer.resolve(filteredResults);
           }
 
         }, defer.reject);

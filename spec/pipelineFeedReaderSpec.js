@@ -50,6 +50,19 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
         });
       });
 
+      it('should cache pipeline run even if its excluded in results when first present', function(done) {
+        thePipelineFeedReader.readPipelineRuns({ exclude: ['1199'] }).then(function (results) {
+          expect(_.keys(results).length).toBe(NUM_ENTRIES_IN_FIXTURE - 1);
+
+          thePipelineFeedReader.readPipelineRuns().then(function (results) {
+            expect(_.keys(results).length).toBe(NUM_ENTRIES_IN_FIXTURE);
+            expect(results['1199']).toBeDefined();
+            done();
+          });
+
+        });
+      });
+
       it('should pass no url to the requestor in initial call', function(done) {
         spyOn(gocdRequestor, 'get').andCallThrough();
         thePipelineFeedReader.readPipelineRuns().then(function () {
