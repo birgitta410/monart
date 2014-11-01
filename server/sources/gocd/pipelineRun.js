@@ -5,17 +5,12 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
   var PipelineRunCreator = {};
 
   PipelineRunCreator.createNew = function (feedEntry) {
-    var defer = Q.defer();
 
     var pipelineRun = {};
+    pipelineRun.stages = [];
     pipelineRun.buildNumber = feedEntry.buildNumber;
-    pipelineRun.stages = pipelineRun.stages || [];
-    pipelineRun.stages.push(feedEntry);
 
     pipelineRun.mapPipelineFinishTime = function () {
-      if (pipelineRun.time !== undefined) {
-        return;
-      }
 
       var lastFinishedStage = _.sortBy(pipelineRun.stages, function (stage) {
         return stage.updated;
@@ -92,12 +87,8 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
     };
 
     pipelineRun.mapPipelineResult = function () {
-      if (pipelineRun.result !== undefined) {
-        return;
-      }
 
       var lastRuns = pipelineRun.getLatestRunsOfStages();
-
       var failedStages = _.where(lastRuns, { result: 'failed' });
 
       if (failedStages.length > 0) {
@@ -114,7 +105,7 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
 
     };
 
-    pipelineRun.enrichWithCommitDetails = function () {
+    pipelineRun.promiseCommitDetails = function () {
 
       if (pipelineRun.materials !== undefined) {
         return;
@@ -165,12 +156,17 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
 
     };
 
-    try {
+    pipelineRun.addStage = function(stageData) {
+      pipelineRun.stages.push(stageData);
+
       pipelineRun.mapPipelineFinishTime();
       pipelineRun.mapPipelineResult();
       pipelineRun.mapPipelineAuthor();
+    };
 
-      var commitDetailsPromises = pipelineRun.enrichWithCommitDetails();
+    pipelineRun.deferMaterialDetails = function(defer) {
+
+      var commitDetailsPromises = pipelineRun.promiseCommitDetails();
       Q.all(commitDetailsPromises).then(function (details) {
         pipelineRun.materials = details;
         pipelineRun.mapInfoText();
@@ -183,12 +179,24 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
         pipelineRun.mapInfoText();
         defer.resolve(pipelineRun);
       });
-    } catch(err) {
-      console.log('ERROR', err);
-      defer.reject();
-    }
+    };
 
-    return defer.promise;
+    pipelineRun.promiseInitialise = function() {
+      var defer = Q.defer();
+
+      try {
+        pipelineRun.addStage(feedEntry);
+        pipelineRun.deferMaterialDetails(defer);
+
+      } catch(err) {
+        console.log('ERROR', err);
+        defer.reject();
+      }
+
+      return defer.promise;
+    };
+
+    return pipelineRun;
 
   };
 

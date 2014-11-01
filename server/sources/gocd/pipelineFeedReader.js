@@ -3,7 +3,6 @@ define(['q', 'lodash', 'server/sources/gocd/pipelineRun', 'server/sources/gocd/g
   function (Q, _, pipelineRunCreator, gocdRequestor, atomEntryParser) {
 
   var pipelineRuns = { };
-  var alreadyPromised = [];
 
   var MIN_NUMBER_PIPELINE_RUNS = 25;
 
@@ -29,22 +28,23 @@ define(['q', 'lodash', 'server/sources/gocd/pipelineRun', 'server/sources/gocd/g
 
       if (result !== undefined) {
 
-        var pipelineRunPromises = _.map(result.feed.entry, function (entry) {
-            if(!_.contains(alreadyPromised, entry.buildNumber)) {
-              alreadyPromised.push(entry.buildNumber);
-              return pipelineRunCreator.createNew(entry);
+        var pipelineRunInitPromises = _.map(result.feed.entry, function (entry) {
+
+            if(! pipelineRuns[entry.buildNumber]) {
+              var pipelineRun = pipelineRunCreator.createNew(entry);
+              pipelineRuns[entry.buildNumber] = pipelineRun;
+              return pipelineRun.promiseInitialise();
+
             } else {
+              pipelineRuns[entry.buildNumber].addStage(entry);
               return undefined;
             }
           }
         );
 
-        pipelineRunPromises = _.compact(pipelineRunPromises);
+        pipelineRunInitPromises = _.compact(pipelineRunInitPromises);
 
-        Q.all(pipelineRunPromises).then(function(pipelineRunResults) {
-          _.each(pipelineRunResults, function(pipelineRun) {
-            pipelineRuns[pipelineRun.buildNumber] = pipelineRuns[pipelineRun.buildNumber] || pipelineRun;
-          });
+        Q.all(pipelineRunInitPromises).then(function() {
 
           var nextLink = _.find(result.feed.link, { rel: 'next' });
 
@@ -73,7 +73,6 @@ define(['q', 'lodash', 'server/sources/gocd/pipelineRun', 'server/sources/gocd/g
 
   var clear = function() {
     pipelineRuns = {};
-    alreadyPromised = [];
   };
 
   return {

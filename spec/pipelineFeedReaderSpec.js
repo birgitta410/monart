@@ -83,6 +83,14 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
 
       });
 
+      it('should add stages to respective pipeline runs', function (done) {
+        thePipelineFeedReader.readPipelineRuns().then(function (results) {
+          expect(results['1199'].stages.length).toBe(5);
+          done();
+        });
+
+      });
+
       it('should determine the time the last stage finished', function(done) {
         thePipelineFeedReader.readPipelineRuns().then(function (results) {
           var expectedTime = moment('2014-07-18T16:08:39+00:00');
