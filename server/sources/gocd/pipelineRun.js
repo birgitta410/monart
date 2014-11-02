@@ -10,15 +10,15 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
     pipelineRun.stages = [];
     pipelineRun.buildNumber = feedEntry.buildNumber;
 
-    pipelineRun.mapPipelineFinishTime = function () {
+    function mapPipelineFinishTime() {
 
       var lastFinishedStage = _.sortBy(pipelineRun.stages, function (stage) {
         return stage.updated;
       })[pipelineRun.stages.length - 1];
       pipelineRun.time = lastFinishedStage.updated;
-    };
+    }
 
-    pipelineRun.mapInfoText = function () {
+    function mapInfoText() {
       if (pipelineRun.info !== undefined) {
         return;
       }
@@ -31,9 +31,9 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
       var theResult = pipelineRun.wasSuccessful() ? 'Success' : pipelineRun.stageFailed;
       pipelineRun.info = '[' + pipelineRun.buildNumber + '] ' + theTime + ' | ' + theResult + ' | ' + theCommit + ' | ' + theAuthor;
 
-    };
+    }
 
-    pipelineRun.getLatestRunsOfStages = function () {
+    function getLatestRunsOfStages() {
       var stages = pipelineRun.stages;
       var allStageNames = _.unique(_.map(stages, function (stage) {
         return stage.stageName;
@@ -43,9 +43,9 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
         allEntriesForStage = _.sortBy(allEntriesForStage, 'runNumber').reverse();
         return allEntriesForStage[0];
       });
-    };
+    }
 
-    pipelineRun.mapPipelineAuthor = function () {
+    function mapPipelineAuthor() {
 
       if (pipelineRun.author !== undefined) {
         return;
@@ -84,11 +84,11 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
       });
       pipelineRun.author.initials = getInitialsOfAuthor(firstStage.author);
 
-    };
+    }
 
-    pipelineRun.mapPipelineResult = function () {
+    function mapPipelineResult() {
 
-      var lastRuns = pipelineRun.getLatestRunsOfStages();
+      var lastRuns = getLatestRunsOfStages();
       var failedStages = _.where(lastRuns, { result: 'failed' });
 
       if (failedStages.length > 0) {
@@ -103,17 +103,9 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
         return pipelineRun.result === 'passed';
       };
 
-    };
+    }
 
-    pipelineRun.addStage = function(stageData) {
-      pipelineRun.stages.push(stageData);
-
-      pipelineRun.mapPipelineFinishTime();
-      pipelineRun.mapPipelineResult();
-      pipelineRun.mapPipelineAuthor();
-    };
-
-    pipelineRun.deferMaterialDetails = function(defer) {
+    function deferMaterialDetails(defer) {
 
       function promiseCommitDetails() {
 
@@ -168,24 +160,24 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
       var commitDetailsPromises = promiseCommitDetails();
       Q.all(commitDetailsPromises).then(function (details) {
         pipelineRun.materials = details;
-        pipelineRun.mapInfoText();
+        mapInfoText();
 
         defer.resolve();
 
       }, function (err) {
         console.log('could not resolve details, returning without |', pipelineRun.buildNumber, err);
 
-        pipelineRun.mapInfoText();
+        mapInfoText();
         defer.resolve();
       });
     };
 
-    pipelineRun.promiseInitialise = function() {
+    function promiseInitialise() {
       var defer = Q.defer();
 
       try {
-        pipelineRun.addStage(feedEntry);
-        pipelineRun.deferMaterialDetails(defer);
+        addStage(feedEntry);
+        deferMaterialDetails(defer);
 
       } catch(err) {
         console.log('ERROR', err);
@@ -193,7 +185,18 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
       }
 
       return [ defer.promise ];
-    };
+    }
+
+    function addStage(stageData) {
+      pipelineRun.stages.push(stageData);
+
+      mapPipelineFinishTime();
+      mapPipelineResult();
+      mapPipelineAuthor();
+    }
+
+    pipelineRun.promiseInitialise = promiseInitialise;
+    pipelineRun.addStage = addStage;
 
     return pipelineRun;
 
