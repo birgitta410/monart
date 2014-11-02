@@ -68,6 +68,17 @@ define(['lodash'], function (_) {
     }
   }
 
+  function parseDetailsLink(links) {
+    if(links === undefined) return;
+
+    var goXmlLink = _.find(links, function(link) {
+      return link.type === 'application/vnd.go+xml' && link.href.indexOf('api/stages') > -1;
+    });
+    return {
+      detailsLink: goXmlLink.href
+    };
+  }
+
   var withData = function(data) {
     var result = {
       id: data.id,
@@ -76,6 +87,7 @@ define(['lodash'], function (_) {
     }; // only expose the data we currently need
     result = _.extend(result, parseParametersFromJobRunUrl(data.id));
     result = _.extend(result, parseAuthor(data.author));
+    result = _.extend(result, parseDetailsLink(data.link));
     return _.extend(result, parseResult(data.title));
   };
 
