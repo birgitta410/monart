@@ -79,7 +79,7 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
   function getSampleStageDetails() {
     var defer = Q.defer();
 
-    var source = 'server/sources/gocd/sample/stage-details.xml';
+    var source = 'server/sources/gocd/sample/pipeline-run-details.xml';
     var xml = fs.readFileSync(source);
     var json = xml2json.toJson(xml, {
       object: true, sanitize: false
