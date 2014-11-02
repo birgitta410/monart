@@ -105,57 +105,6 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
 
     };
 
-    pipelineRun.promiseCommitDetails = function () {
-
-      if (pipelineRun.materials !== undefined) {
-        return;
-      }
-
-      function withoutTimestamp(data) {
-        return data.indexOf('on 2') === -1 ? data : data.slice(0, data.indexOf('on 2')).trim();
-      }
-
-      function addCommitDetails(material) {
-        return githubRequestor.getCommitStats(material.sha).then(function (stats) {
-          material.stats = stats;
-          return material;
-        });
-      }
-
-      function getMaterials(stageId) {
-        return gocdRequestor.getMaterialHtml(stageId).then(function (html) {
-          var $ = cheerio.load(html);
-          try {
-            var changes = $('.material_tab .change');
-
-            return _.map(changes, function (change) {
-              var modifiedBy = withoutTimestamp($(change).find('.modified_by dd')[0].children[0].data);
-              var comment = $(change).find('.comment p')[0].children[0].data;
-              var sha = $(change).find('.revision dd')[0].children[0].data;
-              return {
-                buildNumber: pipelineRun.buildNumber,
-                comment: comment,
-                committer: modifiedBy,
-                sha: sha
-              };
-            });
-
-          } catch (error) {
-            console.log('ERROR loading material', error);
-          }
-        });
-      }
-
-      return getMaterials(pipelineRun.stages[0].id)
-        .then(function (materials) {
-          var commitPromises = _.map(materials, function (material) {
-            return addCommitDetails(material);
-          });
-          return Q.all(commitPromises);
-        });
-
-    };
-
     pipelineRun.addStage = function(stageData) {
       pipelineRun.stages.push(stageData);
 
@@ -166,7 +115,57 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
 
     pipelineRun.deferMaterialDetails = function(defer) {
 
-      var commitDetailsPromises = pipelineRun.promiseCommitDetails();
+      function promiseCommitDetails() {
+
+        if (pipelineRun.materials !== undefined) {
+          return [];
+        }
+
+        function withoutTimestamp(data) {
+          return data.indexOf('on 2') === -1 ? data : data.slice(0, data.indexOf('on 2')).trim();
+        }
+
+        function promiseCommitStatsFromGithub(material) {
+          return githubRequestor.getCommitStats(material.sha).then(function (stats) {
+            material.stats = stats;
+            return material;
+          });
+        }
+
+        function getMaterials(stageId) {
+          return gocdRequestor.getMaterialHtml(stageId).then(function (html) {
+            var $ = cheerio.load(html);
+            try {
+              var changes = $('.material_tab .change');
+
+              return _.map(changes, function (change) {
+                var modifiedBy = withoutTimestamp($(change).find('.modified_by dd')[0].children[0].data);
+                var comment = $(change).find('.comment p')[0].children[0].data;
+                var sha = $(change).find('.revision dd')[0].children[0].data;
+                return {
+                  buildNumber: pipelineRun.buildNumber,
+                  comment: comment,
+                  committer: modifiedBy,
+                  sha: sha
+                };
+              });
+
+            } catch (error) {
+              console.log('ERROR loading material', error);
+            }
+          });
+        }
+
+        return getMaterials(pipelineRun.stages[0].id).then(function (materials) {
+          var commitPromises = _.map(materials, function (material) {
+            return promiseCommitStatsFromGithub(material);
+          });
+          return Q.all(commitPromises);
+        });
+
+      }
+
+      var commitDetailsPromises = promiseCommitDetails();
       Q.all(commitDetailsPromises).then(function (details) {
         pipelineRun.materials = details;
         pipelineRun.mapInfoText();
