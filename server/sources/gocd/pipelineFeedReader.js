@@ -36,8 +36,7 @@ define(['q', 'lodash', 'server/sources/gocd/pipelineRun', 'server/sources/gocd/g
               return pipelineRun.promiseInitialise();
 
             } else {
-              pipelineRuns[entry.buildNumber].addStage(entry);
-              return undefined;
+              return [pipelineRuns[entry.buildNumber].addStage(entry)];
             }
           }
         );

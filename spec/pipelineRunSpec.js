@@ -1,6 +1,10 @@
 var context = createContext({});
 
-context(['moment', 'server/sources/gocd/pipelineRun', 'q'], function (moment, pipelineRunCreator, Q) {
+context(['moment', 'server/sources/gocd/pipelineRun', 'server/sources/gocd/gocdRequestor', 'q'], function (moment, pipelineRunCreator, gocdRequestor, Q) {
+
+  beforeEach(function() {
+    gocdRequestor.getJobRunDetails = gocdRequestor.getSampleJobRunDetails;
+  });
 
   describe('historyEntryCreator', function () {
     it('should create initials of person with special characters in name', function (done) {
@@ -29,6 +33,20 @@ context(['moment', 'server/sources/gocd/pipelineRun', 'q'], function (moment, pi
       }});
       Q.all(pipelineRun.promiseInitialise()).then(function () {
         expect(pipelineRun.stages[0].author.initials).toBe('mmu');
+        done();
+      });
+    });
+
+    it('should add jobDetails', function (done) {
+      var pipelineRun = pipelineRunCreator.createNew({
+        author: { name: 'bla' },
+        stageName: 'functional-test'
+      });
+      Q.all(pipelineRun.promiseInitialise()).then(function () {
+        expect(pipelineRun.stages[0].jobDetails.length).toBe(1);
+        expect(pipelineRun.stages[0].jobDetails[0].name).toBe('both');
+        expect(pipelineRun.stages[0].jobDetails[0].state).toBe('Completed');
+        expect(pipelineRun.stages[0].jobDetails[0].properties).toBeDefined();
         done();
       });
     });

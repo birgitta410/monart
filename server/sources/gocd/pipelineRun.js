@@ -124,7 +124,7 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
           });
         }
 
-        function getMaterials(stageId) {
+        function promiseMaterials(stageId) {
           return gocdRequestor.getMaterialHtml(stageId).then(function (html) {
             var $ = cheerio.load(html);
             try {
@@ -148,7 +148,7 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
           });
         }
 
-        return getMaterials(pipelineRun.stages[0].id).then(function (materials) {
+        return promiseMaterials(pipelineRun.stages[0].id).then(function (materials) {
           var commitPromises = _.map(materials, function (material) {
             return promiseCommitStatsFromGithub(material);
           });
@@ -172,19 +172,75 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
       });
     };
 
+    function findStageByName(stageName) {
+      return _.find(pipelineRun.stages, { stageName: stageName });
+    }
+
+    function deferRunStats(defer) {
+
+      function promiseRunStats() {
+
+        if (pipelineRun.stats !== undefined) {
+          return [];
+        }
+
+        function promiseJobDetails() {
+          var stageUrls = _.compact(_.map(getLatestRunsOfStages(), function(stage) {
+            return stage.detailsLink;
+          }));
+          return gocdRequestor.getJobRunDetails(stageUrls);
+        }
+
+        function mapDetailsIntoStages(jobDetailsByStage) {
+          _.each(jobDetailsByStage, function(stageDetails) {
+            var stage = findStageByName(stageDetails.stage.name);
+            if(stage !== undefined) {
+              stage.jobDetails = _.map(stageDetails.stage.jobDetails, function(jobDetail) {
+                return {
+                  name: jobDetail.job.name,
+                  result: jobDetail.job.result,
+                  state: jobDetail.job.state,
+                  properties: jobDetail.job.properties.property
+                }
+              });
+            }
+          });
+          return pipelineRun.stages;
+        }
+
+        return promiseJobDetails().then(function (jobDetailsByStage) {
+          return mapDetailsIntoStages(jobDetailsByStage);
+        });
+
+      }
+
+      var runStatsPromise = promiseRunStats();
+
+      runStatsPromise.then(function () {
+        defer.resolve();
+
+      }, function (err) {
+        console.log('could not resolve stats, returning without |', pipelineRun.buildNumber, err);
+
+        defer.resolve();
+      });
+    };
+
     function promiseInitialise() {
       var defer = Q.defer();
+      var deferStats = Q.defer();
 
       try {
         addStage(feedEntry);
         deferMaterialDetails(defer);
+        deferRunStats(deferStats);
 
       } catch(err) {
         console.log('ERROR', err);
         defer.reject();
       }
 
-      return [ defer.promise ];
+      return [ defer.promise, deferStats.promise ];
     }
 
     function addStage(stageData) {
@@ -193,6 +249,10 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
       mapPipelineFinishTime();
       mapPipelineResult();
       mapPipelineAuthor();
+
+      var defer = Q.defer();
+      deferRunStats(defer);
+      return defer;
     }
 
     pipelineRun.promiseInitialise = promiseInitialise;

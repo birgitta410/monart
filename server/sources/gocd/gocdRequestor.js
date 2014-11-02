@@ -1,12 +1,35 @@
 
-define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function (Q, xml2json, request, fs, configReader) {
+define(['q', 'lodash', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], function (Q, _, xml2json, request, fs, configReader) {
 
   var config = configReader.create('gocd');
 
-  var PIPELINE_BASE = '/go/api/pipelines/' + config.get().pipeline;
-  var STAGES_ENDPOINT = PIPELINE_BASE + '/stages.xml';
+  var PIPELINE_API_BASE = '/go/api/pipelines/' + config.get().pipeline;
+  var PIPELINE_FEED_ENDPOINT = PIPELINE_API_BASE + '/stages.xml';
+
+  var SAMPLES_PATH = 'server/sources/gocd/sample/';
 
   var pipelineFeedEtag;
+
+  function resolveAndPromiseSampleFile(path, convertToJson) {
+    var defer = Q.defer();
+
+    try {
+      var fileContents = fs.readFileSync(path);
+
+      if(convertToJson === true) {
+        defer.resolve(xml2json.toJson(fileContents, {
+          object: true, sanitize: false
+        }));
+      } else {
+        defer.resolve(fileContents);
+      }
+    } catch (err) {
+      console.log('ERROR reading file', path, err);
+      defer.reject();
+    }
+
+    return defer.promise;
+  }
 
   var get = function(next) {
     if (config.get().sampleIt()) {
@@ -17,9 +40,9 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
       var url = next ? config.addCredentialsToUrl(next) : config.get().url;
 
       var loggableUrl = next ? next : config.get().loggableUrl;
-      console.log('Requesting', loggableUrl + STAGES_ENDPOINT);
+      console.log('Requesting', loggableUrl + PIPELINE_FEED_ENDPOINT);
 
-      request({ method: 'GET', url: url + STAGES_ENDPOINT, headers: {'If-None-Match': pipelineFeedEtag } },
+      request({ method: 'GET', url: url + PIPELINE_FEED_ENDPOINT, headers: {'If-None-Match': pipelineFeedEtag } },
         function (error, response, body) {
           pipelineFeedEtag = response.headers.etag;
 
@@ -36,33 +59,19 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
   };
 
   function getSample(next) {
-    var defer = Q.defer();
-
-    var source = next ? next : 'server/sources/gocd/sample/pipeline-stages.xml';
-    try {
-      var xml = fs.readFileSync(source);
-
-      var json = xml2json.toJson(xml, {
-        object: true, sanitize: false
-      });
-      defer.resolve(json);
-    } catch (err) {
-      console.log('ERROR reading file', source, err);
-      defer.reject();
-    }
-
-    return defer.promise;
+    var source = next ? next : SAMPLES_PATH + 'pipeline-stages.xml';
+    return resolveAndPromiseSampleFile(source, true);
   }
 
-  var getStageDetails = function(stageId) {
+  var getPipelineRunDetails = function(buildNumber) {
     if (config.get().sampleIt()) {
-      return getSampleStageDetails(stageId);
+      return getSamplePipelineRunDetails(buildNumber);
     } else {
       var defer = Q.defer();
 
-      var url = config.get().url + PIPELINE_BASE + '/' + stageId + '.xml';
+      var url = config.get().url + PIPELINE_API_BASE + '/' + buildNumber + '.xml';
 
-      var loggableUrl = config.get().loggableUrl + PIPELINE_BASE + '/' + stageId + '.xml';
+      var loggableUrl = config.get().loggableUrl + PIPELINE_API_BASE + '/' + buildNumber + '.xml';
       console.log('Requesting', loggableUrl);
 
       request(url, function (error, response, body) {
@@ -76,18 +85,64 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
     }
   };
 
-  function getSampleStageDetails() {
-    var defer = Q.defer();
+  function getSamplePipelineRunDetails() {
+    return resolveAndPromiseSampleFile(SAMPLES_PATH + 'pipeline-run-details.xml', true);
+  }
 
-    var source = 'server/sources/gocd/sample/pipeline-run-details.xml';
-    var xml = fs.readFileSync(source);
-    var json = xml2json.toJson(xml, {
-      object: true, sanitize: false
+  function getStageRunDetails(stageUrl) {
+    if (config.get().sampleIt()) {
+      return getSampleStageRunDetails();
+    } else {
+      var defer = Q.defer();
+      request(stageUrl, function (error, response, body) {
+        var json = xml2json.toJson(body, {
+          object: true, sanitize: false
+        });
+        defer.resolve(json);
+      });
+
+      return defer.promise;
+    }
+  }
+
+  function getSampleStageRunDetails() {
+    return [ resolveAndPromiseSampleFile(SAMPLES_PATH + 'stage-run-details.xml', true) ];
+  }
+
+  function mergeJobDetailsWithStageDetails(stages, jobs) {
+    _.each(jobs, function(job) {
+      var stageName = job.job.stage.name;
+      var stage = _.find(stages, { stage: {name: stageName } });
+      stage.stage.jobDetails = stage.stage.jobDetails || [];
+      stage.stage.jobDetails.push(job);
     });
+  }
 
-    defer.resolve(json);
+  function getJobRunDetails(stageUrls) {
+    if (config.get().sampleIt()) {
+      return getSampleJobRunDetails();
+    } else {
+      return Q.all([]);
+//      TODO
+//      var stageRunPromises = _.map(stageUrls, function(stageUrl) {
+//        return getStageRunDetails(stageUrl);
+//      });
+//      return Q.all(stageRunPromises).then(function(stageRunDetails) {
+//        _.each(stageRunDetails, function(stageRunDetail) {
+//          console.log('stageRunDetail', stageRunDetail);
+//        });
+//      });
+    }
+  }
 
-    return defer.promise;
+  function getSampleJobRunDetails() {
+    return Q.all(getSampleStageRunDetails()).then(function(stageRunDetails) {
+      var sampleJobRuns = [ resolveAndPromiseSampleFile(SAMPLES_PATH + 'job-run-details.xml', true) ];
+      return Q.all(sampleJobRuns).then(function(jobRunDetails) {
+        mergeJobDetailsWithStageDetails(stageRunDetails, jobRunDetails);
+        return stageRunDetails;
+      });
+    });
   }
 
   var getMaterialHtml = function(jobId) {
@@ -108,18 +163,16 @@ define(['q', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuConfig'], fun
   };
 
   function getSampleMaterialHtml() {
-    var defer = Q.defer();
-    var html = fs.readFileSync('server/sources/gocd/sample/materials.html');
-
-    defer.resolve(html);
-    return defer.promise;
+    return resolveAndPromiseSampleFile(SAMPLES_PATH + 'materials.html');
   }
 
   return {
     get: get,
     getSample: getSample,
-    getStageDetails: getStageDetails,
-    getSampleStageDetails: getSampleStageDetails,
+    getPipelineRunDetails: getPipelineRunDetails,
+    getSamplePipelineRunDetails: getSamplePipelineRunDetails,
+    getJobRunDetails: getJobRunDetails,
+    getSampleJobRunDetails: getSampleJobRunDetails,
     getMaterialHtml: getMaterialHtml,
     getSampleMaterialHtml: getSampleMaterialHtml
   }

@@ -8,7 +8,8 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
 
   beforeEach(function() {
     gocdRequestor.get = gocdRequestor.getSample;
-    gocdRequestor.getStageDetails = gocdRequestor.getSampleStageDetails;
+    gocdRequestor.getPipelineRunDetails = gocdRequestor.getSamplePipelineRunDetails;
+    gocdRequestor.getJobRunDetails = gocdRequestor.getSampleJobRunDetails;
     gocdRequestor.getMaterialHtml = gocdRequestor.getSampleMaterialHtml;
     githubRequestor.getCommitStats = githubRequestor.getSampleCommitStats
   });
@@ -23,10 +24,11 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
       it('should log an example to the console, for documentation purposes', function (done) {
 
         thePipelineFeedReader.readPipelineRuns().then(function (results) {
-          var keys = _.keys(results);
+          var pipelineRunToLog = '1199';
           var dataToLog = {};
-          results[keys[0]].stages = [ results[keys[0]].stages[0]];
-          dataToLog[keys[0]] = results[keys[0]];
+          // only log one stage, the one whose sample data has job details
+          results[pipelineRunToLog].stages = [ _.find(results[pipelineRunToLog].stages, { stageName: 'functional-test'}) ];
+          dataToLog[pipelineRunToLog] = results[pipelineRunToLog];
 
           console.log('SAMPLE HISTORY PARSED FROM go PIPELINE FEED', JSON.stringify(dataToLog, undefined, 2));
           done();
@@ -89,6 +91,17 @@ context(['lodash', 'moment', 'server/sources/gocd/pipelineFeedReader', 'server/s
           done();
         });
 
+      });
+
+      it('should use the latest run of a stage to determine results', function (done) {
+        thePipelineFeedReader.readPipelineRuns().then(function (results) {
+          var buildStageRuns = _.where(results['1200'].stages, function(stage) {
+            return stage.stageName === 'build';
+          });
+          expect(buildStageRuns.length).toBe(2);
+          expect(results['1200'].wasSuccessful()).toBe(true);
+          done();
+        });
       });
 
       it('should determine the time the last stage finished', function(done) {
