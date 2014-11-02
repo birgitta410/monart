@@ -1,27 +1,38 @@
 var context = createContext({});
 
-context(['moment', 'server/sources/gocd/pipelineRun'], function (moment, pipelineRunCreator) {
+context(['moment', 'server/sources/gocd/pipelineRun', 'q'], function (moment, pipelineRunCreator, Q) {
 
   describe('historyEntryCreator', function () {
-    it('should create initials of person that broke the pipeline run', function (done) {
-      pipelineRunCreator.createNew({author: {
+    it('should create initials of person with special characters in name', function (done) {
+      var pipelineRun = pipelineRunCreator.createNew({author: {
         name: 'Special Cäracter'
-      }}).promiseInitialise().then(function (result) {
-        expect(result.stages[0].author.initials).toBe('scx');
-      });
-      pipelineRunCreator.createNew({author: {
-        name: 'Has Three Names'
-      }}).promiseInitialise().then(function (result) {
-        expect(result.stages[0].author.initials).toBe('htn');
-      });
-      pipelineRunCreator.createNew({author: {
-        name: 'Max Mustermann'
-      }}).promiseInitialise().then(function (result) {
-        expect(result.stages[0].author.initials).toBe('mmu');
+      }});
+      Q.all(pipelineRun.promiseInitialise()).then(function () {
+        expect(pipelineRun.stages[0].author.initials).toBe('scx');
+        done();
       });
 
-      done();
     });
+    it('should create initials of person with three names', function (done) {
+      var pipelineRun = pipelineRunCreator.createNew({author: {
+        name: 'Has Three Names'
+      }});
+      Q.all(pipelineRun.promiseInitialise()).then(function () {
+        expect(pipelineRun.stages[0].author.initials).toBe('htn');
+        done();
+      });
+
+    });
+    it('should create initials of person with two names', function (done) {
+      var pipelineRun = pipelineRunCreator.createNew({author: {
+        name: 'Max Mustermann'
+      }});
+      Q.all(pipelineRun.promiseInitialise()).then(function () {
+        expect(pipelineRun.stages[0].author.initials).toBe('mmu');
+        done();
+      });
+    });
+
   });
 
   describe('addStage()', function() {
@@ -32,10 +43,10 @@ context(['moment', 'server/sources/gocd/pipelineRun'], function (moment, pipelin
         pipeline: 'A-PIPELINE',
         buildNumber: '1199',
         result: 'passed',
-        "author": {
-          "name": "Max Mustermann",
-          "email": "<mmustermann@internet.se>",
-          "initials": "mmu"
+        author: {
+          name: 'Max Mustermann',
+          email: '<mmustermann@internet.se>',
+          initials: 'mmu'
         }
       };
       var secondStage = {
@@ -43,10 +54,10 @@ context(['moment', 'server/sources/gocd/pipelineRun'], function (moment, pipelin
         pipeline: 'A-PIPELINE',
         buildNumber: '1199',
         result: 'failed',
-        "author": {
-          "name": "Max Mustermann",
-          "email": "<mmustermann@internet.se>",
-          "initials": "mmu"
+        author: {
+          name: 'Max Mustermann',
+          email: '<mmustermann@internet.se>',
+          initials: 'mmu'
         }
       };
 

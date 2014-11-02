@@ -171,13 +171,13 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
         pipelineRun.materials = details;
         pipelineRun.mapInfoText();
 
-        defer.resolve(pipelineRun);
+        defer.resolve();
 
       }, function (err) {
         console.log('could not resolve details, returning without |', pipelineRun.buildNumber, err);
 
         pipelineRun.mapInfoText();
-        defer.resolve(pipelineRun);
+        defer.resolve();
       });
     };
 
@@ -193,7 +193,7 @@ define(['q', 'lodash', 'moment', 'cheerio', 'server/sources/gocd/gocdRequestor',
         defer.reject();
       }
 
-      return defer.promise;
+      return [ defer.promise ];
     };
 
     return pipelineRun;
