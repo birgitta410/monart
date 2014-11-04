@@ -42,7 +42,7 @@ define(['q', 'lodash', 'xml2json', 'request', 'fs', 'server/sources/ymlHerokuCon
       var loggableUrl = next ? next : config.get().loggableUrl;
       console.log('Requesting', loggableUrl + PIPELINE_FEED_ENDPOINT);
 
-      request({ method: 'GET', url: url + PIPELINE_FEED_ENDPOINT, headers: {'If-None-Match': pipelineFeedEtag } },
+      request({ method: 'GET', url: url + PIPELINE_FEED_ENDPOINT}, //, headers: {'If-None-Match': pipelineFeedEtag } },
         function (error, response, body) {
           pipelineFeedEtag = response.headers.etag;
 
