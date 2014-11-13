@@ -1,5 +1,8 @@
 
-var haringGocdMapper = function(_, moment, gocdReader) {
+var _ = require('lodash');
+var gocdReader = require('gocd-api');
+
+function haringGocdMapperModule() {
 
   var NUM_FIGURES_IN_VIS = 24;
 
@@ -35,9 +38,7 @@ var haringGocdMapper = function(_, moment, gocdReader) {
   }
 
   var readHistoryAndActivity = function() {
-
     return gocdReader.readData().then(function(data) {
-
       var activityHaring = mapActivityDataToFigures(data.activity);
 
       var numberOfHistoryFigures = NUM_FIGURES_IN_VIS - activityHaring.figures.length;
@@ -183,4 +184,4 @@ var haringGocdMapper = function(_, moment, gocdReader) {
   }
 };
 
-define(['lodash', 'moment', 'server/sources/gocd/gocdReader'], haringGocdMapper);
+exports.readHistoryAndActivity = haringGocdMapperModule().readHistoryAndActivity;

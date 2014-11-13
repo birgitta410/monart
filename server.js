@@ -1,6 +1,7 @@
 
-define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper', 'server/miro/gocdMapper', 'server/sources/gocd/gocdReader', 'server/sources/cc/ccTrayReader'],
-  function (ws, http, express, module, path, _, haringGocdMapper, miroGocdMapper, gocdReader, ccTrayReader) {
+define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper', 'server/miro/gocdMapper', 'gocd-api'],
+  function (ws, http, express, module, path, _, haringGocdMapper, miroGocdMapper, gocdReader) {
+    console.log('gocd-api', gocdReader);
 
   var WebSocketServer = ws.Server
     , app = express();
@@ -128,7 +129,7 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
   });
 
   app.get('/data/cctray', function(req, res) {
-    ccTrayReader.readActivity().then(function(data) {
+    gocdReader.readActivity().then(function(data) {
       respondWithJson(res, data);
     });
   });

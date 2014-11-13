@@ -1,5 +1,7 @@
+var _ = require('lodash');
+var gocdReader = require('gocd-api');
 
-var miroGocdMapper = function(_, moment, gocdReader) {
+function miroGocdMapperModule() {
 
   var createChangeSizer = function(history) {
 
@@ -85,4 +87,4 @@ var miroGocdMapper = function(_, moment, gocdReader) {
   }
 };
 
-define(['lodash', 'moment', 'server/sources/gocd/gocdReader'], miroGocdMapper);
+exports.readHistoryAndActivity = miroGocdMapperModule().readHistoryAndActivity;

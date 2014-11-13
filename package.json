@@ -11,7 +11,8 @@
     "request": "~2.39.0",
     "requirejs": "~2.1.14",
     "cheerio": "~0.17.0",
-    "q": "~1.0.1"
+    "q": "~1.0.1",
+    "gocd-api": "0.0.1"
   },
   "devDependencies": {
     "jasmine-node": "~1.14.5"
