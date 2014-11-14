@@ -9,12 +9,11 @@
     "ws": "~0.4.31",
     "xml2json": "~0.4.0",
     "request": "~2.39.0",
-    "requirejs": "~2.1.14",
-    "cheerio": "~0.17.0",
     "q": "~1.0.1",
-    "gocd-api": "0.0.1"
+    "gocd-api": "file:../gocd-api"
   },
   "devDependencies": {
-    "jasmine-node": "~1.14.5"
+    "jasmine-node": "~1.14.5",
+    "mockery": "~1.4.0"
   }
 }

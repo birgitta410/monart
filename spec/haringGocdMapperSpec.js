@@ -1,13 +1,12 @@
 
-var haringGocdMapper = require('../server/haring/gocdMapper');
 var Q = require('q');
 var _ = require('lodash');
-var mockTime = { format: function () { } };
-var gocdApi = require('gocd-api');
 
 describe('Haring Go CD Mapper', function () {
 
+  var mockTime = { format: function () { } };
   var fakePipelineHistory, fakeActivity;
+  var haringGocdMapper;
 
   var notSuccessfulFn = function () {
     return false;
@@ -17,20 +16,30 @@ describe('Haring Go CD Mapper', function () {
   };
 
   beforeEach(function() {
-    gocdApi.readData = function() {
-      var defer = Q.defer();
-      defer.resolve({
-        activity: { jobs: fakeActivity },
-        history: fakePipelineHistory
-      });
-      return defer.promise;
+    var mockery = require('mockery');
+    var mockGocdApi = {
+      readData: function () {
+        var defer = Q.defer();
+        defer.resolve({
+          activity: {jobs: fakeActivity},
+          history: fakePipelineHistory
+        });
+        return defer.promise;
+      },
+      readActivity: function () {
+        var defer = Q.defer();
+        defer.resolve({jobs: fakeActivity});
+        return defer.promise;
+      }
     };
 
-    gocdApi.readActivity = function() {
-      var defer = Q.defer();
-      defer.resolve({ jobs: fakeActivity });
-      return defer.promise;
-    };
+    mockery.enable({
+      warnOnUnregistered: false,
+      warnOnReplace: false
+    });
+    mockery.registerMock('gocd-api', { getInstance: function() { return mockGocdApi; }});
+
+    haringGocdMapper = require('../server/haring/gocdMapper');
 
   });
 

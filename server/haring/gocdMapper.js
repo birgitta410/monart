@@ -1,6 +1,6 @@
 
 var _ = require('lodash');
-var gocdReader = require('gocd-api');
+var gocdReader = require('../gocdReader');
 
 function haringGocdMapperModule() {
 
@@ -182,6 +182,6 @@ function haringGocdMapperModule() {
   return {
     readHistoryAndActivity: readHistoryAndActivity
   }
-};
+}
 
 exports.readHistoryAndActivity = haringGocdMapperModule().readHistoryAndActivity;

@@ -1,10 +1,9 @@
 var Q = require('q');
-var gocdApi = require('gocd-api');
-var miroGocdMapper = require('../server/miro/gocdMapper');
 
 describe('Miro Go CD Mapper', function () {
 
   var fakePipelineHistory, fakeActivity;
+  var miroGocdMapper;
 
   var notSuccessfulFn = function () {
     return false;
@@ -14,20 +13,30 @@ describe('Miro Go CD Mapper', function () {
   };
 
   beforeEach(function() {
-    gocdApi.readData = function() {
-      var defer = Q.defer();
-      defer.resolve({
-        activity: { jobs: fakeActivity },
-        history: fakePipelineHistory
-      });
-      return defer.promise;
+    var mockery = require('mockery');
+    var mockGocdApi = {
+      readData: function () {
+        var defer = Q.defer();
+        defer.resolve({
+          activity: {jobs: fakeActivity},
+          history: fakePipelineHistory
+        });
+        return defer.promise;
+      },
+      readActivity: function () {
+        var defer = Q.defer();
+        defer.resolve({jobs: fakeActivity});
+        return defer.promise;
+      }
     };
 
-    gocdApi.readActivity = function() {
-      var defer = Q.defer();
-      defer.resolve({ jobs: fakeActivity });
-      return defer.promise;
-    };
+    mockery.enable({
+      warnOnUnregistered: false,
+      warnOnReplace: false
+    });
+    mockery.registerMock('gocd-api', { getInstance: function() { return mockGocdApi; }});
+
+    miroGocdMapper = require('../server/miro/gocdMapper');
 
   });
 

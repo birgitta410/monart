@@ -1,7 +1,15 @@
 
-define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocdMapper', 'server/miro/gocdMapper', 'gocd-api'],
-  function (ws, http, express, module, path, _, haringGocdMapper, miroGocdMapper, gocdReader) {
-    console.log('gocd-api', gocdReader);
+var ws = require('ws');
+var http = require('http');
+var express = require('express');
+//var module = require('module');
+var path = require('path');
+var _ = require('lodash');
+var haringGocdMapper = require('./server/haring/gocdMapper');
+var miroGocdMapper = require('./server/miro/gocdMapper');
+var gocdReader = require('./server/gocdReader');
+
+function artwiseServer() {
 
   var WebSocketServer = ws.Server
     , app = express();
@@ -134,6 +142,11 @@ define(['ws', 'http', 'express', 'module', 'path', 'lodash', 'server/haring/gocd
     });
   });
 
-  return server;
+  var port = process.env.PORT || 5000
+  server.listen(port);
 
-});
+  console.log('http server listening on %d', port);
+
+};
+
+artwiseServer();

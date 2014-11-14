@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var gocdReader = require('gocd-api');
+var gocdReader = require('../gocdReader');
 
 function miroGocdMapperModule() {
 
@@ -85,6 +85,6 @@ function miroGocdMapperModule() {
   return {
     readHistoryAndActivity: readHistoryAndActivity
   }
-};
+}
 
 exports.readHistoryAndActivity = miroGocdMapperModule().readHistoryAndActivity;
