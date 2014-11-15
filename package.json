@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "dependencies": {
     "express": "3.x",
+    "gocd-api": "^0.1.0",
     "lodash": "~2.4.1",
     "moment": "~2.6.0",
     "node-yaml-config": "0.0.2",
-    "ws": "~0.4.31",
-    "xml2json": "~0.4.0",
-    "request": "~2.39.0",
     "q": "~1.0.1",
-    "gocd-api": "file:../gocd-api"
+    "request": "~2.39.0",
+    "ws": "~0.4.31",
+    "xml2json": "~0.4.0"
   },
   "devDependencies": {
     "jasmine-node": "~1.14.5",
