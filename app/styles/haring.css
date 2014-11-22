@@ -92,6 +92,19 @@
   background-size: 100%;
 }
 
+.info {
+  z-index: 20;
+  position: absolute;
+  width: 86%;
+  height: 80%;
+  margin: 8%;
+  font-size: 1.3vw;
+  padding: 3%;
+  padding-right: 1%;
+  overflow: hidden;
+  display: none;
+}
+
 .figure >img {
   z-index: 10;
   max-width: 70%;

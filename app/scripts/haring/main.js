@@ -20,6 +20,14 @@ function randomColdColor() {
   return COLD_COLORS[Math.floor(Math.random() * COLD_COLORS.length)];
 }
 
+function isWarm(color) {
+  return _.contains(WARM_COLORS, color);
+}
+
+function isCold(color) {
+  return _.contains(COLD_COLORS, color);
+}
+
 function buildInitialGrid() {
   var container = $('.container');
   var figureContentHtml = '<div class="bg"></div>' +
@@ -30,9 +38,12 @@ function buildInitialGrid() {
     var rowDiv = $('<div class="figure-row flexbox"></div>').appendTo(container);
     for (var c = 0; c < COLS_PER_ROW; c++) {
       rowDiv.append(
-      '<div class="figure-wrapper"><div class="figure solid">' +
-          figureContentHtml +
-      '</div></div>');
+      '<div class="figure-wrapper">' +
+        '<div class="info"></div>' +
+        '<div class="figure solid">' +
+            figureContentHtml +
+        '</div>' +
+      '</div>');
     }
   }
   container.append('<div class="figure announcement-figure">' + figureContentHtml + '</div>');
@@ -55,32 +66,38 @@ function iterateFigures(haringDescription, callback) {
 }
 
 function configureFigureDiv(entry, figureDiv) {
+  var infoDiv = $(figureDiv.siblings('.info'));
+  var imgTag = $(figureDiv.find('> img'));
+
   if (entry.border === 'dotted') {
     figureDiv.addClass('dotted');
   } else {
     figureDiv.addClass('solid');
   }
 
-  figureDiv.tooltip({ placement: 'bottom'})
-    .tooltip('hide')
-    .attr('data-original-title', entry.info)
-    .tooltip('fixTitle');
+  infoDiv.text(entry.info);
 
-  if (entry.showInfo) {
-    figureDiv.tooltip('show');
-  }
+  // TODO > body click toggle currently too simple for this
+  //if (entry.showInfo) {
+  //  infoDiv.show();
+  //}
 
-  var imgTag = $(figureDiv.find('> img'));
   var imgExtension = entry.type === 'building' ? '.gif' : '.png';
   imgTag.attr('src', 'images/haring/' + entry.type + imgExtension);
   imgTag.removeClass();
 
+  infoDiv.removeClass();
+  infoDiv.addClass('info');
+
   if (entry.color === 'WARM') {
     imgTag.addClass(randomWarmColor());
+    infoDiv.addClass('orange');
   } else if (entry.color === 'COLD') {
     imgTag.addClass(randomColdColor());
+    infoDiv.addClass('green');
   } else {
     imgTag.addClass(entry.color);
+    infoDiv.addClass(isWarm(entry.color) ? 'orange' : 'green');
   }
 
   if (entry.type === 'building') {
@@ -182,3 +199,8 @@ setInterval(function() {
   ws.send('ping');
 
 }, PING_INTERVAL);
+
+var body = $('body');
+body.on('click', function() {
+  body.find('.info').toggle();
+});
