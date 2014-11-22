@@ -13,7 +13,7 @@ sh ./run_spec.sh
 
 Start server
 ```
-node app
+node server
 ```
 
 Local application URL
@@ -24,29 +24,12 @@ http://localhost:5000
 ##Configure for your own data sources
 Create file `config.yml` in the root of the project and configure as described below.
 
-Also supports deployment to Heroku - for each value in the config file, you can create a respective Heroku variable so you won't have to push config.yml to the git repository.
-
-Also supports Heroku config vars instead of the config files. Convention is CAPITALIZEDNAMEOFCONFIGCATEGORY_CAPITALIZEDVARIABLENAME.
-
-For example:
-```
-heroku config:set GOCD_PIPELINE=mypipeline
-heroku config:set GOCD_USER=admin
-heroku config:set GOCD_PASSWORD=somepassword
-```
-
-###Access to Go CD and CC tray
-Currently takes variables for requests to CI servers that provide a cctray.xml file, and Go CD servers.
-
+###Location and access to Go CD
 ```
 default:
   gocd:
-    url: http://the-go-host:8153
+    url: the-go-host:8153
     pipeline: <name of the pipeline you want to visualise>
-    user: xxx
-    password: xxxx
-  cc:
-    url: http://the-ci-host/<location of cctray.xml/cctray.xml
     user: xxx
     password: xxxx
 ```
@@ -56,18 +39,27 @@ If you just want to see what it looks like, setting 'sample' to true will load s
 default:
   gocd:
     sample: true
-  cc:
-    sample: true
 ```
 
 ###Filter the jobs to show from CC Tray activity
 By default, all jobs from CC Tray's activity feed will be displayed. You can restrict that by providing a list of jobs. The application will use the strings in that list to check if a job name STARTS WITH that.
 ```
 default:
-  cc:
-    sample: true
+  gocd:
+    ...
     jobs:
-      - 'A-PIPELINE :: build'
-      - 'A-PIPELINE :: integration-test'
-      - 'A-PIPELINE :: deploy-dev'
+      - 'my-pipeline :: build'
+      - 'my-pipeline :: integration-test'
+      - 'my-pipeline :: deploy'
+```
+
+##Run on Heroku
+For each value in the config file, you can create a respective Heroku variable so you won't have to push config.yml to the git repository.
+
+```
+heroku config:set GOCD_URL=the-go-host:8153
+heroku config:set GOCD_PIPELINE=my-pipeline
+heroku config:set GOCD_USER=xxx
+heroku config:set GOCD_PASSWORD=xxx
+heroku config:set GOCD_JOBS="my-pipeline :: build,my-pipeline :: integration-test,my-pipeline :: deploy"
 ```
