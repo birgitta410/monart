@@ -38,86 +38,8 @@ function buildInitialGrid() {
   container.append('<div class="figure announcement-figure">' + figureContentHtml + '</div>');
 }
 
-function Chardiner() {
-
-  var dottedExplained, colorsExplained, failFigureExplained, passFigureExplained;
-
-  var hints = {};
-
-  function rememberHint(rowIndex, colIndex) {
-    hints[rowIndex] = [] || hints[rowIndex];
-    hints[rowIndex].push(colIndex);
-  }
-
-  function spaceForHint(rowIndex, colIndex) {
-    var space = !_.contains(hints[rowIndex], colIndex)
-      && !_.contains(hints[rowIndex], colIndex - 1)
-      && !(colIndex >= COLS_PER_ROW - 2);
-    return space;
-  }
-
-  var addHint = function(figureDiv, entry, colIndex, rowIndex) {
-    if(spaceForHint(rowIndex, colIndex)) {
-
-      if (entry.border === 'dotted' && !dottedExplained) {
-        figureDiv.attr('data-intro', 'Dotted border means this is a job from the activity feed, it will show the LAST OR CURRENT job runs in a pipeline. ' +
-          'Solid border frames on the other hand are results of whole pipeline runs in the PAST.');
-        figureDiv.attr('data-position', 'right');
-        dottedExplained = true;
-        rememberHint(rowIndex, colIndex);
-        return;
-      }
-
-      if (entry.color === 'WARM' && !colorsExplained) {
-        figureDiv.attr('data-intro', 'The color corresponds to the result of a job or stage - warm colors (red, orange, pink) are for failed, cold colors (blue, green) for passed.');
-        figureDiv.attr('data-position', 'right');
-        colorsExplained = true;
-        rememberHint(rowIndex, colIndex);
-        return;
-      }
-
-      if ((entry.type === 'crawling' || entry.type === 'stumbling') && !failFigureExplained) {
-        figureDiv.attr('data-intro',
-          'The type of figure corresponds to the result of a job or stage - a stumbling man means a ' +
-            'stage just failed for the first time, the \'Radiant Baby\' means it is not the first time in a row.');
-        figureDiv.attr('data-position', 'right');
-        failFigureExplained = true;
-        rememberHint(rowIndex, colIndex);
-        return;
-      }
-
-      if ((entry.type === 'walking' || entry.type === 'flying') && !passFigureExplained) {
-        figureDiv.attr('data-intro', 'Figures for a successful stage or job are a walking man or the \'Flying Angel\'. ' +
-          'The angel indicates that the stage just passed for the first time after a previous failure.');
-        figureDiv.attr('data-position', 'right');
-        passFigureExplained = true;
-        rememberHint(rowIndex, colIndex);
-        return;
-      }
-    }
-
-  };
-
-  var adjustPositioning = function(right) {
-    var allChardinToolTips = $(".chardinjs-tooltiptext");
-    var toolTipLayer = allChardinToolTips.parent();
-    if (toolTipLayer !== undefined) {
-      var top = toolTipLayer.position().top;
-      toolTipLayer.attr('style', 'top: ' + top + 'px; right: -80px');
-    }
-  };
-
-  return {
-    addHint: addHint,
-    adjustPositioning: adjustPositioning
-  }
-
-}
-
 
 buildInitialGrid();
-var chardiner = new Chardiner();
-
 
 function iterateFigures(haringDescription, callback) {
   var rowIndex = -1;
@@ -198,8 +120,6 @@ function processFigure(index, entry, colIndex, rowIndex) {
 
     var figureDiv = $(rowDiv.find('.figure')[colIndex]);
 
-    chardiner.addHint(figureDiv, entry, colIndex, rowIndex);
-
     figureDiv.removeClass();
     figureDiv.addClass('figure');
 
@@ -262,10 +182,3 @@ setInterval(function() {
   ws.send('ping');
 
 }, PING_INTERVAL);
-
-var body = $('body');
-body.on('click', function() {
-  body.chardinJs('start');
-});
-
-body.bind('chardinJs:start', chardiner.adjustPositioning);
