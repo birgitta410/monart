@@ -23,7 +23,7 @@ function randomColdColor() {
 function buildInitialGrid() {
   var container = $('.container');
   var figureContentHtml = '<div class="bg"></div>' +
-    '<img src="images/haring/dog.png" class="grey">' +
+    '<img src="images/haring/default.png" class="grey">' +
     '<div class="letters top-left"></div>' +
     '<div class="letters bottom-right"></div>';
   for(var r = 0; r < NUM_ROWS; r++) {
@@ -149,7 +149,7 @@ function configureFigureDiv(entry, figureDiv) {
   }
 
   var imgTag = $(figureDiv.find('> img'));
-  var imgExtension = entry.type === 'skating' ? '.gif' : '.png';
+  var imgExtension = entry.type === 'building' ? '.gif' : '.png';
   imgTag.attr('src', 'images/haring/' + entry.type + imgExtension);
   imgTag.removeClass();
 
@@ -161,8 +161,8 @@ function configureFigureDiv(entry, figureDiv) {
     imgTag.addClass(entry.color);
   }
 
-  if (entry.type === 'skating') {
-    imgTag.addClass('skating');
+  if (entry.type === 'building') {
+    imgTag.addClass('building');
     figureDiv.append('<div class="changer"></div>')
   }
 

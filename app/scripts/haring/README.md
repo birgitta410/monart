@@ -3,7 +3,7 @@
 Expects sets of figure descriptions, with attributes
 - color { 'red', 'yellow', 'pink', 'orange', 'blue', 'dark-blue', 'green', 'dark-green' }
   Can also be one of the following: { 'WARM', 'COLD' }, will then be chosen by vis accordingly
-- type { 'dancing', 'running', 'flying' }
+- type { 'buildin', 'fail', 'fail_repeated', 'great_success', 'passed', 'passed_after_fail' }
 - border: {'solid' (default), 'dotted' }
 - info = a string to show in the tooltip of the figure
 - showInfo = a boolean indicating if the tooltip info should be displayed by default, without the need to hover; default false
@@ -21,15 +21,14 @@ Global visualisation attributes:
   background: <a-color>,
   announcementFigure: {
     color: 'green',
-    type: 'crawling_takeoff',
-    border: 'dotted',
+    type: 'great_success',
     word1: 'great',
     word2: 'success'
   },
   figures: [
     {
       color: 'blue',
-      type: 'dancing',
+      type: 'fail',
       border: 'solid',
       info: 'Some text to show in a tooltip',
       showInfo: true,
@@ -37,9 +36,9 @@ Global visualisation attributes:
     },
     {
       color: 'orange',
-      type: 'flying',
+      type: 'passed',
       border: 'dotted',
-      info: 'More info about why this is orange and in column 2',
+      info: 'More info about why this is orange',
       initials: 'ab'
     }, ...
   ]

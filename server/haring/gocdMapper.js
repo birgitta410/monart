@@ -29,7 +29,7 @@ function haringGocdMapperModule() {
     if(greatSuccess) {
       return {
         color: 'blue',
-        type: 'crawling_takeoff',
+        type: 'great_success',
         border: 'dotted',
         word1: 'great',
         word2: 'success'
@@ -73,13 +73,13 @@ function haringGocdMapperModule() {
   function getFigureType(entry, lastEntryWasSuccessful) {
 
     if(entry.wasSuccessful() && !lastEntryWasSuccessful) {
-      return 'flying';
+      return 'passed_after_fail';
     } else if (entry.wasSuccessful()) {
-      return 'walking';
+      return 'passed';
     } else if ( ! entry.wasSuccessful() && !lastEntryWasSuccessful) {
-      return 'crawling';
+      return 'fail_repeated';
     } else {
-      return 'stumbling';
+      return 'fail';
     }
   }
 
@@ -127,7 +127,7 @@ function haringGocdMapperModule() {
     function getFigureTypeForActivity(entry) {
 
       if(entry.activity === 'Building') {
-        return 'skating';
+        return 'building';
       } else {
         return getFigureType(entry, true);
       }

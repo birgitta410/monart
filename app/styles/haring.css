@@ -121,11 +121,11 @@
   max-height: 45%;
 }
 
-.skating {
+.building {
   margin: 7% !important;
   max-width: 87% !important;
 }
-.skating ~ .letters {
+.building ~ .letters {
   display: none;
 }
 

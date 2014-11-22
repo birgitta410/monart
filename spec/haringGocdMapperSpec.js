@@ -167,7 +167,7 @@ describe('Haring Go CD Mapper', function () {
         expect(result.announcementFigure).toBeDefined();
         expect(result.announcementFigure.word1).toBe('great');
         expect(result.announcementFigure.word2).toBe('success');
-        expect(result.announcementFigure.type).toBe('crawling_takeoff');
+        expect(result.announcementFigure.type).toBe('great_success');
         expect(result.announcementFigure.color).toBe('blue');
         done();
       });
@@ -191,20 +191,20 @@ describe('Haring Go CD Mapper', function () {
       fakePipelineHistory = {};
     });
 
-    it('should set crawling type if failed and previous one was failure as well', function (done) {
+    it('should set fail_repeated type if failed and previous one was failure as well', function (done) {
       fakePipelineHistory = {
         '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
         '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
       };
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
         expect(_.keys(result.figures).length).toBe(2);
-        expect(result.figures[0].type).toBe('crawling');
+        expect(result.figures[0].type).toBe('fail_repeated');
         done();
       });
 
     });
 
-    it('should set flying type if previous failed, current is success', function (done) {
+    it('should set passed_after_fail type if previous failed, current is success', function (done) {
       // descending order, newest first
       fakePipelineHistory = {
         '124': { wasSuccessful: successfulFn, time: mockTime },
@@ -212,13 +212,13 @@ describe('Haring Go CD Mapper', function () {
       };
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
         expect(_.keys(result.figures).length).toBe(2);
-        expect(result.figures[0].type).toBe('flying');
+        expect(result.figures[0].type).toBe('passed_after_fail');
         done();
       });
 
     });
 
-    it('should set stumbling type if previous was successful', function (done) {
+    it('should set fail type if previous was successful', function (done) {
       // descending order, newest first
       fakePipelineHistory = {
         '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
@@ -226,7 +226,7 @@ describe('Haring Go CD Mapper', function () {
       };
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
         expect(_.keys(result.figures).length).toBe(2);
-        expect(result.figures[0].type).toBe('stumbling');
+        expect(result.figures[0].type).toBe('fail');
         done();
       });
 
@@ -321,7 +321,7 @@ describe('Haring Go CD Mapper', function () {
       });
     });
 
-    it('should set skating type if currently building', function (done) {
+    it('should set building type if currently building', function (done) {
       fakeActivity = [
         { name: 'A-PIPELINE :: integration-test :: backend-integration',
           activity: 'Building',
@@ -330,7 +330,7 @@ describe('Haring Go CD Mapper', function () {
       ];
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
         expect(result.figures.length).toBe(1);
-        expect(result.figures[0].type).toBe('skating');
+        expect(result.figures[0].type).toBe('building');
         done();
       });
     });
@@ -342,8 +342,8 @@ describe('Haring Go CD Mapper', function () {
       ];
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
         expect(result.figures.length).toBe(2);
-        expect(result.figures[0].type).toBe('walking');
-        expect(result.figures[1].type).toBe('stumbling');
+        expect(result.figures[0].type).toBe('passed');
+        expect(result.figures[1].type).toBe('fail');
         done();
       });
     });
