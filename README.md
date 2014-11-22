@@ -1,7 +1,23 @@
 artwise
 =======
 
-###SETUP PROJECT
+Build Monitor for [Go CD](http://go.cd).
+
+## Keith Haring style
+
+Figures with dotted borders show activity of stages in the current/latest pipeline run, all others represent
+the history of runs. Colors and types of figures represent failed and passing builds, background color indicates status
+of latest pipeline run (passed, failed or currently building).
+
+
+![All passing](designs/haring/sample_passed.png?raw=true "All good")
+
+![Failure](designs/haring/sample_failed.png?raw=true "Failure")
+
+![Building](designs/haring/sample_building.png?raw=true "Currently building")
+
+
+##SETUP PROJECT
 ```
 npm install
 ```
@@ -21,7 +37,7 @@ Local application URL
 http://localhost:5000
 ```
 
-##Configure for your own data sources
+##Configuration
 Create file `config.yml` in the root of the project and configure as described below.
 
 ###Location and access to Go CD
