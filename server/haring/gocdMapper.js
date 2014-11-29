@@ -105,7 +105,8 @@ function haringGocdMapperModule() {
 
       return {
         color: getColor(entry),
-        info: entry.info,
+        info: entry.buildNumber,
+        info2: entry.info,
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
         hiddenInitials: entry.author ? entry.author.initials : undefined, // need to save initials for merging with activity
         initials: entry.wasSuccessful() ? undefined : (entry.author ? entry.author.initials : undefined),
@@ -159,7 +160,8 @@ function haringGocdMapperModule() {
     var figures = _.map(activity.jobs, function(entry) {
       return {
         color: getColor(entry),
-        info: getInfo(entry),
+        info: entry.stageName,
+        info2: getInfo(entry),
         showInfo: ! entry.wasSuccessful(),
         type: getFigureTypeForActivity(entry),
         border: 'dotted',

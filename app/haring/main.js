@@ -41,7 +41,7 @@ function buildInitialGrid() {
     for (var c = 0; c < COLS_PER_ROW; c++) {
       rowDiv.append(
       '<div class="figure-wrapper">' +
-        '<div class="info"></div>' +
+        '<div class="info"><span class="level-1"></span><span class="level-2">LEVEL 2</span></div>' +
         '<div class="figure solid">' +
             figureContentHtml +
         '</div>' +
@@ -77,7 +77,9 @@ function configureFigureDiv(entry, figureDiv) {
     figureDiv.addClass('solid');
   }
 
-  infoDiv.text(entry.info);
+  infoDiv.find('.level-1').text(entry.info);
+  console.log('entry.info2', entry.info2);
+  infoDiv.find('.level-2').text(entry.info2);
 
   // TODO > body click toggle currently too simple for this
   //if (entry.showInfo) {
@@ -214,6 +216,13 @@ setInterval(function() {
 }, PING_INTERVAL);
 
 var body = $('body');
+var infoStates = ['', 'info-level-1', 'info-level-2'];
+var currentInfoState = 1;
 body.on('click', function() {
-  body.find('.info').toggle();
+  body.removeClass('info-level-1');
+  body.removeClass('info-level-2');
+  console.log('currentInfoStage', currentInfoState, currentInfoState % 3);
+  body.addClass(infoStates[currentInfoState % 3]);
+  currentInfoState ++;
+
 });

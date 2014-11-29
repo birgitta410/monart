@@ -33,7 +33,6 @@
 .bg {
   z-index: 20;
   position: absolute;
-
 }
 
 .letters {
@@ -102,8 +101,16 @@
   background-size: 100%;
 }
 
+body.info-level-1 .info, body.info-level-2 .info {
+  display: block;
+}
+
+body.info-level-1 .level-1, body.info-level-2 .level-2 {
+  display: block;
+}
+
 .info {
-  z-index: 20;
+  z-index: 25;
   position: absolute;
   width: 86%;
   height: 80%;
@@ -112,6 +119,19 @@
   padding: 3%;
   padding-right: 1%;
   overflow: hidden;
+  display: none;
+}
+
+.info .level-1 {
+  display: none;
+
+  font-size: 2.4vw;
+  font-weight: bold;
+  text-align: center;
+  height: 100%;
+  padding-top: 10%;
+}
+.info .level-2 {
   display: none;
 }
 
