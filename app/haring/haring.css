@@ -101,14 +101,6 @@
   background-size: 100%;
 }
 
-body.info-level-1 .info, body.info-level-2 .info {
-  display: block;
-}
-
-body.info-level-1 .level-1, body.info-level-2 .level-2 {
-  display: block;
-}
-
 .info {
   z-index: 25;
   position: absolute;

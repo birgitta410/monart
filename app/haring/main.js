@@ -46,7 +46,7 @@ function buildInitialGrid() {
     for (var c = 0; c < COLS_PER_ROW; c++) {
       rowDiv.append(
       '<div class="figure-wrapper">' +
-        '<div class="info"><span class="level-1"></span><span class="level-2">LEVEL 2</span></div>' +
+        '<div class="info"><span class="level-1"></span><span class="level-2"></span></div>' +
         '<div class="figure solid">' +
             figureContentHtml +
         '</div>' +
@@ -85,10 +85,11 @@ function configureFigureDiv(entry, figureDiv) {
   infoDiv.find('.level-1').text(entry.info);
   infoDiv.find('.level-2').text(entry.info2);
 
-  // TODO > body click toggle currently too simple for this
-  //if (entry.showInfo) {
-  //  infoDiv.show();
-  //}
+  if (entry.showInfo) {
+    infoDiv.show();
+    infoDiv.find('.level-1').hide();
+    infoDiv.find('.level-2').show();
+  }
 
   var imgExtension = entry.type === 'building' ? '.gif' : '.png';
   imgTag.attr('src', 'images/' + entry.type + imgExtension);
@@ -220,12 +221,24 @@ setInterval(function() {
 }, PING_INTERVAL);
 
 var body = $('body');
-var infoStates = ['', 'info-level-1', 'info-level-2'];
-var currentInfoState = 1;
+
+var STATE_DEFAULT = 0,
+  STATE_INFO_1 = 1,
+  STATE_INFO_2 = 2;
+var currentInfoState = STATE_DEFAULT;
 body.on('click', function() {
-  body.removeClass('info-level-1');
-  body.removeClass('info-level-2');
-  body.addClass(infoStates[currentInfoState % 3]);
   currentInfoState ++;
+  var infos = body.find('.info');
+  if(currentInfoState % 3 === STATE_DEFAULT) {
+    infos.hide();
+  } else if(currentInfoState % 3 === STATE_INFO_1) {
+    infos.show();
+    body.find('.level-1').show();
+    body.find('.level-2').hide();
+  } else if(currentInfoState % 3 === STATE_INFO_2) {
+    infos.show();
+    body.find('.level-1').hide();
+    body.find('.level-2').show();
+  }
 
 });
