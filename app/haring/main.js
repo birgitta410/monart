@@ -9,7 +9,12 @@ var DATA = { figures: [] };
 var WARM_COLORS = [ 'red', 'yellow', 'pink', 'orange' ];
 var COLD_COLORS = [ 'blue', 'dark-blue', 'green', 'dark-green' ];
 
-var FIGURE_BACKGROUND_MODE = 'winter';
+var FIGURE_BACKGROUND_MODE = isWinter() ? 'winter' : undefined;
+
+function isWinter() {
+  var now = new Date();
+  return now.getMonth() >= 11 || now.getMonth() === 0;
+}
 
 var LAST_PING = new Date();
 var PING_INTERVAL = 5 * 60 * 1000;
@@ -78,7 +83,6 @@ function configureFigureDiv(entry, figureDiv) {
   }
 
   infoDiv.find('.level-1').text(entry.info);
-  console.log('entry.info2', entry.info2);
   infoDiv.find('.level-2').text(entry.info2);
 
   // TODO > body click toggle currently too simple for this
@@ -221,7 +225,6 @@ var currentInfoState = 1;
 body.on('click', function() {
   body.removeClass('info-level-1');
   body.removeClass('info-level-2');
-  console.log('currentInfoStage', currentInfoState, currentInfoState % 3);
   body.addClass(infoStates[currentInfoState % 3]);
   currentInfoState ++;
 
