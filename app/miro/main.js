@@ -11,7 +11,7 @@ var PING_INTERVAL = 5 * 60 * 1000;
 function buildInitialGrid() {
   var container = $('.container');
   for(var r = 0; r < NUM_STONES; r++) {
-    $('<div class="stone"><img src="images/miro/medium_black.png"></div>').appendTo(container);
+    $('<div class="stone"><img src="images/medium_black.png"></div>').appendTo(container);
   }
 }
 
@@ -48,7 +48,7 @@ function processStone(index, entry) {
   }
 
   var imgTag = $(stoneDiv.find('> img'));
-  imgTag.attr('src', 'images/miro/' + entry.size + '_' + entry.color + '.png');
+  imgTag.attr('src', 'images/' + entry.size + '_' + entry.color + '.png');
 
 }
 
@@ -59,7 +59,7 @@ ws.onmessage = function (event) {
     var historyData = data.miro;
 
     var strokeImgTag = $('.long-stroke > img');
-    strokeImgTag.attr('src', 'images/miro/stroke_' + historyData.stroke.color + '.png');
+    strokeImgTag.attr('src', 'images/stroke_' + historyData.stroke.color + '.png');
     strokeImgTag.tooltip({ placement: 'right'})
       .tooltip('hide')
       .attr('data-original-title', historyData.stroke.info)

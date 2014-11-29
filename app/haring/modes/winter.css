@@ -1,0 +1,23 @@
+
+/*noinspection CssUnknownTarget*/
+.bg.winter.fail {
+  background: url('winter/fail.png') no-repeat bottom center;
+  background-size: 30%;
+  bottom: 62%;
+  left: 27%;
+}
+/*noinspection CssUnknownTarget*/
+.bg.winter.passed {
+  background: url('winter/passed.png') no-repeat bottom center;
+  background-size: 22%;
+  bottom: 66%;
+  left: 3%;
+}
+
+/*noinspection CssUnknownTarget*/
+.bg.winter.passed_after_fail {
+  background: url('winter/passed_after_fail.png') no-repeat bottom center;
+  background-size: 69%;
+  bottom: 67%;
+  left: 0;
+}

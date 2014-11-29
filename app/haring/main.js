@@ -9,6 +9,8 @@ var DATA = { figures: [] };
 var WARM_COLORS = [ 'red', 'yellow', 'pink', 'orange' ];
 var COLD_COLORS = [ 'blue', 'dark-blue', 'green', 'dark-green' ];
 
+var FIGURE_BACKGROUND_MODE = 'winter';
+
 var LAST_PING = new Date();
 var PING_INTERVAL = 5 * 60 * 1000;
 
@@ -31,7 +33,7 @@ function isCold(color) {
 function buildInitialGrid() {
   var container = $('.container');
   var figureContentHtml = '<div class="bg"></div>' +
-    '<img src="images/haring/default.png" class="grey">' +
+    '<img src="images/default.png" class="grey">' +
     '<div class="letters top-left"></div>' +
     '<div class="letters bottom-right"></div>';
   for(var r = 0; r < NUM_ROWS; r++) {
@@ -83,7 +85,7 @@ function configureFigureDiv(entry, figureDiv) {
   //}
 
   var imgExtension = entry.type === 'building' ? '.gif' : '.png';
-  imgTag.attr('src', 'images/haring/' + entry.type + imgExtension);
+  imgTag.attr('src', 'images/' + entry.type + imgExtension);
   imgTag.removeClass();
 
   infoDiv.removeClass();
@@ -113,13 +115,24 @@ function configureFigureDiv(entry, figureDiv) {
   var bottomRightText = entry.initials || entry.word2;
   addLetters(bottomRightLettersDiv, bottomRightText);
 
+  addMode(figureDiv, entry);
+}
+
+function addMode(figureDiv, entry) {
+  if(FIGURE_BACKGROUND_MODE) {
+    var bgDiv = figureDiv.find('.bg');
+    bgDiv.removeClass();
+    bgDiv.addClass(FIGURE_BACKGROUND_MODE);
+    bgDiv.addClass(entry.type);
+    bgDiv.addClass('bg');
+  }
 }
 
 function addLetters(lettersDiv, text) {
   lettersDiv.empty();
   if (text) {
     for (var l = 0; l < text.length; l++) {
-      $('<img src="images/haring/alphabet/' + text[l].toLowerCase() + '.svg">').appendTo(lettersDiv);
+      $('<img src="images/alphabet/' + text[l].toLowerCase() + '.svg">').appendTo(lettersDiv);
     }
   }
 }

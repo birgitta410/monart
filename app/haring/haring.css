@@ -68,27 +68,37 @@
   max-height: 70%;
 }
 
+.bg {
+  z-index: 20;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+}
+
 /*noinspection CssUnknownTarget*/
 .bg.water {
-  background: url('../images/haring/water.png') no-repeat bottom center;
+  background: url('images/water.png') no-repeat bottom center;
   background-size: 100%;
 }
 
 /*noinspection CssUnknownTarget*/
 .bg.ground {
-  background: url('../images/haring/ground.png') no-repeat bottom center;
+  background: url('images/ground.png') no-repeat bottom center;
   background-size: 100%;
 }
 
 /*noinspection CssUnknownTarget*/
 .figure.solid {
-  background: url('../images/haring/border.png') no-repeat;
+  background: url('images/border.png') no-repeat;
   background-size: 100%;
 }
 
 /*noinspection CssUnknownTarget*/
 .figure.dotted {
-  background: url('../images/haring/border_dotted.png') no-repeat;
+  background: url('images/border_dotted.png') no-repeat;
   background-size: 100%;
 }
 
@@ -114,12 +124,14 @@
 }
 
 .announcement-figure {
+  z-index: 30;
+  display: none;
   position: absolute;
   bottom: -5%;
   left: 25%;
   width: 50%;
   height: 85%;
-  display: none;
+
 }
 .announcement-figure >img {
   width: 70%;
