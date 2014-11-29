@@ -5,8 +5,9 @@ Expects sets of figure descriptions, with attributes
   Can also be one of the following: { 'WARM', 'COLD' }, will then be chosen by vis accordingly
 - type { 'buildin', 'fail', 'fail_repeated', 'great_success', 'passed', 'passed_after_fail' }
 - border: {'solid' (default), 'dotted' }
-- info = a string to show in the tooltip of the figure
-- showInfo = a boolean indicating if the tooltip info should be displayed by default, without the need to hover; default false
+- info = a text to show in the info overlay, detail level 1
+- info2 = a text to show in the info overlay, detail level 2
+- showInfo = a boolean indicating if the info layover for this figure should be displayed immediately on figure update; default false
 - initials = letters to show as initials in a frame
 
 Visualisation will iterate over the array of figures and put them into rows, left to right.
@@ -30,7 +31,7 @@ Global visualisation attributes:
       color: 'blue',
       type: 'fail',
       border: 'solid',
-      info: 'Some text to show in a tooltip',
+      info: 'Some text to show in info overlay',
       showInfo: true,
       initials: 'mmu'
     },
