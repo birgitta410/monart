@@ -9,11 +9,23 @@ var DATA = { figures: [] };
 var WARM_COLORS = [ 'red', 'yellow', 'pink', 'orange' ];
 var COLD_COLORS = [ 'blue', 'dark-blue', 'green', 'dark-green' ];
 
-var FIGURE_BACKGROUND_MODE = isWinter() ? 'winter' : undefined;
+var FIGURE_BACKGROUND_MODE;
+configureModes();
 
 function isWinter() {
   var now = new Date();
   return now.getMonth() >= 11 || now.getMonth() === 0;
+}
+
+function configureModes() {
+  snowStorm.autoStart = false;
+
+  if(isWinter()) {
+    FIGURE_BACKGROUND_MODE = 'winter';
+    snowStorm.snowColor = '#fff';
+    snowStorm.snowStick = true;
+  }
+
 }
 
 var LAST_PING = new Date();
@@ -228,6 +240,12 @@ ws.onmessage = function (event) {
     var haringDescription = data.haring;
 
     setBackgroundStyle(haringDescription.background);
+
+    if(isWinter() && haringDescription.background === 'orange') {
+      snowStorm.start();
+    } else {
+      snowStorm.stop();
+    }
 
     iterateFigures(haringDescription, processFigure);
 
