@@ -19,6 +19,7 @@ function isWinter() {
 
 function configureModes() {
   snowStorm.autoStart = false;
+  snowStorm.stop();
 
   if(isWinter()) {
     FIGURE_BACKGROUND_MODE = 'winter';
