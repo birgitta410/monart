@@ -25,6 +25,10 @@ function artwiseServer() {
     var wssHaring = new WebSocketServer({server: server, path: '/haring'});
     console.log('haring websocket server created');
 
+    haringGocdMapper.readHistoryAndActivity().then(function(activityHaring) {
+      console.log('INITIALISED DATA');
+    });
+
     wssHaring.on('connection', function(ws) {
       console.log('connected to /haring');
 
