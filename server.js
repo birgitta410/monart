@@ -20,6 +20,7 @@ function artwiseServer() {
 
   /** HARING ************************/
   var UPDATE_INTERVAL_HARING = 10000;
+  var CACHE_INITIALISED = false;
 
   function listenToHaring() {
     var wssHaring = new WebSocketServer({server: server, path: '/haring'});
@@ -27,6 +28,7 @@ function artwiseServer() {
 
     haringGocdMapper.readHistoryAndActivity().then(function(activityHaring) {
       console.log('INITIALISED DATA');
+      CACHE_INITIALISED = true;
     });
 
     wssHaring.on('connection', function(ws) {
@@ -35,9 +37,14 @@ function artwiseServer() {
       function newClient() {
 
         function getActivityAndUpdateClients() {
-          haringGocdMapper.readHistoryAndActivity().then(function(activityHaring) {
-            ws.send(JSON.stringify({ haring: activityHaring }), function() {  });
-          });
+          if(CACHE_INITIALISED) {
+            haringGocdMapper.readHistoryAndActivity().then(function (activityHaring) {
+              ws.send(JSON.stringify({haring: activityHaring}), function () {
+              });
+            });
+          } else {
+            ws.send(JSON.stringify({ loading: true }));
+          }
         }
 
         getActivityAndUpdateClients();
@@ -109,6 +116,16 @@ function artwiseServer() {
 
   /** ENDPOINTS ************************/
 
+  function readAndRespond(promiseFunction, res) {
+    if(CACHE_INITIALISED) {
+      promiseFunction().then(function (data) {
+        respondWithJson(res, data);
+      });
+    } else {
+      res.send('warming up');
+    }
+  }
+
   function respondWithJson(response, data) {
     response.set({
       'Content-Type': 'application/json'
@@ -123,27 +140,19 @@ function artwiseServer() {
     });
 
   app.get('/data/gocd', function(req, res) {
-    gocdReader.readData().then(function(data) {
-      respondWithJson(res, data);
-    });
+    readAndRespond(gocdReader.readData, res);
   });
 
   app.get('/data/gocd/haring', function(req, res) {
-    haringGocdMapper.readHistoryAndActivity().then(function(data) {
-      respondWithJson(res, data);
-    });
+    readAndRespond(haringGocdMapper.readHistoryAndActivity, res);
   });
 
   app.get('/data/gocd/miro', function(req, res) {
-    miroGocdMapper.readHistoryAndActivity().then(function(data) {
-      respondWithJson(res, data);
-    });
+    readAndRespond(miroGocdMapper.readHistoryAndActivity, res);
   });
 
   app.get('/data/cctray', function(req, res) {
-    gocdReader.readActivity().then(function(data) {
-      respondWithJson(res, data);
-    });
+    readAndRespond(gocdReader.readActivity, res);
   });
 
   var port = process.env.PORT || 5000

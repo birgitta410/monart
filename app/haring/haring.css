@@ -14,6 +14,18 @@
   flex-direction: column;
 }
 
+#status-message {
+  display: none;
+  position: absolute;
+  top: 20%;
+  left: 35%;
+  z-index: 50;
+  background-color: grey;
+  height: 14%;
+  width: 30%;
+  text-align: center;
+}
+
 .figure-row {
   flex-direction: row;
   flex-wrap: nowrap;
@@ -191,7 +203,7 @@
   background-color: #fecd1b;
 }
 .grey {
-  background-color: #cccccc;
+  background-color: #cccccc !important;
 }
 
 /* bootstrap extensions */

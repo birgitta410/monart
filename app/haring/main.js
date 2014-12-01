@@ -59,6 +59,46 @@ function buildInitialGrid() {
 
 buildInitialGrid();
 
+var InfoToggler = function(body) {
+
+  var STATE_DEFAULT = 0,
+    STATE_INFO_1 = 1,
+    STATE_INFO_2 = 2;
+
+  var currentInfoState = STATE_DEFAULT;
+
+  return {
+    toggle: function() {
+      currentInfoState ++;
+      var infos = body.find('.info');
+      if(currentInfoState % 3 === STATE_DEFAULT) {
+        body.removeClass('grey');
+        infos.hide();
+      } else if(currentInfoState % 3 === STATE_INFO_1) {
+        body.addClass('grey');
+        infos.show();
+        body.find('.level-1').show();
+        body.find('.level-2').hide();
+      } else if(currentInfoState % 3 === STATE_INFO_2) {
+        infos.show();
+        body.find('.level-1').hide();
+        body.find('.level-2').show();
+      }
+    },
+    isDisplayingInfo: function() {
+      return currentInfoState % 3 !== STATE_DEFAULT;
+    }
+  };
+
+};
+
+var body = $('body');
+var toggler = InfoToggler(body);
+
+body.on('click', function() {
+  toggler.toggle();
+});
+
 function iterateFigures(haringDescription, callback) {
   var rowIndex = -1;
   for(var i = 0; i < haringDescription.figures.length; i++) {
@@ -87,8 +127,8 @@ function configureFigureDiv(entry, figureDiv) {
 
   if (entry.showInfo) {
     infoDiv.show();
-    infoDiv.find('.level-1').hide();
-    infoDiv.find('.level-2').show();
+    infoDiv.find('.level-1').show();
+    infoDiv.find('.level-2').hide();
   }
 
   var imgExtension = entry.type === 'building' ? '.gif' : '.png';
@@ -169,15 +209,21 @@ function processFigure(index, entry, colIndex, rowIndex) {
 }
 
 function setBackgroundStyle(styleClass) {
-  var bodyTag = $('body');
-  bodyTag.removeClass();
-  bodyTag.addClass(styleClass);
+  if(!toggler.isDisplayingInfo()) {
+    var bodyTag = $('body');
+    bodyTag.removeClass();
+    bodyTag.addClass(styleClass);
+  }
 }
 
 ws.onmessage = function (event) {
 
   var data = JSON.parse(event.data);
+  var statusMessage = $('#status-message');
+  var statusProgress = $('#status-progress');
   if(data.haring) {
+    statusMessage.hide();
+    statusProgress.text('.');
 
     var haringDescription = data.haring;
 
@@ -195,6 +241,10 @@ ws.onmessage = function (event) {
     }
 
     DATA = haringDescription;
+  } else if(data.loading === true) {
+    statusMessage.show();
+    var progress = statusProgress.text() + '.';
+    statusProgress.text(progress);
   } else if(data.ping) {
     LAST_PING = new Date();
     console.log('ping success - still connected to server', LAST_PING);
@@ -220,25 +270,3 @@ setInterval(function() {
 
 }, PING_INTERVAL);
 
-var body = $('body');
-
-var STATE_DEFAULT = 0,
-  STATE_INFO_1 = 1,
-  STATE_INFO_2 = 2;
-var currentInfoState = STATE_DEFAULT;
-body.on('click', function() {
-  currentInfoState ++;
-  var infos = body.find('.info');
-  if(currentInfoState % 3 === STATE_DEFAULT) {
-    infos.hide();
-  } else if(currentInfoState % 3 === STATE_INFO_1) {
-    infos.show();
-    body.find('.level-1').show();
-    body.find('.level-2').hide();
-  } else if(currentInfoState % 3 === STATE_INFO_2) {
-    infos.show();
-    body.find('.level-1').hide();
-    body.find('.level-2').show();
-  }
-
-});
