@@ -7,7 +7,6 @@ Expects sets of figure descriptions, with attributes
 - border: {'solid' (default), 'dotted' }
 - info = a text to show in the info overlay, detail level 1
 - info2 = a text to show in the info overlay, detail level 2
-- showInfo = a boolean indicating if the info layover for this figure should be displayed immediately on figure update; default false
 - initials = letters to show as initials in a frame
 
 Visualisation will iterate over the array of figures and put them into rows, left to right.

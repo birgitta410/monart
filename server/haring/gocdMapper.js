@@ -162,7 +162,6 @@ function haringGocdMapperModule() {
         color: getColor(entry),
         info: entry.stageName,
         info2: getInfo(entry),
-        showInfo: ! entry.wasSuccessful(),
         type: getFigureTypeForActivity(entry),
         border: 'dotted',
         initials: entry.author ? entry.author.initials : undefined,

@@ -348,18 +348,6 @@ describe('Haring Go CD Mapper', function () {
       });
     });
 
-    it('should show info by default if a stage fails', function (done) {
-      fakeActivity = [
-        {
-          wasSuccessful: notSuccessfulFn
-        }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].showInfo).toBe(true);
-        done();
-      });
-    });
-
   });
 
 });

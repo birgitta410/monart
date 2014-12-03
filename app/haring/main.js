@@ -138,12 +138,6 @@ function configureFigureDiv(entry, figureDiv) {
   infoDiv.find('.level-1').text(entry.info);
   infoDiv.find('.level-2').text(entry.info2);
 
-  if (entry.showInfo) {
-    infoDiv.show();
-    infoDiv.find('.level-1').show();
-    infoDiv.find('.level-2').hide();
-  }
-
   var imgExtension = entry.type === 'building' ? '.gif' : '.png';
   imgTag.attr('src', 'images/' + entry.type + imgExtension);
   imgTag.removeClass();
