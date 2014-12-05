@@ -3,6 +3,10 @@ artwise
 
 Build Monitor for [Go CD](http://go.cd).
 
+Loosely based on the idea of [Informative Art](http://www.cse.chalmers.se/research/group/idc/ituniv/kurser/07/idproj/papers/p103-redstrom.pdf).
+
+Tested in Chrome and Chromium (works in Firefox, too, but has some layouting quirks).
+
 ## Keith Haring style
 
 Figures with dotted borders show activity of stages in the current/latest pipeline run, all others represent
@@ -16,6 +20,11 @@ of latest pipeline run (passed, failed or currently building).
 
 ![Building](designs/haring/sample_building.png?raw=true "Currently building")
 
+### Need more details?
+
+Click the view to toggle through two different info modes.
+
+![Info modes](designs/haring/info_modes.png?raw=true "Info modes")
 
 ##SETUP PROJECT
 ```
@@ -26,6 +35,8 @@ Run tests
 ```
 sh ./run_spec.sh
 ```
+
+Configure access to your Go CD server (see below)
 
 Start server
 ```
@@ -50,7 +61,7 @@ default:
     password: xxxx
 ```
 
-If you just want to see what it looks like, setting 'sample' to true will load some static fixtures to give you an idea:
+If you just want to see an example, without connecting to a server yet, setting 'sample' to true will load some static fixtures to give you an idea:
 ```
 default:
   gocd:
