@@ -22,6 +22,11 @@ function haringGocdMapperModule() {
     return strippedDownHistory;
   }
 
+  function isWinter() {
+    var now = new Date();
+    return now.getMonth() >= 11 || now.getMonth() === 0;
+  }
+
   function getSpecialAnnouncementFigure(historyData) {
     var greatSuccess = ! _.any(_.keys(historyData), function(key) {
       return historyData[key].wasSuccessful() === false;
@@ -29,7 +34,7 @@ function haringGocdMapperModule() {
     if(greatSuccess) {
       return {
         color: 'blue',
-        type: 'great_success',
+        type: isWinter() ? 'winter/great_success' : 'great_success',
         border: 'dotted',
         word1: 'great',
         word2: 'success'

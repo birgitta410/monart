@@ -140,6 +140,13 @@ function configureFigureDiv(entry, figureDiv) {
 
   var imgExtension = entry.type === 'building' ? '.gif' : '.png';
   imgTag.attr('src', 'images/' + entry.type + imgExtension);
+
+  // Little hack for announcementFigure in winter mode
+  if(entry.type.indexOf('winter') > -1) {
+    console.log('entry.type', entry.type);
+    imgTag.attr('src', 'modes/' + entry.type + imgExtension);
+  }
+
   imgTag.removeClass();
 
   infoDiv.removeClass();
