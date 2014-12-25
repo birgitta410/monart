@@ -56,7 +56,7 @@ Local application URL
 http://localhost:5000
 ```
 
-##Configuration
+##Configure and run locally
 Create file `config.yml` in the root of the project and configure as described below.
 
 ###Location and access to Go CD
@@ -88,7 +88,7 @@ default:
       - 'my-pipeline :: deploy'
 ```
 
-##Run on Heroku
+##Configure and run on Heroku
 For each value in the config file, you can create a respective Heroku variable so you won't have to push config.yml to the git repository.
 
 ### Step by step
