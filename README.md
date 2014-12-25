@@ -20,6 +20,14 @@ of latest pipeline run (passed, failed or currently building).
 
 ![Building](designs/haring/sample_building.png?raw=true "Currently building")
 
+### Why so MANY colors and figures?
+
+Green and red, and one figure each for pass and failed would be enough, right? But that would be boring and not look very "Haring like"...
+
+The idea is to show high level information at a glance, and more details if you need them. Yes, first you'll have to figure out and explain what it all means, but usage shows that it's easy to remember afterwards.
+
+And the most important piece of information is very easy to see, by the way: The last run's status is depicted by the background color, good ol' red and green.
+
 ### Need more details?
 
 Click the view to toggle through two different info modes.
