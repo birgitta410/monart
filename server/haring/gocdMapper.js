@@ -105,7 +105,7 @@ function haringGocdMapperModule() {
 
       return {
         color: getColor(entry),
-        info: entry.buildNumber,
+        info: entry.label,
         info2: entry.info,
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
         hiddenInitials: entry.author ? entry.author.initials : undefined, // need to save initials for merging with activity

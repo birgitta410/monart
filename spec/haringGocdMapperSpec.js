@@ -64,6 +64,7 @@ describe('Haring Go CD Mapper', function () {
         done();
       });
     });
+
     it('should set the background colour to orange if unsuccessful', function(done) {
       fakePipelineHistory = {
         '125': { wasSuccessful: notSuccessfulFn, time: mockTime }
@@ -78,6 +79,7 @@ describe('Haring Go CD Mapper', function () {
         done();
       });
     });
+
     it('should set the background colour to blue if building', function(done) {
       fakePipelineHistory = {
         '125': { wasSuccessful: successfulFn, time: mockTime }
@@ -145,9 +147,8 @@ describe('Haring Go CD Mapper', function () {
       haringGocdMapper.readHistoryAndActivity().then(function(result) {
         expect(result.figures.length).toBe(NUM_FIGURES_IN_VIS);
 
-        // FIXME: Why is this not working anymore?
-//          var firstHistoryFigure = result.figures[fakeActivity.length];
-//          expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
+        var firstHistoryFigure = result.figures[fakeActivity.length];
+        expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
 
         var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
         expect(activityFigures.length).toBe(8);
@@ -267,16 +268,6 @@ describe('Haring Go CD Mapper', function () {
       });
     });
 
-    //it('should exclude the currently active build from the history', function (done) {
-    //  spyOn(mockPipelineReader, 'readPipelineRuns').andCallThrough();
-    //  haringGocdMapper.readHistoryAndActivity().then(function () {
-    //    var optionsReadHistory = mockPipelineReader.readPipelineRuns.mostRecentCall.args[0];
-    //    expect(optionsReadHistory.exclude).toEqual([ fakeBuildNumberInProgress ]);
-    //    done();
-    //  });
-    //
-    //});
-
     it('should not add initials of authors of passed jobs', function (done) {
       fakePipelineHistory = {
         '124': {
@@ -295,6 +286,21 @@ describe('Haring Go CD Mapper', function () {
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
         expect(result.figures[0].initials).toBeUndefined();
         expect(result.figures[1].initials).toBe('mmu');
+        done();
+      });
+    });
+
+    it('should set info texts', function(done) {
+      fakePipelineHistory = {
+        '124': {
+          wasSuccessful: successfulFn,
+          label: '124',
+          info: 'a text'
+        }
+      };
+      haringGocdMapper.readHistoryAndActivity().then(function (result) {
+        expect(result.figures[0].info).toBe('124');
+        expect(result.figures[0].info2).toBe('a text');
         done();
       });
     });
