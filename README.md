@@ -91,10 +91,26 @@ default:
 ##Run on Heroku
 For each value in the config file, you can create a respective Heroku variable so you won't have to push config.yml to the git repository.
 
+### Step by step
+- Create a new application in Heroku and make a note of its Git repository address.
+- Install the [Heroku Toolbelt](https://toolbelt.heroku.com).
+
 ```
+# Clone artwise
+git clone https://github.com/artwise/artwise.git
+
+# Add your Heroku repository as a remote
+cd artwise
+git remote add heroku git@heroku.com:your-repo-name.git
+
+# Configure access
 heroku config:set GOCD_URL=the-go-host:8153
 heroku config:set GOCD_PIPELINE=my-pipeline
 heroku config:set GOCD_USER=xxx
 heroku config:set GOCD_PASSWORD=xxx
 heroku config:set GOCD_JOBS="my-pipeline :: build,my-pipeline :: integration-test,my-pipeline :: deploy"
+
+# Deploy code
+git push heroku master
+
 ```
