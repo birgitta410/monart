@@ -47,7 +47,11 @@
   position: absolute;
 }
 
-.letters {
+.figure {
+  position: relative;
+}
+
+.figure .letters {
   position: absolute;
 
   transform:rotate(-7deg);
@@ -58,7 +62,7 @@
   height: 11%;
 }
 
-.letters.bottom-right {
+.figure .letters.bottom-right {
   bottom: 10%;
   right: 5%;
   padding-right: 5%;
@@ -66,7 +70,12 @@
   text-align: right;
 }
 
-.letters.top-left {
+.figure.shrunk .letters.bottom-right {
+  bottom: 20%;
+  right: 20%;
+}
+
+.figure .letters.top-left {
   top: 2%;
   left: 5%;
   padding-left: 5%;
@@ -74,7 +83,7 @@
   text-align: left;
 }
 
-.letters img {
+.figure .letters img {
   max-width: 70%;
   max-height: 70%;
 }
@@ -113,6 +122,25 @@
   background-size: 100%;
 }
 
+.figure.shrunk {
+  background-size: 80%;
+  background-position: 35% 35%;
+  margin-top: 7%;
+  margin-left: 7%;
+}
+
+/*noinspection CssUnknownTarget*/
+.figure .start-four-to-the-right {
+  /*background: url('images/border_four.png') no-repeat;*/
+  position: absolute;
+  left: -8%;
+  top: -8%;
+  z-index: 20;
+}
+.figure .start-four-to-the-right img {
+  width: 400%;
+}
+
 .info {
   z-index: 25;
   position: absolute;
@@ -145,6 +173,12 @@
   max-height: 70%;
   margin: 13%;
   margin-left: 15%;
+}
+
+.figure.shrunk >img {
+  max-width: 50%;
+  max-height: 50%;
+  margin-left: 25%;
 }
 
 .announcement-figure {
@@ -204,18 +238,4 @@
 }
 .grey {
   background-color: #cccccc !important;
-}
-
-/* bootstrap extensions */
-.tooltip {
-  font-size: 1em;
-}
-
-/* chardin extensions */
-.chardinjs-tooltip.chardinjs-right:before {
-  left: -20px;
-}
-
-.chardinjs-tooltip.chardinjs-right:before, .chardinjs-tooltip.chardinjs-left:after {
-  width: 18px;
 }
