@@ -1,12 +1,15 @@
 
 var _ = require('lodash');
 var gocdReader = require('../gocdReader');
+var config = require('../ymlHerokuConfig');
 
 function haringGocdMapperModule() {
 
   var NUM_FIGURES_IN_VIS = 24;
   var NUM_ROWS = 4;
   var COLS_PER_ROW = 6;
+
+  var haringConfig = config.create('haring').get();
 
   function compareNumbers(a, b) {
     // JS does lexicographical sorting by default, need to sort by number
@@ -86,7 +89,10 @@ function haringGocdMapperModule() {
 
     var horizontalGroup = searchHorizontal();
     if(horizontalGroup !== undefined) {
-      horizontalGroup[0].four = { direction: 'right' };
+      _.each(horizontalGroup, function(groupMember) {
+        groupMember.four = { highlight: true };
+      });
+      horizontalGroup[0].four.direction = 'right';
     }
   }
 
@@ -106,7 +112,9 @@ function haringGocdMapperModule() {
       finalFigures.background = activityHaring.background || historyHaring.background;
       finalFigures.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
 
-      applyVierGewinnt(finalFigures.figures);
+      if(haringConfig.four === true) {
+        applyVierGewinnt(finalFigures.figures);
+      }
 
       return finalFigures;
 

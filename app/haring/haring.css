@@ -130,14 +130,14 @@
 }
 
 /*noinspection CssUnknownTarget*/
-.figure .start-four-to-the-right {
+.figure .highlight-four-to-the-right {
   /*background: url('images/border_four.png') no-repeat;*/
   position: absolute;
   left: -8%;
   top: -8%;
   z-index: 20;
 }
-.figure .start-four-to-the-right img {
+.figure .highlight-four-to-the-right img {
   width: 400%;
 }
 

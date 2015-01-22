@@ -35,11 +35,23 @@ describe('Haring Go CD Mapper', function () {
       }
     };
 
+    var mockConfig = {
+      //config.create('haring').get()
+      create: function() {
+        return {
+          get: function() {
+            return { four: true }
+          }
+        };
+      }
+    };
+
     mockery.enable({
       warnOnUnregistered: false,
       warnOnReplace: false
     });
     mockery.registerMock('gocd-api', { getInstance: function() { return mockGocdApi; }});
+    mockery.registerMock('../ymlHerokuConfig', mockConfig);
 
     haringGocdMapper = require('../server/haring/gocdMapper');
 
@@ -195,7 +207,11 @@ describe('Haring Go CD Mapper', function () {
 
         haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.figures[0].four).toBeUndefined();
-          expect(result.figures[6].four).toEqual({ direction: 'right' });
+          expect(result.figures[6].four).toEqual({ direction: 'right', highlight: true });
+          expect(result.figures[7].four).toEqual({ highlight: true });
+          expect(result.figures[8].four).toEqual({ highlight: true });
+          expect(result.figures[9].four).toEqual({ highlight: true });
+
           done();
         });
 
