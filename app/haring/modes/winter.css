@@ -8,7 +8,8 @@
 }
 .figure.shrunk .bg.winter.fail {
   background-size: 20%;
-  bottom: 55%;
+  bottom: 62%;
+  left: 22%;
 }
 
 /*noinspection CssUnknownTarget*/
@@ -20,8 +21,8 @@
 }
 .figure.shrunk .bg.winter.passed {
   background-size: 15%;
-  bottom: 61%;
-  left: 8%;
+  bottom: 67%;
+  left: 2%;
 }
 
 /*noinspection CssUnknownTarget*/

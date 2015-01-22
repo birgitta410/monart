@@ -55,7 +55,7 @@ function haringGocdMapperModule() {
       return ! allDotted;
     }
 
-    function checkGroup(rangeOfIndices) {
+    function checkGroup(rangeOfIndices, orientation) {
       var groupToCheck = _.at(figures, rangeOfIndices);
       if(_.compact(groupToCheck).length === NUM_TO_WIN) {
         var allPassedWithSameAuthor = _.every(groupToCheck, function (groupMember) {
@@ -63,37 +63,43 @@ function haringGocdMapperModule() {
         });
 
         if (allPassedWithSameAuthor && groupIsEligible(groupToCheck)) {
-          return groupToCheck;
+          return markGroup(groupToCheck, orientation);
         }
       }
     }
 
-    function searchHorizontal() {
-      var successfulGroup = undefined;
-      function continueSearch() {
-        return successfulGroup === undefined;
+    function markGroup(group, orientation) {
+      if(group !== undefined && group.length > 0) {
+        _.each(group, function (groupMember) {
+          groupMember.four = {highlight: true};
+        });
+        group[0].four.direction = orientation;
       }
-      _.times(NUM_ROWS, function(rowIndex) {
-        if(continueSearch()) {
-          _.times(COLS_PER_ROW - NUM_TO_WIN + 1, function (offset) {
-            if(continueSearch()) {
-              var startIndex = rowIndex * COLS_PER_ROW + offset;
-              successfulGroup = checkGroup(_.range(startIndex, startIndex + NUM_TO_WIN));
-            }
-          });
-        }
-
-      });
-      return successfulGroup;
+      return group;
     }
 
-    var horizontalGroup = searchHorizontal();
-    if(horizontalGroup !== undefined) {
-      _.each(horizontalGroup, function(groupMember) {
-        groupMember.four = { highlight: true };
-      });
-      horizontalGroup[0].four.direction = 'right';
+    function checkHorizontal(index) {
+      var colIndex = index % COLS_PER_ROW;
+      if(colIndex + NUM_TO_WIN <= COLS_PER_ROW) {
+        return checkGroup(_.range(index, index + NUM_TO_WIN), 'horizontal');
+      }
     }
+
+    function checkVertical(index) {
+      var rowIndex = Math.floor(index / COLS_PER_ROW);
+      if(rowIndex + NUM_TO_WIN <= NUM_ROWS) {
+        var indices = [];
+        _.times(NUM_TO_WIN, function(time) { indices.push(index + (time * COLS_PER_ROW)); })
+        return checkGroup(indices, 'vertical');
+      }
+    }
+
+    var successfulGroup = undefined;
+    _.each(figures, function(figure, index) {
+      successfulGroup = successfulGroup || checkVertical(index) || checkHorizontal(index);
+    });
+    return successfulGroup;
+
   }
 
   var readHistoryAndActivity = function() {

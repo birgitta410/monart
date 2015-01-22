@@ -163,8 +163,8 @@ var HaringVisualisation = function() {
       figureDiv.addClass('figure');
       if(entry.four) {
         figureDiv.addClass('shrunk');
-        if(entry.four.direction === 'right') {
-          figureDiv.append('<div class="highlight-four-to-the-right"><img src="images/border_four.png"></div>');
+        if(entry.four.direction) {
+          figureDiv.append('<div class="highlight-four ' + entry.four.direction + '"><img src="images/border_four_' + entry.four.direction + '.png"></div>');
         }
       }
 

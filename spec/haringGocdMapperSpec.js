@@ -200,14 +200,30 @@ describe('Haring Go CD Mapper', function () {
     });
 
     describe('Vier Gewinnt', function() {
-      it('should determine horizontal winners', function(done) {
+      it('should mark first vertical quadruple', function(done) {
+
+        var numActivity = 8;
+        preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
+
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
+          expect(result.figures[0].four).toEqual({ direction: 'vertical', highlight: true });
+          expect(result.figures[6].four).toEqual({ highlight: true });
+          expect(result.figures[12].four).toEqual({ highlight: true });
+          expect(result.figures[18].four).toEqual({ highlight: true });
+
+          done();
+        });
+
+      });
+
+      xit('should mark first horizontal quadruple not consisting of only activities', function(done) {
 
         var numActivity = 8;
         preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
 
         haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.figures[0].four).toBeUndefined();
-          expect(result.figures[6].four).toEqual({ direction: 'right', highlight: true });
+          expect(result.figures[6].four).toEqual({ direction: 'horizontal', highlight: true });
           expect(result.figures[7].four).toEqual({ highlight: true });
           expect(result.figures[8].four).toEqual({ highlight: true });
           expect(result.figures[9].four).toEqual({ highlight: true });

@@ -123,22 +123,28 @@
 }
 
 .figure.shrunk {
-  background-size: 80%;
+  background-size: 85%;
   background-position: 35% 35%;
-  margin-top: 7%;
-  margin-left: 7%;
+  margin-top: 8%;
+  margin-left: 8%;
 }
 
 /*noinspection CssUnknownTarget*/
-.figure .highlight-four-to-the-right {
-  /*background: url('images/border_four.png') no-repeat;*/
+.figure .highlight-four {
   position: absolute;
   left: -8%;
   top: -8%;
   z-index: 20;
 }
-.figure .highlight-four-to-the-right img {
+.figure .highlight-four.horizontal img {
   width: 400%;
+}
+.figure .highlight-four.vertical {
+  transform: rotate(90deg);
+  transform-origin: 50% 50%;
+}
+.figure .highlight-four.vertical img {
+  width: 320%;
 }
 
 .info {
