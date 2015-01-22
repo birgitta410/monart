@@ -5,6 +5,8 @@ var gocdReader = require('../gocdReader');
 function haringGocdMapperModule() {
 
   var NUM_FIGURES_IN_VIS = 24;
+  var NUM_ROWS = 4;
+  var COLS_PER_ROW = 6;
 
   function compareNumbers(a, b) {
     // JS does lexicographical sorting by default, need to sort by number
@@ -42,6 +44,52 @@ function haringGocdMapperModule() {
     }
   }
 
+  function applyVierGewinnt(figures) {
+    var NUM_TO_WIN = 4;
+
+    function groupIsEligible(group) {
+      var allDotted = _.every(group, { border: 'dotted' });
+      return ! allDotted;
+    }
+
+    function checkGroup(rangeOfIndices) {
+      var groupToCheck = _.at(figures, rangeOfIndices);
+      if(_.compact(groupToCheck).length === NUM_TO_WIN) {
+        var allPassedWithSameAuthor = _.every(groupToCheck, function (groupMember) {
+          return isFigureSuccessful(groupMember) && groupMember.initials === groupToCheck[0].initials;
+        });
+
+        if (allPassedWithSameAuthor && groupIsEligible(groupToCheck)) {
+          return groupToCheck;
+        }
+      }
+    }
+
+    function searchHorizontal() {
+      var successfulGroup = undefined;
+      function continueSearch() {
+        return successfulGroup === undefined;
+      }
+      _.times(NUM_ROWS, function(rowIndex) {
+        if(continueSearch()) {
+          _.times(COLS_PER_ROW - NUM_TO_WIN + 1, function (offset) {
+            if(continueSearch()) {
+              var startIndex = rowIndex * COLS_PER_ROW + offset;
+              successfulGroup = checkGroup(_.range(startIndex, startIndex + NUM_TO_WIN));
+            }
+          });
+        }
+
+      });
+      return successfulGroup;
+    }
+
+    var horizontalGroup = searchHorizontal();
+    if(horizontalGroup !== undefined) {
+      horizontalGroup[0].four = { direction: 'right' };
+    }
+  }
+
   var readHistoryAndActivity = function() {
     return gocdReader.readData().then(function(data) {
       var activityHaring = mapActivityDataToFigures(data.activity);
@@ -58,6 +106,8 @@ function haringGocdMapperModule() {
       finalFigures.background = activityHaring.background || historyHaring.background;
       finalFigures.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
 
+      applyVierGewinnt(finalFigures.figures);
+
       return finalFigures;
 
     });
@@ -70,9 +120,17 @@ function haringGocdMapperModule() {
         return activityFigure.key === historyFigure.key;
       });
       if(historyFigureWithSameKey !== undefined) {
-        activityFigure.initials = historyFigureWithSameKey.hiddenInitials;
+        activityFigure.initials = historyFigureWithSameKey.initials;
       }
     });
+  }
+
+  function isFigureSuccessful(figure) {
+    if(figure.type === 'passed' || figure.type === 'passed_after_fail') {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   function getFigureType(entry, lastEntryWasSuccessful) {
@@ -113,8 +171,7 @@ function haringGocdMapperModule() {
         info: entry.label,
         info2: entry.info,
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
-        hiddenInitials: entry.author ? entry.author.initials : undefined, // need to save initials for merging with activity
-        initials: entry.wasSuccessful() ? undefined : (entry.author ? entry.author.initials : undefined),
+        initials: entry.author ? entry.author.initials : undefined,
         key: key
       };
     });

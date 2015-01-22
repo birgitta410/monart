@@ -4,6 +4,8 @@ var _ = require('lodash');
 
 describe('Haring Go CD Mapper', function () {
 
+  var NUM_FIGURES_IN_VIS = 24;
+
   var mockTime = { format: function () { } };
   var fakePipelineHistory, fakeActivity;
   var haringGocdMapper;
@@ -62,6 +64,8 @@ describe('Haring Go CD Mapper', function () {
       haringGocdMapper.readHistoryAndActivity().then(function(result) {
         expect(result.background).toBe('green');
         done();
+      }, function() {
+        console.log('error', arguments);
       });
     });
 
@@ -114,7 +118,7 @@ describe('Haring Go CD Mapper', function () {
       ];
       haringGocdMapper.readHistoryAndActivity().then(function(result) {
         expect(result.figures[0].initials).toBe('mmu');
-        expect(result.figures[1].initials).toBeUndefined();
+        expect(result.figures[1].initials).toBe('mmu');
         done();
       });
     });
@@ -157,7 +161,6 @@ describe('Haring Go CD Mapper', function () {
     });
 
     it('should make a "great success" announcement if all visible history is successful', function (done) {
-      var NUM_FIGURES_IN_VIS = 24;
       var numActivity = 8;
       var numSuccessfulVisibleHistory = NUM_FIGURES_IN_VIS - numActivity; // 16
       var numFailingInvisibleHistory = 5;
@@ -168,7 +171,7 @@ describe('Haring Go CD Mapper', function () {
         expect(result.announcementFigure).toBeDefined();
         expect(result.announcementFigure.word1).toBe('great');
         expect(result.announcementFigure.word2).toBe('success');
-        expect(result.announcementFigure.type).toBe('great_success');
+        expect(result.announcementFigure.type).toContain('great_success');
         expect(result.announcementFigure.color).toBe('blue');
         done();
       });
@@ -181,6 +184,21 @@ describe('Haring Go CD Mapper', function () {
       haringGocdMapper.readHistoryAndActivity().then(function(result) {
         expect(result.announcementFigure).toBeUndefined();
         done();
+      });
+    });
+
+    describe('Vier Gewinnt', function() {
+      it('should determine horizontal winners', function(done) {
+
+        var numActivity = 8;
+        preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
+
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
+          expect(result.figures[0].four).toBeUndefined();
+          expect(result.figures[6].four).toEqual({ direction: 'right' });
+          done();
+        });
+
       });
     });
   });
@@ -268,7 +286,7 @@ describe('Haring Go CD Mapper', function () {
       });
     });
 
-    it('should not add initials of authors of passed jobs', function (done) {
+    it('should not add initials of authors of both passed and failed jobs', function (done) {
       fakePipelineHistory = {
         '124': {
           wasSuccessful: successfulFn,
@@ -284,7 +302,7 @@ describe('Haring Go CD Mapper', function () {
         }
       };
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].initials).toBeUndefined();
+        expect(result.figures[0].initials).toBe('mmu');
         expect(result.figures[1].initials).toBe('mmu');
         done();
       });
