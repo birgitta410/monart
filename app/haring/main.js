@@ -16,13 +16,9 @@ var HaringVisualisation = function() {
   }
 
   function configureModes() {
-    snowStorm.autoStart = false;
-    snowStorm.stop();
 
     if (isWinter()) {
       FIGURE_BACKGROUND_MODE = 'winter';
-      snowStorm.snowColor = '#fff';
-      snowStorm.snowStick = true;
     }
 
   }
@@ -185,12 +181,6 @@ var HaringVisualisation = function() {
   function processNewData(haringDescription) {
 
     setBackgroundStyle(haringDescription.background);
-
-    if (isWinter() && haringDescription.background === 'orange') {
-      snowStorm.start();
-    } else {
-      snowStorm.stop();
-    }
 
     iterateFigures(haringDescription, processFigure);
 
