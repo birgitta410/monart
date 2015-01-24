@@ -184,7 +184,7 @@
   font-size: 1.3vw;
   padding: 3%;
   padding-right: 1%;
-  overflow: hidden;
+  overflow: scroll;
   display: none;
 }
 
