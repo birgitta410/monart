@@ -23,6 +23,6 @@
   left: 0;
 }
 
-.four-horizontal .figure .bg.winter {
+.four-horizontal .figure .bg.winter, .four-vertical .figure .bg.winter {
   background: none;
 }
