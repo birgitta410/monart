@@ -26,6 +26,6 @@
 .four-horizontal .figure .bg.winter, .four-vertical .figure .bg.winter, .four-diagonal .figure .bg.winter {
   background: none;
 }
-.figure-wrapper.invisible-diagonal .figure .bg.winter {
+.figure-wrapper.invisible-diagonal-lr .figure .bg.winter, .figure-wrapper.invisible-diagonal-rl .figure .bg.winter {
   background: none;
 }

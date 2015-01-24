@@ -60,9 +60,9 @@ var HaringVisualisation = function() {
         rowDiv.append(figureWrapperTemplate);
       }
     }
-    _.each(['horizontal', 'vertical', 'diagonal'], function(direction) {
+    _.each(['horizontal', 'vertical', 'diagonal-lr', 'diagonal-rl'], function(direction) {
       container.append(figureWrapperTemplate
-        .replace('figure-wrapper', 'figure-wrapper four-' + direction)
+        .replace('figure-wrapper', 'figure-wrapper four-' + direction + (direction.indexOf('diagonal') === 0 ? ' four-diagonal' : ''))
         .replace('default.png', 'four_' + direction + '.png'));
     });
 
@@ -178,9 +178,10 @@ var HaringVisualisation = function() {
         figureWrapperFourDiv.removeClass('do-not-display');
         figureWrapperDiv.addClass('invisible-' + entry.four.direction);
         if(entry.four.starter === true) {
-          var offsetLeft = 2 - (colIndex * 0.5);
+          var numColsFromLeft = entry.four.direction === 'diagonal-rl' ? colIndex - (4-1) : colIndex;
+          var offsetLeft = 2 - (numColsFromLeft * 0.5);
           var offsetTop = entry.four.direction === 'vertical' ? 2 : 0;
-          figureWrapperFourDiv.css('left', (offsetLeft + (colIndex * COL_WIDTH_PERCENT)) + '%');
+          figureWrapperFourDiv.css('left', (offsetLeft + (numColsFromLeft * COL_WIDTH_PERCENT)) + '%');
           figureWrapperFourDiv.css('top', (offsetTop + (rowIndex * ROW_HEIGHT_PERCENT)) + '%');
 
           configureFigureDiv(entry, $(figureWrapperFourDiv.find('.figure')));
@@ -205,7 +206,7 @@ var HaringVisualisation = function() {
   }
 
   function hideFoursIfNotNeeded(figures) {
-    _.each(['vertical', 'horizontal', 'diagonal'], function(direction) {
+    _.each(['vertical', 'horizontal', 'diagonal-lr', 'diagonal-rl'], function(direction) {
       var hasFour = _.find(figures, { four: { direction: direction } });
       if(hasFour === undefined) {
         var figureWrapperFourDiv = $('.figure-wrapper.four-' + direction);

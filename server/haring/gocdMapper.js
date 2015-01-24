@@ -96,20 +96,32 @@ function haringGocdMapperModule() {
       }
     }
 
-    function checkDiagonalLeftToRight(index) {
+    function checkDiagonal(index) {
+      var rowIndex = Math.floor(index / COLS_PER_ROW);
       var colIndex = index % COLS_PER_ROW;
-      if(colIndex + NUM_TO_WIN <= COLS_PER_ROW) {
+      if(NUM_ROWS - NUM_TO_WIN >= rowIndex) {
+
+        var leftToRight = 1,
+          rightToLeft = -1,
+          orientation = rightToLeft;
+        if(COLS_PER_ROW - NUM_TO_WIN >= colIndex) {
+          orientation = leftToRight;
+        }
+
         var indices = [  ];
         _.times(NUM_TO_WIN, function(time) {
-          indices.push(index + ((time * COLS_PER_ROW) + time));
+          indices.push(index + ((time * COLS_PER_ROW) + (orientation * time)));
         });
-        return checkGroup(indices, 'diagonal');
+        return checkGroup(indices, 'diagonal-' + (orientation > 0 ? 'lr' : 'rl'));
       }
     }
 
     var successfulGroup = undefined;
     _.each(figures, function(figure, index) {
-      successfulGroup = successfulGroup || checkDiagonalLeftToRight(index) || checkVertical(index) || checkHorizontal(index);
+      successfulGroup = successfulGroup
+        || checkDiagonal(index)
+        || checkVertical(index)
+        || checkHorizontal(index);
     });
     return successfulGroup;
 

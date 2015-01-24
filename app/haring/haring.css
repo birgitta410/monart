@@ -47,7 +47,7 @@
 .figure-wrapper.invisible-horizontal, .figure-wrapper.invisible-vertical {
   visibility: hidden;
 }
-.figure-wrapper.invisible-diagonal img {
+.figure-wrapper.invisible-diagonal-lr img, .figure-wrapper.invisible-diagonal-rl img {
   visibility: hidden;
 }
 .info-state .figure-wrapper.invisible-horizontal, .info-state .figure-wrapper.invisible-vertical, .info-state .figure-wrapper.invisible-diagonal {
@@ -113,6 +113,10 @@
   bottom: 7%;
   right: 34%;
   height: 6%;
+}
+
+.figure-wrapper.four-diagonal.four-diagonal-rl .letters.bottom-right {
+  right: 82%;
 }
 
 .bg {

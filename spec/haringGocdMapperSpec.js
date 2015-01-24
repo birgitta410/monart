@@ -206,20 +206,21 @@ describe('Haring Go CD Mapper', function () {
         preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
 
         haringGocdMapper.readHistoryAndActivity().then(function(result) {
-          expect(result.figures[0].four).toEqual({ direction: 'diagonal', starter: true });
-          expect(result.figures[7].four).toEqual({ direction: 'diagonal' });
-          expect(result.figures[14].four).toEqual({ direction: 'diagonal' });
-          expect(result.figures[21].four).toEqual({ direction: 'diagonal' });
+          expect(result.figures[0].four).toEqual({ direction: 'diagonal-lr', starter: true });
+          expect(result.figures[7].four).toEqual({ direction: 'diagonal-lr' });
+          expect(result.figures[14].four).toEqual({ direction: 'diagonal-lr' });
+          expect(result.figures[21].four).toEqual({ direction: 'diagonal-lr' });
 
           done();
         });
 
       });
 
-      xit('should mark first vertical quadruple', function(done) {
+      it('should mark first vertical quadruple', function(done) {
 
         var numActivity = 8;
         preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
+        fakeActivity[7].wasSuccessful = notSuccessfulFn;
 
         haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.figures[0].four).toEqual({ direction: 'vertical', starter: true });
@@ -236,6 +237,10 @@ describe('Haring Go CD Mapper', function () {
 
         var numActivity = 8;
         preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
+        var startFailingHistory = 13;
+        _.times(NUM_FIGURES_IN_VIS - numActivity - (startFailingHistory-numActivity), function(time) {
+          fakePipelineHistory[(startFailingHistory + time) - numActivity].wasSuccessful = notSuccessfulFn;
+        });
 
         haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.figures[0].four).toBeUndefined();
