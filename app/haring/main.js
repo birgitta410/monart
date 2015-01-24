@@ -3,6 +3,9 @@ var HaringVisualisation = function() {
   var NUM_ROWS = 4;
   var COLS_PER_ROW = 6;
 
+  var ROW_HEIGHT_PERCENT = 100 / NUM_ROWS;
+  var COL_WIDTH_PERCENT = 100 / COLS_PER_ROW;
+
   var DATA = {figures: []};
 
   var WARM_COLORS = ['red', 'yellow', 'pink', 'orange'];
@@ -170,10 +173,16 @@ var HaringVisualisation = function() {
       if(entry.four) {
         var figureWrapperFourDiv = $('.figure-wrapper.four-' + entry.four.direction);
         figureWrapperFourDiv.removeClass('do-not-display');
-        figureWrapperDiv.addClass('invisible');
+        figureWrapperDiv.addClass('invisible-' + entry.four.direction);
         if(entry.four.starter === true) {
+          var offsetLeft = 2 - (colIndex * 0.5);
+          var offsetTop = entry.four.direction === 'vertical' ? 2 : 0;
+          figureWrapperFourDiv.css('left', (offsetLeft + (colIndex * COL_WIDTH_PERCENT)) + '%');
+          figureWrapperFourDiv.css('top', (offsetTop + (rowIndex * ROW_HEIGHT_PERCENT)) + '%');
+
           figureDiv = $(figureWrapperFourDiv.find('.figure'));
         }
+
       }
 
       if(!entry.four || entry.four.starter === true) {
@@ -197,16 +206,14 @@ var HaringVisualisation = function() {
   }
 
   function hideFoursIfNotNeeded(figures) {
-    var hasVerticalFour = _.find(figures, { four: { direction: 'vertical' } });
-    if(hasVerticalFour === undefined) {
-      var figureWrapperVerticalDiv = $('.figure-wrapper.four-vertical');
-      figureWrapperVerticalDiv.addClass('do-not-display');
-    }
-    var hasHorizontalFour = _.find(figures, { four: { direction: 'horizontal' } });
-    if(hasHorizontalFour === undefined) {
-      var figureWrapperHorizontalDiv = $('.figure-wrapper.four-horizontal');
-      figureWrapperHorizontalDiv.addClass('do-not-display');
-    }
+    _.each(['vertical', 'horizontal'], function(direction) {
+      var hasFour = _.find(figures, { four: { direction: direction } });
+      if(hasFour === undefined) {
+        var figureWrapperFourDiv = $('.figure-wrapper.four-' + direction);
+        figureWrapperFourDiv.addClass('do-not-display');
+        $('.invisible-' + direction).removeClass('invisible-' + direction);
+      }
+    });
   }
 
   function processNewData(haringDescription) {
