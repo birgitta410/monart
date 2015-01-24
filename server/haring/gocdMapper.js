@@ -9,6 +9,8 @@ function haringGocdMapperModule() {
   var NUM_ROWS = 4;
   var COLS_PER_ROW = 6;
 
+  var IS_BUILDING_BACKGROUND = 'blue';
+
   var haringConfig = config.create('haring').get();
 
   function compareNumbers(a, b) {
@@ -118,7 +120,7 @@ function haringGocdMapperModule() {
       finalFigures.background = activityHaring.background || historyHaring.background;
       finalFigures.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
 
-      if(haringConfig.four === true) {
+      if(haringConfig.four === true && finalFigures.background !== IS_BUILDING_BACKGROUND) {
         applyVierGewinnt(finalFigures.figures);
       }
 
@@ -250,7 +252,7 @@ function haringGocdMapperModule() {
     });
 
     return {
-      background: isBuilding ? 'blue' : undefined,
+      background: isBuilding ? IS_BUILDING_BACKGROUND : undefined,
       figures: figures
     };
 
