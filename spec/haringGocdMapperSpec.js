@@ -200,7 +200,23 @@ describe('Haring Go CD Mapper', function () {
     });
 
     describe('Vier Gewinnt', function() {
-      it('should mark first vertical quadruple', function(done) {
+      it('should mark first diagonal quadruple', function(done) {
+
+        var numActivity = 8;
+        preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
+
+        haringGocdMapper.readHistoryAndActivity().then(function(result) {
+          expect(result.figures[0].four).toEqual({ direction: 'diagonal', starter: true });
+          expect(result.figures[7].four).toEqual({ direction: 'diagonal' });
+          expect(result.figures[14].four).toEqual({ direction: 'diagonal' });
+          expect(result.figures[21].four).toEqual({ direction: 'diagonal' });
+
+          done();
+        });
+
+      });
+
+      xit('should mark first vertical quadruple', function(done) {
 
         var numActivity = 8;
         preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);

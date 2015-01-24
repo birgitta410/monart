@@ -96,9 +96,20 @@ function haringGocdMapperModule() {
       }
     }
 
+    function checkDiagonalLeftToRight(index) {
+      var colIndex = index % COLS_PER_ROW;
+      if(colIndex + NUM_TO_WIN <= COLS_PER_ROW) {
+        var indices = [  ];
+        _.times(NUM_TO_WIN, function(time) {
+          indices.push(index + ((time * COLS_PER_ROW) + time));
+        });
+        return checkGroup(indices, 'diagonal');
+      }
+    }
+
     var successfulGroup = undefined;
     _.each(figures, function(figure, index) {
-      successfulGroup = successfulGroup || checkVertical(index) || checkHorizontal(index);
+      successfulGroup = successfulGroup || checkDiagonalLeftToRight(index) || checkVertical(index) || checkHorizontal(index);
     });
     return successfulGroup;
 

@@ -60,12 +60,12 @@ var HaringVisualisation = function() {
         rowDiv.append(figureWrapperTemplate);
       }
     }
-    container.append(figureWrapperTemplate
-      .replace('figure-wrapper', 'figure-wrapper four-vertical')
-      .replace('default.png', 'four_vertical.png'));
-    container.append(figureWrapperTemplate
-      .replace('figure-wrapper', 'figure-wrapper four-horizontal')
-      .replace('default.png', 'four_horizontal.png'));
+    _.each(['horizontal', 'vertical', 'diagonal'], function(direction) {
+      container.append(figureWrapperTemplate
+        .replace('figure-wrapper', 'figure-wrapper four-' + direction)
+        .replace('default.png', 'four_' + direction + '.png'));
+    });
+
     container.append('<div class="figure announcement-figure">' + figureContentTemplate + '</div>');
   }
 
@@ -205,7 +205,7 @@ var HaringVisualisation = function() {
   }
 
   function hideFoursIfNotNeeded(figures) {
-    _.each(['vertical', 'horizontal'], function(direction) {
+    _.each(['vertical', 'horizontal', 'diagonal'], function(direction) {
       var hasFour = _.find(figures, { four: { direction: direction } });
       if(hasFour === undefined) {
         var figureWrapperFourDiv = $('.figure-wrapper.four-' + direction);

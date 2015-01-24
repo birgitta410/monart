@@ -23,6 +23,9 @@
   left: 0;
 }
 
-.four-horizontal .figure .bg.winter, .four-vertical .figure .bg.winter {
+.four-horizontal .figure .bg.winter, .four-vertical .figure .bg.winter, .four-diagonal .figure .bg.winter {
+  background: none;
+}
+.figure-wrapper.invisible-diagonal .figure .bg.winter {
   background: none;
 }

@@ -47,27 +47,25 @@
 .figure-wrapper.invisible-horizontal, .figure-wrapper.invisible-vertical {
   visibility: hidden;
 }
-.info-state .figure-wrapper.invisible-horizontal, .info-state .figure-wrapper.invisible-vertical {
+.figure-wrapper.invisible-diagonal img {
+  visibility: hidden;
+}
+.info-state .figure-wrapper.invisible-horizontal, .info-state .figure-wrapper.invisible-vertical, .info-state .figure-wrapper.invisible-diagonal {
   visibility: visible;
 }
 
-.figure-wrapper.do-not-display, .figure-wrapper.four-vertical.do-not-display {
+.figure-wrapper.do-not-display, .figure-wrapper.four-vertical.do-not-display, .figure-wrapper.four-diagonal.do-not-display {
   display: none;
 }
 
-.info-state .figure-wrapper.four-horizontal, .info-state .figure-wrapper.four-vertical {
+.info-state .figure-wrapper.four-horizontal, .info-state .figure-wrapper.four-vertical, .info-state .figure-wrapper.four-diagonal {
   display: none;
 }
 
+/*HORIZONTAL*/
 .figure-wrapper.four-horizontal {
   position: absolute;
   width: 64%;
-
-  /*TODO: top according to which row it is*/
-  top: 25%;
-  /*TODO: left according to which column it is*/
-  left: 34%;
-
 }
 .figure-wrapper.four-horizontal .figure .image >img {
   margin-top: 3%;
@@ -75,11 +73,22 @@
   margin-left: 12%;
   max-width: 77%;
 }
-
 .figure-wrapper.four-horizontal .letters.bottom-right {
   bottom: 0%;
   right: 0%;
   height: 18%;
+}
+
+/*VERTICAL*/
+.figure-wrapper.four-vertical {
+  display: flex;
+  height: 97%;
+  width: 17%;
+  position: absolute;
+}
+.figure-wrapper.four-vertical .figure .image >img {
+  margin-left: 11%;
+  margin-top: 21%;
 }
 .figure-wrapper.four-vertical .letters.bottom-right {
   bottom: 0%;
@@ -87,16 +96,23 @@
   height: 7%;
 }
 
-.figure-wrapper.four-vertical {
-  display: flex;
-  height: 97%;
-  width: 17%;
+/*DIAGONAL*/
+.figure-wrapper.four-diagonal {
   position: absolute;
-  top: 2%;
 }
-.figure-wrapper.four-vertical .figure .image >img {
-  margin-left: 11%;
-  margin-top: 21%;
+.figure-wrapper.four-diagonal .figure {
+  background: none;
+}
+.figure-wrapper.four-diagonal .figure .image >img {
+  width: 58%;
+  margin-left: 3%;
+  margin-top: 2%;
+  background: none;
+}
+.figure-wrapper.four-diagonal .letters.bottom-right {
+  bottom: 7%;
+  right: 34%;
+  height: 6%;
 }
 
 .bg {
