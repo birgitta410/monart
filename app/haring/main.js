@@ -41,23 +41,26 @@ var HaringVisualisation = function() {
 
   function buildHtmlGrid() {
     var container = $('.container');
-    var figureContentHtml = '<div class="bg"></div>' +
-      '<img src="images/default.png" class="grey">' +
+    var figureContentTemplate = '<div class="bg"></div>' +
+      '<div class="image"><img src="images/default.png" class="grey"></div>' +
       '<div class="letters top-left"></div>' +
       '<div class="letters bottom-right"></div>';
+    var figureWrapperTemplate = '<div class="figure-wrapper">' +
+      '<div class="info"><span class="level-1"></span><span class="level-2"></span></div>' +
+      '<div class="figure solid">' +
+        figureContentTemplate +
+      '</div>' +
+      '</div>';
     for (var r = 0; r < NUM_ROWS; r++) {
       var rowDiv = $('<div class="figure-row flexbox"></div>').appendTo(container);
       for (var c = 0; c < COLS_PER_ROW; c++) {
-        rowDiv.append(
-          '<div class="figure-wrapper">' +
-          '<div class="info"><span class="level-1"></span><span class="level-2"></span></div>' +
-          '<div class="figure solid">' +
-          figureContentHtml +
-          '</div>' +
-          '</div>');
+        rowDiv.append(figureWrapperTemplate);
       }
     }
-    container.append('<div class="figure announcement-figure">' + figureContentHtml + '</div>');
+    container.append(figureWrapperTemplate
+      .replace('figure-wrapper', 'figure-wrapper four-vertical')
+      .replace('default.png', 'four_vertical.png'));
+    container.append('<div class="figure announcement-figure">' + figureContentTemplate + '</div>');
   }
 
   function iterateFigures(haringDescription, callback) {
@@ -75,7 +78,7 @@ var HaringVisualisation = function() {
 
   function configureFigureDiv(entry, figureDiv) {
     var infoDiv = $(figureDiv.siblings('.info'));
-    var imgTag = $(figureDiv.find('> img'));
+    var imgTag = $(figureDiv.find('.image > img'));
 
     if (entry.border === 'dotted') {
       figureDiv.addClass('dotted');
@@ -87,15 +90,14 @@ var HaringVisualisation = function() {
     infoDiv.find('.level-2').text(entry.info2);
 
     var imgExtension = entry.type === 'building' ? '.gif' : '.png';
-    if(entry.four && entry.four.direction) {
+    if(entry.four && entry.four.starter === true && entry.four.direction === 'horizontal') {
       imgTag.attr('src', 'images/four_horizontal.png');
-    } else {
+    } else if(!entry.four || entry.four.direction !== 'vertical') {
       imgTag.attr('src', 'images/' + entry.type + imgExtension);
     }
 
     // Little hack for announcementFigure in winter mode
     if (entry.type.indexOf('winter') > -1) {
-      console.log('entry.type', entry.type);
       imgTag.attr('src', 'modes/' + entry.type + imgExtension);
     }
 
@@ -165,14 +167,19 @@ var HaringVisualisation = function() {
       var figureDiv = $(figureWrapperDiv.find('.figure'));
 
       if(entry.four) {
-        if(entry.four.direction) {
+        if(entry.four.starter === true && entry.four.direction === 'horizontal') {
           figureWrapperDiv.addClass('four-horizontal');
+        } else if (entry.four.direction === 'vertical') {
+          var figureWrapperVerticalDiv = $('.figure-wrapper.four-vertical');
+          figureWrapperVerticalDiv.removeClass('do-not-display');
+          figureWrapperDiv.addClass('invisible');
+          figureDiv = $(figureWrapperVerticalDiv.find('.figure'));
         } else {
-          figureWrapperDiv.addClass('hide');
+          figureWrapperDiv.addClass('do-not-display');
         }
       }
 
-      if(!entry.four || entry.four.direction) {
+      if(!entry.four || entry.four.starter === true) {
         figureDiv.removeClass();
         figureDiv.addClass('figure');
         configureFigureDiv(entry, figureDiv);
@@ -197,6 +204,12 @@ var HaringVisualisation = function() {
     setBackgroundStyle(haringDescription.background);
 
     iterateFigures(haringDescription, processFigure);
+
+    var hasVerticalFour = _.find(haringDescription.figures, { four: { direction: 'vertical' } });
+    if(hasVerticalFour === undefined) {
+      var figureWrapperVerticalDiv = $('.figure-wrapper.four-vertical');
+      figureWrapperVerticalDiv.addClass('do-not-display');
+    }
 
     var announcementDiv = $('.announcement-figure');
     if (haringDescription.announcementFigure !== undefined) {

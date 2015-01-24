@@ -206,10 +206,10 @@ describe('Haring Go CD Mapper', function () {
         preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
 
         haringGocdMapper.readHistoryAndActivity().then(function(result) {
-          expect(result.figures[0].four).toEqual({ direction: 'vertical', highlight: true });
-          expect(result.figures[6].four).toEqual({ highlight: true });
-          expect(result.figures[12].four).toEqual({ highlight: true });
-          expect(result.figures[18].four).toEqual({ highlight: true });
+          expect(result.figures[0].four).toEqual({ direction: 'vertical', starter: true });
+          expect(result.figures[6].four).toEqual({ direction: 'vertical' });
+          expect(result.figures[12].four).toEqual({ direction: 'vertical' });
+          expect(result.figures[18].four).toEqual({ direction: 'vertical' });
 
           done();
         });
@@ -223,10 +223,10 @@ describe('Haring Go CD Mapper', function () {
 
         haringGocdMapper.readHistoryAndActivity().then(function(result) {
           expect(result.figures[0].four).toBeUndefined();
-          expect(result.figures[6].four).toEqual({ direction: 'horizontal', highlight: true });
-          expect(result.figures[7].four).toEqual({ highlight: true });
-          expect(result.figures[8].four).toEqual({ highlight: true });
-          expect(result.figures[9].four).toEqual({ highlight: true });
+          expect(result.figures[6].four).toEqual({ direction: 'horizontal', starter: true });
+          expect(result.figures[7].four).toEqual({ direction: 'horizontal' });
+          expect(result.figures[8].four).toEqual({ direction: 'horizontal' });
+          expect(result.figures[9].four).toEqual({ direction: 'horizontal' });
 
           done();
         });

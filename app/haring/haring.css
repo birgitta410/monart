@@ -6,6 +6,8 @@
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
+
+  position: relative;
 }
 
 .container {
@@ -42,7 +44,11 @@
   flex: 1;
 }
 
-.figure-wrapper.hide {
+.figure-wrapper.invisible {
+  visibility: hidden;
+}
+
+.figure-wrapper.do-not-display, .figure-wrapper.four-vertical.do-not-display {
   display: none;
 }
 
@@ -53,7 +59,7 @@
   -ms-flex: 4;
   flex: 4;
 }
-.figure-wrapper.four-horizontal .figure >img {
+.figure-wrapper.four-horizontal .figure .image >img {
   margin-top: 3%;
   margin-bottom: 1%;
   margin-left: 12%;
@@ -64,6 +70,23 @@
   bottom: 0%;
   right: 0%;
   height: 18%;
+}
+.figure-wrapper.four-vertical .letters.bottom-right {
+  bottom: 0%;
+  right: 22%;
+  height: 7%;
+}
+
+.figure-wrapper.four-vertical {
+  display: flex;
+  height: 97%;
+  width: 17%;
+  position: absolute;
+  top: 2%;
+}
+.figure-wrapper.four-vertical .figure .image >img {
+  margin-left: 11%;
+  margin-top: 21%;
 }
 
 .bg {
@@ -118,51 +141,28 @@
 }
 
 /*noinspection CssUnknownTarget*/
-.bg.water {
-  background: url('images/water.png') no-repeat bottom center;
-  background-size: 100%;
-}
-
-/*noinspection CssUnknownTarget*/
-.bg.ground {
-  background: url('images/ground.png') no-repeat bottom center;
-  background-size: 100%;
-}
-
-/*noinspection CssUnknownTarget*/
 .figure.solid {
   background: url('images/border.png') no-repeat;
   background-size: 100%;
 }
 
 /*noinspection CssUnknownTarget*/
-.four-horizontal .figure.solid {
+.four-horizontal .figure.solid, .four-horizontal .figure.dotted {
   background: url('images/border_four_horizontal.png') no-repeat;
   background-size: 100%;
+}
+
+/*noinspection CssUnknownTarget*/
+.four-vertical .figure.solid, .four-vertical .figure.dotted {
+  background: url('images/border_four_vertical.png') no-repeat;
+  background-size: 90%;
+  background-position: 0% 100%;
 }
 
 /*noinspection CssUnknownTarget*/
 .figure.dotted {
   background: url('images/border_dotted.png') no-repeat;
   background-size: 100%;
-}
-
-/*noinspection CssUnknownTarget*/
-.figure .highlight-four {
-  position: absolute;
-  left: -8%;
-  top: -8%;
-  z-index: 20;
-}
-.figure .highlight-four.horizontal img {
-  width: 400%;
-}
-.figure .highlight-four.vertical {
-  transform: rotate(90deg);
-  transform-origin: 50% 50%;
-}
-.figure .highlight-four.vertical img {
-  width: 320%;
 }
 
 .info {
@@ -191,7 +191,7 @@
   display: none;
 }
 
-.figure >img {
+.figure .image >img {
   z-index: 10;
   max-width: 70%;
   max-height: 70%;
@@ -209,7 +209,7 @@
   height: 85%;
 
 }
-.announcement-figure >img {
+.announcement-figure .image >img {
   width: 70%;
 }
 .announcement-figure >.top-left {

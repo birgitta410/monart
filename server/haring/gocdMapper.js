@@ -71,9 +71,9 @@ function haringGocdMapperModule() {
     function markGroup(group, orientation) {
       if(group !== undefined && group.length > 0) {
         _.each(group, function (groupMember) {
-          groupMember.four = {highlight: true};
+          groupMember.four = {direction: orientation};
         });
-        group[0].four.direction = orientation;
+        group[0].four.starter = true;
       }
       return group;
     }
