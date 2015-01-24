@@ -64,7 +64,11 @@ function haringGocdMapperModule() {
           return isFigureSuccessful(groupMember) && groupMember.initials === groupToCheck[0].initials;
         });
 
-        if (allPassedWithSameAuthor && groupIsEligible(groupToCheck)) {
+        var allFailedWithSameAuthor = _.every(groupToCheck, function (groupMember) {
+          return ! isFigureSuccessful(groupMember) && groupMember.initials === groupToCheck[0].initials;
+        });
+
+        if ((allPassedWithSameAuthor || allFailedWithSameAuthor) && groupIsEligible(groupToCheck)) {
           return markGroup(groupToCheck, orientation);
         }
       }
