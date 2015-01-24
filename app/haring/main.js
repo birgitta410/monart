@@ -83,6 +83,9 @@ var HaringVisualisation = function() {
   }
 
   function configureFigureDiv(entry, figureDiv) {
+    figureDiv.removeClass();
+    figureDiv.addClass('figure');
+
     var infoDiv = $(figureDiv.siblings('.info'));
     var imgTag = $(figureDiv.find('.image > img'));
 
@@ -180,16 +183,12 @@ var HaringVisualisation = function() {
           figureWrapperFourDiv.css('left', (offsetLeft + (colIndex * COL_WIDTH_PERCENT)) + '%');
           figureWrapperFourDiv.css('top', (offsetTop + (rowIndex * ROW_HEIGHT_PERCENT)) + '%');
 
-          figureDiv = $(figureWrapperFourDiv.find('.figure'));
+          configureFigureDiv(entry, $(figureWrapperFourDiv.find('.figure')));
         }
 
       }
 
-      if(!entry.four || entry.four.starter === true) {
-        figureDiv.removeClass();
-        figureDiv.addClass('figure');
-        configureFigureDiv(entry, figureDiv);
-      }
+      configureFigureDiv(entry, figureDiv);
 
     } else {
       console.log('not enough rows');
@@ -257,17 +256,13 @@ var InfoToggler = function (body) {
   return {
     toggle: function () {
       currentInfoState++;
-      var infos = body.find('.info');
       if (currentInfoState % 3 === STATE_DEFAULT) {
-        body.removeClass('grey');
-        infos.hide();
+        body.removeClass('info-state');
       } else if (currentInfoState % 3 === STATE_INFO_1) {
-        body.addClass('grey');
-        infos.show();
+        body.addClass('info-state');
         body.find('.level-1').show();
         body.find('.level-2').hide();
       } else if (currentInfoState % 3 === STATE_INFO_2) {
-        infos.show();
         body.find('.level-1').hide();
         body.find('.level-2').show();
       }

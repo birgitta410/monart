@@ -47,8 +47,15 @@
 .figure-wrapper.invisible-horizontal, .figure-wrapper.invisible-vertical {
   visibility: hidden;
 }
+.info-state .figure-wrapper.invisible-horizontal, .info-state .figure-wrapper.invisible-vertical {
+  visibility: visible;
+}
 
 .figure-wrapper.do-not-display, .figure-wrapper.four-vertical.do-not-display {
+  display: none;
+}
+
+.info-state .figure-wrapper.four-horizontal, .info-state .figure-wrapper.four-vertical {
   display: none;
 }
 
@@ -179,6 +186,14 @@
   padding-right: 1%;
   overflow: hidden;
   display: none;
+}
+
+.info-state {
+  background-color: #cccccc !important;
+}
+
+.info-state .info {
+  display: block;
 }
 
 .info .level-1 {
