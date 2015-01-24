@@ -87,7 +87,11 @@ var HaringVisualisation = function() {
     infoDiv.find('.level-2').text(entry.info2);
 
     var imgExtension = entry.type === 'building' ? '.gif' : '.png';
-    imgTag.attr('src', 'images/' + entry.type + imgExtension);
+    if(entry.four && entry.four.direction) {
+      imgTag.attr('src', 'images/four_horizontal.png');
+    } else {
+      imgTag.attr('src', 'images/' + entry.type + imgExtension);
+    }
 
     // Little hack for announcementFigure in winter mode
     if (entry.type.indexOf('winter') > -1) {
@@ -157,18 +161,22 @@ var HaringVisualisation = function() {
     if (allRows.length > rowIndex) {
       var rowDiv = $(allRows[rowIndex]);
 
-      var figureDiv = $(rowDiv.find('.figure')[colIndex]);
+      var figureWrapperDiv = $(rowDiv.find('.figure-wrapper')[colIndex]);
+      var figureDiv = $(figureWrapperDiv.find('.figure'));
 
-      figureDiv.removeClass();
-      figureDiv.addClass('figure');
       if(entry.four) {
-        figureDiv.addClass('shrunk');
         if(entry.four.direction) {
-          figureDiv.append('<div class="highlight-four ' + entry.four.direction + '"><img src="images/border_four_' + entry.four.direction + '.png"></div>');
+          figureWrapperDiv.addClass('four-horizontal');
+        } else {
+          figureWrapperDiv.addClass('hide');
         }
       }
 
-      configureFigureDiv(entry, figureDiv);
+      if(!entry.four || entry.four.direction) {
+        figureDiv.removeClass();
+        figureDiv.addClass('figure');
+        configureFigureDiv(entry, figureDiv);
+      }
 
     } else {
       console.log('not enough rows');
