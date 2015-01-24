@@ -53,11 +53,14 @@
 }
 
 .figure-wrapper.four-horizontal {
-  -webkit-box-flex: 4;
-  -moz-box-flex: 4;
-  -webkit-flex: 4;
-  -ms-flex: 4;
-  flex: 4;
+  position: absolute;
+  width: 64%;
+
+  /*TODO: top according to which row it is*/
+  top: 25%;
+  /*TODO: left according to which column it is*/
+  left: 34%;
+
 }
 .figure-wrapper.four-horizontal .figure .image >img {
   margin-top: 3%;

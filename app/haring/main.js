@@ -60,6 +60,9 @@ var HaringVisualisation = function() {
     container.append(figureWrapperTemplate
       .replace('figure-wrapper', 'figure-wrapper four-vertical')
       .replace('default.png', 'four_vertical.png'));
+    container.append(figureWrapperTemplate
+      .replace('figure-wrapper', 'figure-wrapper four-horizontal')
+      .replace('default.png', 'four_horizontal.png'));
     container.append('<div class="figure announcement-figure">' + figureContentTemplate + '</div>');
   }
 
@@ -90,9 +93,7 @@ var HaringVisualisation = function() {
     infoDiv.find('.level-2').text(entry.info2);
 
     var imgExtension = entry.type === 'building' ? '.gif' : '.png';
-    if(entry.four && entry.four.starter === true && entry.four.direction === 'horizontal') {
-      imgTag.attr('src', 'images/four_horizontal.png');
-    } else if(!entry.four || entry.four.direction !== 'vertical') {
+    if(!entry.four) {
       imgTag.attr('src', 'images/' + entry.type + imgExtension);
     }
 
@@ -167,15 +168,11 @@ var HaringVisualisation = function() {
       var figureDiv = $(figureWrapperDiv.find('.figure'));
 
       if(entry.four) {
-        if(entry.four.starter === true && entry.four.direction === 'horizontal') {
-          figureWrapperDiv.addClass('four-horizontal');
-        } else if (entry.four.direction === 'vertical') {
-          var figureWrapperVerticalDiv = $('.figure-wrapper.four-vertical');
-          figureWrapperVerticalDiv.removeClass('do-not-display');
-          figureWrapperDiv.addClass('invisible');
-          figureDiv = $(figureWrapperVerticalDiv.find('.figure'));
-        } else {
-          figureWrapperDiv.addClass('do-not-display');
+        var figureWrapperFourDiv = $('.figure-wrapper.four-' + entry.four.direction);
+        figureWrapperFourDiv.removeClass('do-not-display');
+        figureWrapperDiv.addClass('invisible');
+        if(entry.four.starter === true) {
+          figureDiv = $(figureWrapperFourDiv.find('.figure'));
         }
       }
 
@@ -199,17 +196,26 @@ var HaringVisualisation = function() {
     }
   }
 
+  function hideFoursIfNotNeeded(figures) {
+    var hasVerticalFour = _.find(figures, { four: { direction: 'vertical' } });
+    if(hasVerticalFour === undefined) {
+      var figureWrapperVerticalDiv = $('.figure-wrapper.four-vertical');
+      figureWrapperVerticalDiv.addClass('do-not-display');
+    }
+    var hasHorizontalFour = _.find(figures, { four: { direction: 'horizontal' } });
+    if(hasHorizontalFour === undefined) {
+      var figureWrapperHorizontalDiv = $('.figure-wrapper.four-horizontal');
+      figureWrapperHorizontalDiv.addClass('do-not-display');
+    }
+  }
+
   function processNewData(haringDescription) {
 
     setBackgroundStyle(haringDescription.background);
 
     iterateFigures(haringDescription, processFigure);
 
-    var hasVerticalFour = _.find(haringDescription.figures, { four: { direction: 'vertical' } });
-    if(hasVerticalFour === undefined) {
-      var figureWrapperVerticalDiv = $('.figure-wrapper.four-vertical');
-      figureWrapperVerticalDiv.addClass('do-not-display');
-    }
+    hideFoursIfNotNeeded(haringDescription.figures);
 
     var announcementDiv = $('.announcement-figure');
     if (haringDescription.announcementFigure !== undefined) {
