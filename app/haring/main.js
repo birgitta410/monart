@@ -62,7 +62,7 @@ var HaringVisualisation = function() {
     }
     _.each(['horizontal', 'vertical', 'diagonal-lr', 'diagonal-rl'], function(direction) {
       container.append(figureWrapperTemplate
-        .replace('figure-wrapper', 'figure-wrapper four-' + direction + (direction.indexOf('diagonal') === 0 ? ' four-diagonal' : ''))
+        .replace('figure-wrapper', 'figure-wrapper do-not-display four-' + direction + (direction.indexOf('diagonal') === 0 ? ' four-diagonal' : ''))
         .replace('default.png', 'four_' + direction + '.png'));
     });
 
