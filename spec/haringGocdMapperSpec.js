@@ -35,23 +35,11 @@ describe('Haring Go CD Mapper', function () {
       }
     };
 
-    var mockConfig = {
-      //config.create('haring').get()
-      create: function() {
-        return {
-          get: function() {
-            return { four: true }
-          }
-        };
-      }
-    };
-
     mockery.enable({
       warnOnUnregistered: false,
       warnOnReplace: false
     });
     mockery.registerMock('gocd-api', { getInstance: function() { return mockGocdApi; }});
-    mockery.registerMock('../ymlHerokuConfig', mockConfig);
 
     haringGocdMapper = require('../server/haring/gocdMapper');
 
@@ -199,61 +187,6 @@ describe('Haring Go CD Mapper', function () {
       });
     });
 
-    describe('Vier Gewinnt', function() {
-      it('should mark first diagonal quadruple', function(done) {
-
-        var numActivity = 8;
-        preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
-
-        haringGocdMapper.readHistoryAndActivity().then(function(result) {
-          expect(result.figures[0].four).toEqual({ direction: 'diagonal-lr', starter: true });
-          expect(result.figures[7].four).toEqual({ direction: 'diagonal-lr' });
-          expect(result.figures[14].four).toEqual({ direction: 'diagonal-lr' });
-          expect(result.figures[21].four).toEqual({ direction: 'diagonal-lr' });
-
-          done();
-        });
-
-      });
-
-      it('should mark first vertical quadruple', function(done) {
-
-        var numActivity = 8;
-        preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
-        fakeActivity[7].wasSuccessful = notSuccessfulFn;
-
-        haringGocdMapper.readHistoryAndActivity().then(function(result) {
-          expect(result.figures[0].four).toEqual({ direction: 'vertical', starter: true });
-          expect(result.figures[6].four).toEqual({ direction: 'vertical' });
-          expect(result.figures[12].four).toEqual({ direction: 'vertical' });
-          expect(result.figures[18].four).toEqual({ direction: 'vertical' });
-
-          done();
-        });
-
-      });
-
-      xit('should mark first horizontal quadruple not consisting of only activities', function(done) {
-
-        var numActivity = 8;
-        preparePipelineAndActivity(0, NUM_FIGURES_IN_VIS - numActivity, numActivity, 0);
-        var startFailingHistory = 13;
-        _.times(NUM_FIGURES_IN_VIS - numActivity - (startFailingHistory-numActivity), function(time) {
-          fakePipelineHistory[(startFailingHistory + time) - numActivity].wasSuccessful = notSuccessfulFn;
-        });
-
-        haringGocdMapper.readHistoryAndActivity().then(function(result) {
-          expect(result.figures[0].four).toBeUndefined();
-          expect(result.figures[6].four).toEqual({ direction: 'horizontal', starter: true });
-          expect(result.figures[7].four).toEqual({ direction: 'horizontal' });
-          expect(result.figures[8].four).toEqual({ direction: 'horizontal' });
-          expect(result.figures[9].four).toEqual({ direction: 'horizontal' });
-
-          done();
-        });
-
-      });
-    });
   });
 
   describe('mapPipelineDataToFigures()', function () {
@@ -376,6 +309,19 @@ describe('Haring Go CD Mapper', function () {
       });
     });
 
+    it('should set the time', function(done) {
+      fakePipelineHistory = {
+        '124': {
+          wasSuccessful: successfulFn,
+          last_scheduled: '1419000842499'
+        }
+      };
+      haringGocdMapper.readHistoryAndActivity().then(function (result) {
+        expect(result.figures[0].time).toBe(1419000842499);
+        done();
+      });
+    });
+
   });
 
   describe('mapActivityDataToFigures()', function () {
@@ -421,6 +367,20 @@ describe('Haring Go CD Mapper', function () {
         expect(result.figures.length).toBe(2);
         expect(result.figures[0].type).toBe('passed');
         expect(result.figures[1].type).toBe('fail');
+        done();
+      });
+    });
+
+    it('should set the time', function (done) {
+      fakeActivity = [
+        { name: 'A-PIPELINE :: integration-test :: backend-integration',
+          activity: 'Building',
+          wasSuccessful: successfulFn,
+          lastBuildTime: '2014-07-24T09:14:02'
+        }
+      ];
+      haringGocdMapper.readHistoryAndActivity().then(function (result) {
+        expect(result.figures[0].time).toEqual(1406193242000);
         done();
       });
     });

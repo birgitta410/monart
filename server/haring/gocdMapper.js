@@ -1,13 +1,12 @@
 
 var _ = require('lodash');
+var vierGewinnt = require('./vierGewinnt');
 var gocdReader = require('../gocdReader');
 var config = require('../ymlHerokuConfig');
 
 function haringGocdMapperModule() {
 
   var NUM_FIGURES_IN_VIS = 24;
-  var NUM_ROWS = 4;
-  var COLS_PER_ROW = 6;
 
   var IS_BUILDING_BACKGROUND = 'blue';
 
@@ -49,88 +48,6 @@ function haringGocdMapperModule() {
     }
   }
 
-  function applyVierGewinnt(figures) {
-    var NUM_TO_WIN = 4;
-
-    function groupIsEligible(group) {
-      var allDotted = _.every(group, { border: 'dotted' });
-      return ! allDotted;
-    }
-
-    function checkGroup(rangeOfIndices, orientation) {
-      var groupToCheck = _.at(figures, rangeOfIndices);
-      if(_.compact(groupToCheck).length === NUM_TO_WIN) {
-        var allPassedWithSameAuthor = _.every(groupToCheck, function (groupMember) {
-          return isFigureSuccessful(groupMember) && groupMember.initials === groupToCheck[0].initials;
-        });
-
-        var allFailedWithSameAuthor = _.every(groupToCheck, function (groupMember) {
-          return ! isFigureSuccessful(groupMember) && groupMember.initials === groupToCheck[0].initials;
-        });
-
-        if ((allPassedWithSameAuthor || allFailedWithSameAuthor) && groupIsEligible(groupToCheck)) {
-          return markGroup(groupToCheck, orientation);
-        }
-      }
-    }
-
-    function markGroup(group, orientation) {
-      if(group !== undefined && group.length > 0) {
-        _.each(group, function (groupMember) {
-          groupMember.four = {direction: orientation};
-        });
-        group[0].four.starter = true;
-      }
-      return group;
-    }
-
-    function checkHorizontal(index) {
-      var colIndex = index % COLS_PER_ROW;
-      if(colIndex + NUM_TO_WIN <= COLS_PER_ROW) {
-        return checkGroup(_.range(index, index + NUM_TO_WIN), 'horizontal');
-      }
-    }
-
-    function checkVertical(index) {
-      var rowIndex = Math.floor(index / COLS_PER_ROW);
-      if(rowIndex + NUM_TO_WIN <= NUM_ROWS) {
-        var indices = [];
-        _.times(NUM_TO_WIN, function(time) { indices.push(index + (time * COLS_PER_ROW)); })
-        return checkGroup(indices, 'vertical');
-      }
-    }
-
-    function checkDiagonal(index) {
-      var rowIndex = Math.floor(index / COLS_PER_ROW);
-      var colIndex = index % COLS_PER_ROW;
-      if(NUM_ROWS - NUM_TO_WIN >= rowIndex) {
-
-        var leftToRight = 1,
-          rightToLeft = -1,
-          orientation = rightToLeft;
-        if(COLS_PER_ROW - NUM_TO_WIN >= colIndex) {
-          orientation = leftToRight;
-        }
-
-        var indices = [  ];
-        _.times(NUM_TO_WIN, function(time) {
-          indices.push(index + ((time * COLS_PER_ROW) + (orientation * time)));
-        });
-        return checkGroup(indices, 'diagonal-' + (orientation > 0 ? 'lr' : 'rl'));
-      }
-    }
-
-    var successfulGroup = undefined;
-    _.each(figures, function(figure, index) {
-      successfulGroup = successfulGroup
-        || checkDiagonal(index)
-        || checkVertical(index)
-        || checkHorizontal(index);
-    });
-    return successfulGroup;
-
-  }
-
   var readHistoryAndActivity = function() {
     return gocdReader.readData().then(function(data) {
       var activityHaring = mapActivityDataToFigures(data.activity);
@@ -148,7 +65,7 @@ function haringGocdMapperModule() {
       finalFigures.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
 
       if(haringConfig.four === true && finalFigures.background !== IS_BUILDING_BACKGROUND) {
-        applyVierGewinnt(finalFigures.figures);
+        vierGewinnt.apply(finalFigures.figures);
       }
 
       return finalFigures;
@@ -166,14 +83,6 @@ function haringGocdMapperModule() {
         activityFigure.initials = historyFigureWithSameKey.initials;
       }
     });
-  }
-
-  function isFigureSuccessful(figure) {
-    if(figure.type === 'passed' || figure.type === 'passed_after_fail') {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   function getFigureType(entry, lastEntryWasSuccessful) {
@@ -215,6 +124,7 @@ function haringGocdMapperModule() {
         info2: entry.info,
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
         initials: entry.author ? entry.author.initials : undefined,
+        time: parseInt(entry.last_scheduled),
         key: key
       };
     });
@@ -270,6 +180,7 @@ function haringGocdMapperModule() {
         type: getFigureTypeForActivity(entry),
         border: 'dotted',
         initials: entry.author ? entry.author.initials : undefined,
+        time: new Date(entry.lastBuildTime).getTime(),
         key: entry.buildNumber
       }
     });
