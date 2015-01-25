@@ -59,14 +59,15 @@ function haringGocdMapperModule() {
       var historyFigures = historyHaring.figures;
       mapInitialsFromHistoryToActivity(historyFigures, activityHaring.figures);
 
-      var finalFigures = {  };
-      finalFigures.figures = activityHaring.figures.concat(historyFigures);
-      finalFigures.background = activityHaring.background || historyHaring.background;
-      finalFigures.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
+      var finalData = {  };
+      finalData.figures = activityHaring.figures.concat(historyFigures);
+      finalData.background = activityHaring.background || historyHaring.background;
+      finalData.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
+      finalData.dangerZones = haringConfig.dangerZones;
 
-      vierGewinnt.apply(finalFigures.figures);
+      vierGewinnt.apply(finalData.figures);
 
-      return finalFigures;
+      return finalData;
 
     }).fail(function() {
       console.error('ERROR transforming data', arguments);

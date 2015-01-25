@@ -13,9 +13,25 @@ var HaringVisualisation = function() {
 
   var FIGURE_BACKGROUND_MODE;
 
+  var currentlyInDangerZone = false;
+
   function isWinter() {
     var now = new Date();
     return now.getMonth() >= 11 || now.getMonth() === 0;
+  }
+
+  function setDangerZone(dangerZoneDefinitions) {
+    var now = moment();
+
+    var zones = _.map(dangerZoneDefinitions, function(zone) {
+      var times = zone.split('-');
+      var from = moment(times[0], 'HH:mm');
+      var to = moment(times[1], 'HH:mm');
+      return { danger: now.isAfter(from) && now.isBefore(to) };
+    });
+
+    currentlyInDangerZone = _.any(zones, 'danger');
+
   }
 
   function configureModes() {
@@ -95,12 +111,16 @@ var HaringVisualisation = function() {
       figureDiv.addClass('solid');
     }
 
+    if(entry.type === 'building' && currentlyInDangerZone) {
+      entry.info = 'Building in a Danger Zone !!!';
+    }
     infoDiv.find('.level-1').html(entry.info);
     infoDiv.find('.level-2').text(entry.info2);
 
     var imgExtension = entry.type === 'building' ? '.gif' : '.png';
+    var imgFileName = entry.type === 'building' && currentlyInDangerZone ? 'danger' : entry.type;
     if(!entry.four) {
-      imgTag.attr('src', 'images/' + entry.type + imgExtension);
+      imgTag.attr('src', 'images/' + imgFileName + imgExtension);
     }
 
     // Little hack for announcementFigure in winter mode
@@ -113,20 +133,21 @@ var HaringVisualisation = function() {
     infoDiv.removeClass();
     infoDiv.addClass('info');
 
-    if (entry.color === 'WARM') {
-      imgTag.addClass(randomWarmColor());
-      infoDiv.addClass('orange');
-    } else if (entry.color === 'COLD') {
-      imgTag.addClass(randomColdColor());
-      infoDiv.addClass('green');
-    } else {
-      imgTag.addClass(entry.color);
-      infoDiv.addClass(isWarm(entry.color) ? 'orange' : 'green');
-    }
-
-    if (entry.type === 'building') {
+    if(entry.type === 'building') {
       imgTag.addClass('building');
-      figureDiv.append('<div class="changer"></div>')
+      infoDiv.addClass('blue');
+      infoDiv.addClass('smaller');
+    } else {
+      if (entry.color === 'WARM') {
+        imgTag.addClass(randomWarmColor());
+        infoDiv.addClass('orange');
+      } else if (entry.color === 'COLD') {
+        imgTag.addClass(randomColdColor());
+        infoDiv.addClass('green');
+      } else {
+        imgTag.addClass(entry.color);
+        infoDiv.addClass(isWarm(entry.color) ? 'orange' : 'green');
+      }
     }
 
     var topLeftLettersDiv = $(figureDiv.find('.letters.top-left'));
@@ -219,6 +240,7 @@ var HaringVisualisation = function() {
   function processNewData(haringDescription) {
 
     setBackgroundStyle(haringDescription.background);
+    setDangerZone(haringDescription.dangerZones);
 
     iterateFigures(haringDescription, processFigure);
 
@@ -244,7 +266,7 @@ var HaringVisualisation = function() {
     setBackgroundStyle: setBackgroundStyle
   };
 
-}
+};
 
 var InfoToggler = function (body) {
 

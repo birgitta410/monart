@@ -225,6 +225,11 @@
   height: 100%;
   padding-top: 10%;
 }
+
+.info.smaller .level-1 {
+  font-size: 1.8vw;
+}
+
 .info .level-2 {
   display: none;
 }
