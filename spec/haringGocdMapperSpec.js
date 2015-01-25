@@ -1,6 +1,7 @@
 
 var Q = require('q');
 var _ = require('lodash');
+var tk = require('timekeeper');
 
 describe('Haring Go CD Mapper', function () {
 
@@ -382,6 +383,41 @@ describe('Haring Go CD Mapper', function () {
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
         expect(result.figures[0].time).toEqual(1406193242000);
         done();
+      });
+    });
+
+    describe('fail_too_long', function() {
+      beforeEach(function() {
+        tk.freeze(new Date(2014, 0, 1, 9, 45, 0));
+      });
+
+      afterEach(tk.reset);
+
+      iit('should be the type when build was more than 30 minutes ago', function(done) {
+        fakeActivity = [
+          { name: 'A-PIPELINE :: integration-test :: backend-integration',
+            wasSuccessful: notSuccessfulFn,
+            lastBuildTime: '2014-01-01T09:00:00'
+          }
+        ];
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
+          expect(result.figures[0].type).toEqual('fail_too_long');
+          expect(result.figures[0].info).toContain('45 minutes');
+          done();
+        });
+      });
+
+      it('should not be the type when failed build was less than 30 minutes ago', function(done) {
+        fakeActivity = [
+          { name: 'A-PIPELINE :: integration-test :: backend-integration',
+            wasSuccessful: notSuccessfulFn,
+            lastBuildTime: '2014-01-01T09:40:00'
+          }
+        ];
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
+          expect(result.figures[0].type).toEqual('fail');
+          done();
+        });
       });
     });
 

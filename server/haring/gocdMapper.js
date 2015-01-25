@@ -89,8 +89,7 @@ function haringGocdMapperModule() {
   }
 
   function getMinutesSinceBuild(entry) {
-    // TODO: Use moment.duration().minutes()
-    var millisSinceBuild = moment().diff(entry.lastBuildTime);
+    var millisSinceBuild = moment(new Date()).diff(entry.lastBuildTime);
     return Math.floor(millisSinceBuild / 1000 / 60);
   }
 
