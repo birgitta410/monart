@@ -10,6 +10,7 @@ describe('Haring Go CD Mapper', function () {
   var mockTime = { format: function () { } };
   var fakePipelineHistory, fakeActivity;
   var haringGocdMapper;
+  var configData = {};
 
   var notSuccessfulFn = function () {
     return false;
@@ -35,15 +36,30 @@ describe('Haring Go CD Mapper', function () {
         return defer.promise;
       }
     };
+    var mockConfig = {
+      //config.create('haring').get()
+      create: function() {
+        return {
+          get: function() {
+            return configData
+          }
+        };
+      }
+    };
 
     mockery.enable({
       warnOnUnregistered: false,
       warnOnReplace: false
     });
     mockery.registerMock('gocd-api', { getInstance: function() { return mockGocdApi; }});
+    mockery.registerMock('../ymlHerokuConfig', mockConfig);
 
     haringGocdMapper = require('../server/haring/gocdMapper');
 
+  });
+
+  afterEach(function() {
+    configData = {};
   });
 
   describe('readHistoryAndActivity()', function() {
@@ -388,12 +404,13 @@ describe('Haring Go CD Mapper', function () {
 
     describe('fail_too_long', function() {
       beforeEach(function() {
-        tk.freeze(new Date(2014, 0, 1, 9, 45, 0));
+        var clientDate = new Date(2014, 0, 1, 9, 45, 0);
+        tk.freeze(clientDate);
       });
 
       afterEach(tk.reset);
 
-      iit('should be the type when build was more than 30 minutes ago', function(done) {
+      it('should be the type when build was more than 30 minutes ago', function(done) {
         fakeActivity = [
           { name: 'A-PIPELINE :: integration-test :: backend-integration',
             wasSuccessful: notSuccessfulFn,
@@ -416,6 +433,22 @@ describe('Haring Go CD Mapper', function () {
         ];
         haringGocdMapper.readHistoryAndActivity().then(function (result) {
           expect(result.figures[0].type).toEqual('fail');
+          done();
+        });
+      });
+
+      iit('should take into account a time difference to the server', function(done) {
+        configData.timeDiff = -60;
+        var goServerTimeLastBuild = '2014-01-01T10:00:00';
+        fakeActivity = [
+          { name: 'A-PIPELINE :: integration-test :: backend-integration',
+            wasSuccessful: notSuccessfulFn,
+            lastBuildTime: goServerTimeLastBuild
+          }
+        ];
+        haringGocdMapper.readHistoryAndActivity().then(function (result) {
+          expect(result.figures[0].type).toEqual('fail_too_long');
+          expect(result.figures[0].info).toContain('45 minutes');
           done();
         });
       });

@@ -12,6 +12,7 @@ function haringGocdMapperModule() {
   var IS_BUILDING_BACKGROUND = 'blue';
 
   var haringConfig = config.create('haring').get();
+  var gocdConfig = config.create('gocd').get();
 
   function compareNumbers(a, b) {
     // JS does lexicographical sorting by default, need to sort by number
@@ -89,7 +90,12 @@ function haringGocdMapperModule() {
   }
 
   function getMinutesSinceBuild(entry) {
-    var millisSinceBuild = moment(new Date()).diff(entry.lastBuildTime);
+    var lastBuildTime = moment(entry.lastBuildTime);
+    if(gocdConfig.timeDiff) {
+      lastBuildTime.add(gocdConfig.timeDiff, 'minutes');
+    }
+
+    var millisSinceBuild = moment(new Date()).diff(lastBuildTime);
     return Math.floor(millisSinceBuild / 1000 / 60);
   }
 
@@ -102,17 +108,7 @@ function haringGocdMapperModule() {
     } else if ( ! entry.wasSuccessful() && !lastEntryWasSuccessful) {
       return 'fail_repeated';
     } else {
-      var sinceLast = getMinutesSinceBuild(entry);
-      var acceptableTimeValue = haringConfig.acceptableTimeFailed || '30';
-
-      // TODO: Take possible time difference between build monitor location and GO instance into account
-      if(sinceLast > parseInt(acceptableTimeValue)) {
-        entry.tooLongSinceBuild = sinceLast;
-        return 'fail_too_long';
-      } else {
-        return 'fail';
-      }
-
+      return 'fail';
     }
   }
 
@@ -161,11 +157,19 @@ function haringGocdMapperModule() {
 
     function getFigureTypeForActivity(entry) {
 
+      var type = getFigureType(entry, true);
       if(entry.activity === 'Building') {
-        return 'building';
-      } else {
-        return getFigureType(entry, true);
+        type = 'building';
+      } else if(type === 'fail') {
+        var sinceLast = getMinutesSinceBuild(entry);
+        var acceptableTimeValue = haringConfig.acceptableTimeFailed || '30';
+
+        if(sinceLast > parseInt(acceptableTimeValue)) {
+          entry.tooLongSinceBuild = sinceLast;
+          type = 'fail_too_long';
+        }
       }
+      return type;
     }
 
     function getColor(entry) {
