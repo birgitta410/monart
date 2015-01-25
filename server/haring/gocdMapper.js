@@ -1,5 +1,6 @@
 
 var _ = require('lodash');
+var moment = require('moment');
 var vierGewinnt = require('./vierGewinnt');
 var gocdReader = require('../gocdReader');
 var config = require('../ymlHerokuConfig');
@@ -87,6 +88,12 @@ function haringGocdMapperModule() {
     });
   }
 
+  function getMinutesSinceBuild(entry) {
+    // TODO: Use moment.duration().minutes()
+    var millisSinceBuild = moment().diff(entry.lastBuildTime);
+    return Math.floor(millisSinceBuild / 1000 / 60);
+  }
+
   function getFigureType(entry, lastEntryWasSuccessful) {
 
     if(entry.wasSuccessful() && !lastEntryWasSuccessful) {
@@ -96,7 +103,17 @@ function haringGocdMapperModule() {
     } else if ( ! entry.wasSuccessful() && !lastEntryWasSuccessful) {
       return 'fail_repeated';
     } else {
-      return 'fail';
+      var sinceLast = getMinutesSinceBuild(entry);
+      var acceptableTimeValue = haringConfig.acceptableTimeFailed || '30';
+
+      // TODO: Take possible time difference between build monitor location and GO instance into account
+      if(sinceLast > parseInt(acceptableTimeValue)) {
+        entry.tooLongSinceBuild = sinceLast;
+        return 'fail_too_long';
+      } else {
+        return 'fail';
+      }
+
     }
   }
 
@@ -162,7 +179,14 @@ function haringGocdMapperModule() {
       }
     }
 
-    function getInfo(entry) {
+    function getInfoShort(entry) {
+      var initials = entry.author && entry.author.initials ? entry.author.initials.toUpperCase() : undefined;
+      var tooLong = entry.tooLongSinceBuild ? 'It\'s been ' + entry.tooLongSinceBuild + ' minutes!' : undefined;
+      var stageInfo = entry.stageName + (initials ? '<br>' + initials : '');
+      return tooLong ? tooLong : stageInfo;
+    }
+
+    function getInfoDetailed(entry) {
       var entryTitle = '[' + entry.buildNumber + '] ' + entry.name;
       if(entry.activity === 'Building') {
         return entryTitle + ' is building';
@@ -176,14 +200,13 @@ function haringGocdMapperModule() {
     }
 
     var figures = _.map(activity.jobs, function(entry) {
-      var initials = entry.author && entry.author.initials ? entry.author.initials.toUpperCase() : undefined;
       return {
-        color: getColor(entry),
-        info: entry.stageName + (initials ? '<br>' + initials : ''),
-        info2: getInfo(entry),
         type: getFigureTypeForActivity(entry),
+        color: getColor(entry),
+        info: getInfoShort(entry),
+        info2: getInfoDetailed(entry),
         border: 'dotted',
-        initials: initials,
+        initials: entry.author ? entry.author.initials : undefined,
         time: new Date(entry.lastBuildTime).getTime(),
         key: entry.buildNumber
       }
