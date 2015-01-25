@@ -20,19 +20,14 @@ of latest pipeline run (passed, failed or currently building).
 
 ![Building](designs/haring/sample_building.png?raw=true "Currently building")
 
-### Why so MANY colors and figures?
-
-Green and red, and one figure each for pass and failed would be enough, right? But that would be boring and not look very "Haring like"...
-
-The idea is to show high level information at a glance, and more details if you need them. Yes, first you'll have to figure out and explain what it all means, but usage shows that it's easy to remember afterwards.
-
-And the most important piece of information is very easy to see, by the way: The last run's status is depicted by the background color, good ol' red and green.
-
 ### Need more details?
 
 Click the view to toggle through two different info modes.
 
 ![Info modes](designs/haring/info_modes.png?raw=true "Info modes")
+
+### What else?
+Has a few little surprises in stock, like using the grid as a bingo board, or keeping track of a green streak.
 
 ##SETUP PROJECT
 ```
@@ -59,21 +54,15 @@ http://localhost:5000
 ##Configure and run locally
 Create file `config.yml` in the root of the project and configure as described below.
 
-###Location and access to Go CD
+###Access to Go CD
 ```
 default:
   gocd:
     url: the-go-host:8153
-    pipeline: <name of the pipeline you want to visualise>
+    pipeline: XXX    # name of the pipeline you want to visualise>
     user: xxx
     password: xxxx
-```
-
-If you just want to see an example, without connecting to a server yet, setting 'sample' to true will load some static fixtures to give you an idea:
-```
-default:
-  gocd:
-    sample: true
+    timeDiff: -60    # (in minutes) if the Go server is in a different time zone than where artwise server is running
 ```
 
 ###Filter the jobs to show from CC Tray activity
@@ -87,6 +76,17 @@ default:
       - 'my-pipeline :: integration-test'
       - 'my-pipeline :: deploy'
 ```
+###Haring visualization
+```
+default:
+  haring:
+    dangerZones:
+      - '17:50-23:00'
+    acceptableTimeFailed: 30
+```
+'dangerZones' (optional) are time slots in 24-hour format. If you trigger a build at these times, you will get a visual indicator that maybe now is not a good time to build.
+
+'acceptableTimeFailed' (optional, default is 30) is the number of minutes that is acceptable for a build to stay red. When that period is up, there will be a visual indicator that it is.
 
 ##Configure and run on Heroku
 For each value in the config file, you can create a respective Heroku variable so you won't have to push config.yml to the git repository.
