@@ -13,7 +13,7 @@ var HaringVisualisation = function() {
 
   var FIGURE_BACKGROUND_MODE;
 
-  var currentlyInDangerZone = false;
+  var currentlyInDanger = undefined;
 
   function isWinter() {
     var now = new Date();
@@ -27,10 +27,10 @@ var HaringVisualisation = function() {
       var times = zone.split('-');
       var from = moment(times[0], 'HH:mm');
       var to = moment(times[1], 'HH:mm');
-      return { danger: now.isAfter(from) && now.isBefore(to) };
+      return { danger: now.isAfter(from) && now.isBefore(to), zone: zone };
     });
 
-    currentlyInDangerZone = _.any(zones, 'danger');
+    currentlyInDanger = _.find(zones, 'danger');
 
   }
 
@@ -111,14 +111,14 @@ var HaringVisualisation = function() {
       figureDiv.addClass('solid');
     }
 
-    if(entry.type === 'building' && currentlyInDangerZone) {
-      entry.info = 'Building in a Danger Zone !!!';
+    if(entry.type === 'building' && currentlyInDanger) {
+      entry.info = 'Building in a Danger Zone !!!<br>' + currentlyInDanger.zone;
     }
     infoDiv.find('.level-1').html(entry.info);
     infoDiv.find('.level-2').text(entry.info2);
 
     var imgExtension = entry.type === 'building' || entry.type === 'fail_too_long' ? '.gif' : '.png';
-    var imgFileName = entry.type === 'building' && currentlyInDangerZone ? 'danger' : entry.type;
+    var imgFileName = entry.type === 'building' && currentlyInDanger ? 'danger' : entry.type;
     if(!entry.four) {
       imgTag.attr('src', 'images/' + imgFileName + imgExtension);
     }
