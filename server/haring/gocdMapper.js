@@ -64,9 +64,7 @@ function haringGocdMapperModule() {
       finalFigures.background = activityHaring.background || historyHaring.background;
       finalFigures.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
 
-      if(haringConfig.four === true && finalFigures.background !== IS_BUILDING_BACKGROUND) {
-        vierGewinnt.apply(finalFigures.figures);
-      }
+      vierGewinnt.apply(finalFigures.figures);
 
       return finalFigures;
 
