@@ -106,7 +106,7 @@ describe('Haring Go CD Mapper', function () {
           wasSuccessful: successfulFn,
           time: mockTime,
           author: {
-            initials: 'mmu'
+            initials: 'MMU'
           }
         }
       };
@@ -117,8 +117,8 @@ describe('Haring Go CD Mapper', function () {
         }
       ];
       haringGocdMapper.readHistoryAndActivity().then(function(result) {
-        expect(result.figures[0].initials).toBe('mmu');
-        expect(result.figures[1].initials).toBe('mmu');
+        expect(result.figures[0].initials).toBe('MMU');
+        expect(result.figures[1].initials).toBe('MMU');
         done();
       });
     });
@@ -277,19 +277,19 @@ describe('Haring Go CD Mapper', function () {
         '124': {
           wasSuccessful: successfulFn,
           author: {
-            initials: 'mmu'
+            initials: 'MMU'
           }
         },
         '123': {
           wasSuccessful: notSuccessfulFn,
           author: {
-            initials: 'mmu'
+            initials: 'MMU'
           }
         }
       };
       haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].initials).toBe('mmu');
-        expect(result.figures[1].initials).toBe('mmu');
+        expect(result.figures[0].initials).toBe('MMU');
+        expect(result.figures[1].initials).toBe('MMU');
         done();
       });
     });

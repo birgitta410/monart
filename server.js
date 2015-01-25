@@ -86,6 +86,8 @@ function artwiseServer() {
         function getActivityAndUpdateClients() {
           miroGocdMapper.readHistoryAndActivity().then(function(activityMiro) {
             ws.send(JSON.stringify({ miro: activityMiro }), function() {  });
+          }).fail(function() {
+            console.error('ERROR reading and transforming data', arguments);
           });
         }
 

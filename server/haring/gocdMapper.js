@@ -68,6 +68,8 @@ function haringGocdMapperModule() {
 
       return finalFigures;
 
+    }).fail(function() {
+      console.error('ERROR transforming data', arguments);
     });
 
   };
@@ -79,6 +81,7 @@ function haringGocdMapperModule() {
       });
       if(historyFigureWithSameKey !== undefined) {
         activityFigure.initials = historyFigureWithSameKey.initials;
+        activityFigure.info = activityFigure.info + '<br>' + historyFigureWithSameKey.initials.toUpperCase();
       }
     });
   }
@@ -116,12 +119,13 @@ function haringGocdMapperModule() {
       var entry = history[key];
       var previous = index < keysDescending.length ? history[keysDescending[index + 1]] : undefined;
 
+      var initials = entry.author ? entry.author.initials.toUpperCase() : undefined;
       return {
         color: getColor(entry),
-        info: entry.label,
+        info: entry.label + (initials ? '<br>' + initials : ''),
         info2: entry.info,
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
-        initials: entry.author ? entry.author.initials : undefined,
+        initials: initials,
         time: parseInt(entry.last_scheduled),
         key: key
       };
@@ -171,13 +175,14 @@ function haringGocdMapperModule() {
     }
 
     var figures = _.map(activity.jobs, function(entry) {
+      var initials = entry.author && entry.author.initials ? entry.author.initials.toUpperCase() : undefined;
       return {
         color: getColor(entry),
-        info: entry.stageName,
+        info: entry.stageName + (initials ? '<br>' + initials : ''),
         info2: getInfo(entry),
         type: getFigureTypeForActivity(entry),
         border: 'dotted',
-        initials: entry.author ? entry.author.initials : undefined,
+        initials: initials,
         time: new Date(entry.lastBuildTime).getTime(),
         key: entry.buildNumber
       }

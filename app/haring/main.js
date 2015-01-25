@@ -49,7 +49,7 @@ var HaringVisualisation = function() {
       '<div class="letters top-left"></div>' +
       '<div class="letters bottom-right"></div>';
     var figureWrapperTemplate = '<div class="figure-wrapper">' +
-      '<div class="info"><span class="level-1"></span><span class="level-2"></span></div>' +
+      '<div class="info"><div class="level-1"></div><div class="level-2"></div></div>' +
       '<div class="figure solid">' +
         figureContentTemplate +
       '</div>' +
@@ -95,7 +95,7 @@ var HaringVisualisation = function() {
       figureDiv.addClass('solid');
     }
 
-    infoDiv.find('.level-1').text(entry.info);
+    infoDiv.find('.level-1').html(entry.info);
     infoDiv.find('.level-2').text(entry.info2);
 
     var imgExtension = entry.type === 'building' ? '.gif' : '.png';
