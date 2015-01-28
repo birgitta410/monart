@@ -6,7 +6,7 @@ var _ = require('lodash');
 function ymlHerokuConfigModule() {
 
   var HEROKU_VARS_SUPPORT = [
-    'user', 'password', 'url', 'pipeline', 'jobs', 'key', 'secret', 'account', 'debug', 'dangerzone', 'acceptableTimeFailed'
+    'user', 'password', 'url', 'pipeline', 'jobs', 'key', 'secret', 'account', 'debug', 'dangerzone', 'acceptableTimeFailed', 'timeDiff'
   ];
 
   var create = function (configKey) {
