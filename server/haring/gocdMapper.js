@@ -96,6 +96,7 @@ function haringGocdMapperModule() {
     }
 
     var millisSinceBuild = moment(new Date()).diff(lastBuildTime);
+    console.log('minutes since', millisSinceBuild / 1000 / 60, 'timeDiff', gocdConfig.timeDiff, 'lastBuildTime', entry.lastBuildTime);
     return Math.floor(millisSinceBuild / 1000 / 60);
   }
 
