@@ -192,6 +192,9 @@ var HaringVisualisation = function() {
       var rowDiv = $(allRows[rowIndex]);
 
       var figureWrapperDiv = $(rowDiv.find('.figure-wrapper')[colIndex]);
+      figureWrapperDiv.removeClass();
+      figureWrapperDiv.addClass('figure-wrapper');
+
       var figureDiv = $(figureWrapperDiv.find('.figure'));
 
       if(entry.four) {
