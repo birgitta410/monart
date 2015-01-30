@@ -99,8 +99,12 @@ var HaringVisualisation = function() {
   }
 
   function configureFigureDiv(entry, figureDiv) {
+    var isAnnouncement = figureDiv.hasClass('announcement-figure');
     figureDiv.removeClass();
     figureDiv.addClass('figure');
+    if(isAnnouncement) {
+      figureDiv.addClass('announcement-figure');
+    }
 
     var infoDiv = $(figureDiv.siblings('.info'));
     var imgTag = $(figureDiv.find('.image > img'));
