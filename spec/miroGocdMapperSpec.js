@@ -80,76 +80,17 @@ describe('Miro Go CD Mapper', function () {
         '124': {
           wasSuccessful: notSuccessfulFn,
           "build_cause": {
-            "material_revisions": [
-              {
-                "material": {
-                  "id": 1
-                },
-                "modifications": [
-                  {
-                    "modified_time": 1410000000000,
-                    "id": 5554,
-                    "revision": "cb855ca1516888541722d8c0ed8973792f30ee57",
-                    "comment": "Some comment 5554"
-                  }
-                ],
-                "changed": true
-              },
-              {
-                "material": {
-                  "id": 37
-                },
-                "modifications": [
-                  {
-                    "modified_time": 1418894233000,
-                    "id": 5542,
-                    "revision": "41b4b36cad8684b88ba1866d660bc675dc50e7ed",
-                    "comment": "Some comment 5542"
-                  }
-                ],
-                "changed": false
-              }
+            "files": [
+              { "name":"aFile.txt", action: "modified" }
             ]
           }
         },
         '123': {
           wasSuccessful: notSuccessfulFn,
           "build_cause": {
-            "material_revisions": [
-              {
-                "material": {
-                  "id": 1
-                },
-                "modifications": [
-                  {
-                    "modified_time": 1410000000000,
-                    "id": 5554,
-                    "revision": "cb855ca1516888541722d8c0ed8973792f30ee57",
-                    "comment": "Some comment 5554"
-                  },
-                  {
-                    "modified_time": 1410000000000,
-                    "id": 5555,
-                    "revision": "ab855ca1516888541722d8c0ed8973792f30ee57",
-                    "comment": "Some comment 5555"
-                  }
-                ],
-                "changed": true
-              },
-              {
-                "material": {
-                  "id": 37
-                },
-                "modifications": [
-                  {
-                    "modified_time": 1418894233000,
-                    "id": 5542,
-                    "revision": "41b4b36cad8684b88ba1866d660bc675dc50e7ed",
-                    "comment": "Some comment 5542"
-                  }
-                ],
-                "changed": false
-              }
+            "files": [
+              { "name":"aFile.txt", action: "modified" },
+              { "name":"aFile.txt", action: "modified" }
             ]
           }
         }

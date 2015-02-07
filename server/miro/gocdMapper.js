@@ -6,8 +6,7 @@ function miroGocdMapperModule() {
   function mapSize(entry) {
 
     if(entry['build_cause']) {
-      var changedRevision = _.find(entry['build_cause']['material_revisions'], 'changed');
-      var numberOfModifications = changedRevision.modifications.length;
+      var numberOfModifications = entry['build_cause'].files ? entry['build_cause'].files.length : 0;
       if(numberOfModifications <= 1) {
         return 'small';
       } else if(numberOfModifications <= 3) {

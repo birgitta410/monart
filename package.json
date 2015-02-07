@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "dependencies": {
     "express": "3.x",
-    "gocd-api": "^0.4.0",
+    "gocd-api": "git://github.com/birgitta410/gocd-api.git#WIP",
     "lodash": "~2.4.1",
     "moment": "^2.9.0",
     "node-yaml-config": "0.0.2",
