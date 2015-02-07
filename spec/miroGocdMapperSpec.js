@@ -71,37 +71,92 @@ describe('Miro Go CD Mapper', function () {
 
     });
 
-    it('should set the size of stones according to the size of changes', function (done) {
+    iit('should set the size of stones according to the size of changes', function (done) {
+
       fakePipelineHistory = {
         '125': {
           wasSuccessful: notSuccessfulFn
         },
         '124': {
           wasSuccessful: notSuccessfulFn,
-          materials: [
-            {
-              "stats": {
-                "total": 153,
-                "filesChanged": 10
+          "build_cause": {
+            "material_revisions": [
+              {
+                "material": {
+                  "id": 1
+                },
+                "modifications": [
+                  {
+                    "modified_time": 1410000000000,
+                    "id": 5554,
+                    "revision": "cb855ca1516888541722d8c0ed8973792f30ee57",
+                    "comment": "Some comment 5554"
+                  }
+                ],
+                "changed": true
+              },
+              {
+                "material": {
+                  "id": 37
+                },
+                "modifications": [
+                  {
+                    "modified_time": 1418894233000,
+                    "id": 5542,
+                    "revision": "41b4b36cad8684b88ba1866d660bc675dc50e7ed",
+                    "comment": "Some comment 5542"
+                  }
+                ],
+                "changed": false
               }
-            }
-          ]
+            ]
+          }
         },
         '123': {
           wasSuccessful: notSuccessfulFn,
-          materials: [
-            {
-              "stats": {
-                "total": 40,
-                "filesChanged": 2
+          "build_cause": {
+            "material_revisions": [
+              {
+                "material": {
+                  "id": 1
+                },
+                "modifications": [
+                  {
+                    "modified_time": 1410000000000,
+                    "id": 5554,
+                    "revision": "cb855ca1516888541722d8c0ed8973792f30ee57",
+                    "comment": "Some comment 5554"
+                  },
+                  {
+                    "modified_time": 1410000000000,
+                    "id": 5555,
+                    "revision": "ab855ca1516888541722d8c0ed8973792f30ee57",
+                    "comment": "Some comment 5555"
+                  }
+                ],
+                "changed": true
+              },
+              {
+                "material": {
+                  "id": 37
+                },
+                "modifications": [
+                  {
+                    "modified_time": 1418894233000,
+                    "id": 5542,
+                    "revision": "41b4b36cad8684b88ba1866d660bc675dc50e7ed",
+                    "comment": "Some comment 5542"
+                  }
+                ],
+                "changed": false
               }
-            }
-          ]
+            ]
+          }
         }
       };
       miroGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.stones[0].size).toBe('large');
-        expect(result.stones[1].size).toBe('small');
+        expect(result.stones[0].size).toBe('small'); // 1 modification
+        expect(result.stones[1].size).toBe('medium'); // 2 modifications
         done();
       });
 

@@ -3,56 +3,25 @@ var gocdReader = require('../gocdReader');
 
 function miroGocdMapperModule() {
 
-  var createChangeSizer = function(history) {
+  function mapSize(entry) {
 
-    var changeSizes = _.map(_.keys(history), function(key) {
-      var entry = history[key];
-      if(entry.materials) {
-
-        var changeSize = _.reduce(entry.materials, function(value, material) {
-          if(material.stats) { // TODO: What makes sense to calculate the size of a change?
-            var factor = 1;
-            if(material.stats.filesChanged > 2) {
-              factor = material.stats.filesChanged / 2;
-            }
-            var size = material.stats.total * factor;
-            return value + size;
-          } else {
-            return -1;
-          }
-        }, 0);
-        entry.changeSize = changeSize;
-        return changeSize;
-
+    if(entry['build_cause']) {
+      var changedRevision = _.find(entry['build_cause']['material_revisions'], 'changed');
+      var numberOfModifications = changedRevision.modifications.length;
+      if(numberOfModifications <= 1) {
+        return 'small';
+      } else if(numberOfModifications <= 3) {
+        return 'medium';
       } else {
-        return -1;
+        return 'large';
       }
-
-    });
-
-    var max = Math.max.apply( Math, changeSizes);
-
-    function getSize(entrySize) {
-      var sizeFactor = entrySize / max * 100;
-      var size = 'small';
-      if(sizeFactor >= 70) {
-        size = 'large';
-      } else if(sizeFactor >= 35) {
-        size = 'medium';
-      }
-      return size;
     }
-
-    return {
-      getSize: getSize
-    };
-  };
+  }
 
   var readHistoryAndActivity = function() {
     return gocdReader.readData().then(function(data) {
 
       var history = data.history;
-      var changeSizer = createChangeSizer(history);
 
       var keysDescending = _.keys(history).sort(function(a, b) {
         return a - b; // JS does lexicographical sorting by default, need to sort by number
@@ -69,7 +38,7 @@ function miroGocdMapperModule() {
       finalShapes.stones = _.map(keysDescending.splice(1), function(key) {
         var entry = history[key];
 
-        var size = changeSizer.getSize(entry.changeSize);
+        var size = mapSize(entry);
         return {
           size: size,
           color: entry.wasSuccessful() ? 'black' : 'red',
