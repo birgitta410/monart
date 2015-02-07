@@ -90,6 +90,8 @@ describe('Miro Go CD Mapper', function () {
           "build_cause": {
             "files": [
               { "name":"aFile.txt", action: "modified" },
+              { "name":"aFile.txt", action: "modified" },
+              { "name":"aFile.txt", action: "created" },
               { "name":"aFile.txt", action: "modified" }
             ]
           }

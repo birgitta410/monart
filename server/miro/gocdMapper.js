@@ -7,9 +7,9 @@ function miroGocdMapperModule() {
 
     if(entry['build_cause']) {
       var numberOfModifications = entry['build_cause'].files ? entry['build_cause'].files.length : 0;
-      if(numberOfModifications <= 1) {
+      if(numberOfModifications <= 3) {
         return 'small';
-      } else if(numberOfModifications <= 3) {
+      } else if(numberOfModifications <= 6) {
         return 'medium';
       } else {
         return 'large';
@@ -41,7 +41,7 @@ function miroGocdMapperModule() {
         return {
           size: size,
           color: entry.wasSuccessful() ? 'black' : 'red',
-          info: entry.info + ' ' + size
+          info: entry.info + ' ' + (entry['build_cause'].files ? entry['build_cause'].files.length + ' changes' : 'no changes')
         };
       });
 
