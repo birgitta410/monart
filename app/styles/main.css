@@ -1,4 +1,22 @@
+.container {
+    -webkit-box-orient: vertical;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+}
 
+#status-message {
+    display: none;
+    position: absolute;
+    top: 20%;
+    left: 35%;
+    z-index: 50;
+    background-color: grey;
+    height: 14%;
+    width: 30%;
+    text-align: center;
+}
+
+/**********************************************/
 .browsehappy {
     margin: 0.2em 0;
     background: #ccc;

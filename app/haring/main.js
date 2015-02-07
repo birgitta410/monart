@@ -306,51 +306,15 @@ var InfoToggler = function (body) {
 
 var haringVisualisation = new HaringVisualisation();
 
-var LAST_PING = new Date();
-var PING_INTERVAL = 5 * 60 * 1000;
-
 var wsHost = 'ws://' + window.location.host;
 var ws = new WebSocket(wsHost + '/haring');
+artwise.initPing(ws, function() {
+  haringVisualisation.setBackgroundStyle('grey');
+});
 
 ws.onmessage = function (event) {
-
-  var data = JSON.parse(event.data);
-  var statusMessage = $('#status-message');
-  var statusProgress = $('#status-progress');
-  if (data.haring) {
-    statusMessage.hide();
-    statusProgress.text('.');
-
-    haringVisualisation.processNewData(data.haring);
-
-  } else if (data.loading === true) {
-    statusMessage.show();
-    var progress = statusProgress.text() + '.';
-    statusProgress.text(progress);
-  } else if (data.ping) {
-    LAST_PING = new Date();
-    console.log('ping success - still connected to server', LAST_PING);
-  }
-
+  artwise.processMessage(event, 'haring', haringVisualisation.processNewData);
 };
-
-// Let server know we're still watching (Keep alive Heroku)
-setInterval(function () {
-
-  var timeSinceLastPing = new Date() - LAST_PING;
-  if (timeSinceLastPing > (PING_INTERVAL * 1.1)) {
-    console.log('Last successful ping too long ago', timeSinceLastPing);
-    haringVisualisation.setBackgroundStyle('grey');
-    window.location = window.location;
-  }
-
-  var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open("GET", location.origin + '/alive', false);
-  xmlHttp.send(null);
-
-  ws.send('ping');
-
-}, PING_INTERVAL);
 
 var body = $('body');
 var toggler = InfoToggler(body);
