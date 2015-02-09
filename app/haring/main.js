@@ -21,6 +21,10 @@ var HaringVisualisation = function() {
   }
 
   function setDangerZone(dangerZoneDefinitions) {
+    if(dangerZoneDefinitions === undefined) {
+      return false;
+    }
+
     var now = moment();
 
     var zones = _.map(dangerZoneDefinitions.split(','), function(zone) {
