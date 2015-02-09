@@ -23,7 +23,7 @@ var HaringVisualisation = function() {
   function setDangerZone(dangerZoneDefinitions) {
     var now = moment();
 
-    var zones = _.map(dangerZoneDefinitions, function(zone) {
+    var zones = _.map(dangerZoneDefinitions.split(','), function(zone) {
       var times = zone.split('-');
       var from = moment(times[0], 'HH:mm');
       var to = moment(times[1], 'HH:mm');
