@@ -110,6 +110,10 @@ heroku config:set GOCD_USER=xxx
 heroku config:set GOCD_PASSWORD=xxx
 heroku config:set GOCD_JOBS="my-pipeline :: build,my-pipeline :: integration-test,my-pipeline :: deploy"
 
+# Configure haring settings (optional)
+heroku config:set HARING_DANGERZONES="17:50-23:00"
+heroku config:set HARING_ACCEPTABLETIMEFAILED="60"
+
 # Deploy code
 git push heroku master
 
