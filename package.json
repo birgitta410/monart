@@ -12,6 +12,9 @@
     "ws": "~0.4.31",
     "xml2json": "~0.4.0"
   },
+  "engines" : {
+    "node": "0.10.35"
+  },
   "devDependencies": {
     "jasmine-node": "~1.14.5",
     "mockery": "~1.4.0",
