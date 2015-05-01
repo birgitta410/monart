@@ -55,8 +55,8 @@ BezierPlotter = function(pos1, pos2, pos3, pos4)
 
 BezierPlotter.prototype.definePoint = function(index, pos)
 {
-  this["p" + index + "x"] = pos._x;
-  this["p" + index + "y"] = pos._y;
+  this["p" + index + "x"] = pos.x;
+  this["p" + index + "y"] = pos.y;
 };
 
 BezierPlotter.prototype.setupProps = function(speed){
@@ -93,17 +93,17 @@ function getBezRand(){
 
 function doBezTrail(startX, startY, trailTarget) {
 
-  var startPt = {_x: startX, _y: startY};
+  var startPt = {x: startX, y: startY};
 
   var ctrl1x = getBezRand();
   var ctrl1y = getBezRand();
   var ctrl2x = getBezRand();
   var ctrl2y = getBezRand();
 
-  var ctrl1 = {_x: startPt._x + ctrl1x, _y: startPt._y + ctrl1y};
-  var ctrl2 = {_x: trailTarget._x + ctrl2x, _y: trailTarget._y + ctrl2y};
+  var ctrl1 = {x: startPt.x + ctrl1x, y: startPt.y + ctrl1y};
+  var ctrl2 = {x: trailTarget.x + ctrl2x, y: trailTarget.y + ctrl2y};
 
-  var endPt = {_x: trailTarget._x, _y: trailTarget._y};
+  var endPt = {x: trailTarget.x, y: trailTarget.y};
 
   var bezPlot = new BezierPlotter(startPt, ctrl1, ctrl2, endPt);
   bezPlot.setupProps(30);
@@ -114,6 +114,8 @@ function doBezTrail(startX, startY, trailTarget) {
 
   return {
     points: plottedPoints,
+    start: startPt,
+    end: endPt,
     ctrl1: {
       x: ctrl1x,
       y: ctrl1y
@@ -123,4 +125,6 @@ function doBezTrail(startX, startY, trailTarget) {
       y: ctrl2y
     }
   };
+
+
 };

@@ -12,29 +12,13 @@
 
 <canvas id="myCanvas" width="900" height="700" style="border: 1px solid #000; -webkit-transform: translate(-289.3125,-336.47751)"></canvas>
 
-<script src="bezierPlotter.js"></script>
 <script src="../libs/lodash.min.js"></script>
+<script src="libs/processing.js"></script>
+<script src="bezierPlotter.js"></script>
+<script src="sketch.js"></script>
 <script>
     var canvas = document.getElementById('myCanvas');
     var context = canvas.getContext('2d');
-
-    var trail = doBezTrail(200, 100, { _x: 500, _y: 400});
-    var points = trail.points;
-
-    context.strokeStyle = 'black';
-    context.moveTo(points[0][0], points[0][1]);
-    _.each(points, function(point) {
-        context.lineTo(point[0], point[1]);
-    });
-    context.stroke();
-
-    function orZero(value) {
-        return value > 0 ? value : 0;
-    }
-
-    context.fillStyle = 'red';
-    context.fillRect(orZero(trail.ctrl1.x), orZero(trail.ctrl1.y), 5, 5);
-    context.fillRect(orZero(trail.ctrl2.x), orZero(trail.ctrl2.y), 5, 5);
 
 </script>
 
