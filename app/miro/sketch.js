@@ -53,7 +53,7 @@ function Miro(P) {
 
       P.fill(redFactor, greenFactor, blueFactor);
       _.each(trail.points, function (point) {
-        P.rect(point[0], point[1], 5, 5);
+        P.rect(point.x, point.y, 5, 5);
       });
       function orZero(value) {
         return value > 0 ? value : 0;
@@ -73,7 +73,7 @@ function Miro(P) {
 
     trails = [
       doBezTrail({ x: 200, y: 100 }, { x: 500, y: 400}),
-      doBezTrail({ x: 500, y: 400 }, { x: 800, y: 700})
+      doBezTrail({ x: 500, y: 400 }, { x: 800, y: 650})
     ];
     _.each(trails, function(trail, i) {
       trail.index = 0;
@@ -92,7 +92,7 @@ function Miro(P) {
 
       drawControlPoints();
 
-      P.ellipse(trail.points[trail.index][0], trail.points[trail.index][1], 20, 20);
+      P.ellipse(trail.points[trail.index].x, trail.points[trail.index].y, 20, 20);
 
       trail.index ++;
       if(trail.points.length <= trail.index) {

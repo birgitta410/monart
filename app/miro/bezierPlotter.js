@@ -8,16 +8,10 @@
 BezierPlotter = function(pos1, pos2, pos3, pos4)
 {
   this.setupProps(50);
-  this.definePoint(1, pos1);
-  this.definePoint(2, pos2);
-  this.definePoint(3, pos3);
-  this.definePoint(4, pos4);
-};
-
-BezierPlotter.prototype.definePoint = function(index, pos)
-{
-  this["p" + index + "x"] = pos.x;
-  this["p" + index + "y"] = pos.y;
+  this.p1 = pos1;
+  this.p2 = pos2;
+  this.p3 = pos3;
+  this.p4 = pos4;
 };
 
 BezierPlotter.prototype.setupProps = function(speed){
@@ -27,21 +21,20 @@ BezierPlotter.prototype.setupProps = function(speed){
 BezierPlotter.prototype.plotPoints = function()
 {
 
-  this.cx = 3 * (this.p2x - this.p1x);
-  this.cy = 3 * (this.p2y - this.p1y);
+  this.cx = 3 * (this.p2.x - this.p1.x);
+  this.cy = 3 * (this.p2.y - this.p1.y);
 
-  this.bx = 3 * (this.p3x - this.p2x) - this.cx;
-  this.by = 3 * (this.p3y - this.p2y) - this.cy;
+  this.bx = 3 * (this.p3.x - this.p2.x) - this.cx;
+  this.by = 3 * (this.p3.y - this.p2.y) - this.cy;
 
-  this.ax = this.p4x - this.p1x - this.cx - this.bx;
-  this.ay = this.p4y - this.p1y - this.cy - this.by;
+  this.ax = this.p4.x - this.p1.x - this.cx - this.bx;
+  this.ay = this.p4.y - this.p1.y - this.cy - this.by;
 
   var ary_return = [];
   for(var i = 0; i <= 1; i += this.speed){
-    var obj_temp = [];
-    obj_temp[0] = (this.ax * (i * i * i)) + (this.bx * (i  * i)) + (this.cx * i) + this.p1x;
-    obj_temp[1] = (this.ay * (i * i * i)) + (this.by * (i  * i)) + (this.cy * i) + this.p1y;
-    ary_return.push(obj_temp);
+    var x = (this.ax * (i * i * i)) + (this.bx * (i  * i)) + (this.cx * i) + this.p1.x;
+    var y = (this.ay * (i * i * i)) + (this.by * (i  * i)) + (this.cy * i) + this.p1.y;
+    ary_return.push({ x: x, y: y });
   }
   this.points = ary_return;
   return this.points;
