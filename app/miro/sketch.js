@@ -10,7 +10,7 @@ function Miro(P) {
     var endPt = {x: endPt.x, y: endPt.y};
 
     var bezPlot = new BezierPlotter(startPt, cp1, cp2, endPt);
-    bezPlot.setupProps(50);
+    bezPlot.setupProps(100);
 
     var plottedPoints = bezPlot.plotPoints();
     console.log('bezier control points factors', cp1.x, cp1.y, cp2.x, cp2.y);
@@ -138,20 +138,33 @@ function Miro(P) {
     var firstPoint = _.first(trails).start;
     P.vertex(firstPoint.x, firstPoint.y);
     _.each(trails, function(trail) {
-
       P.bezierVertex(trail.cp1.x, trail.cp1.y, trail.cp2.x, trail.cp2.y, trail.end.x, trail.end.y);
-
-      P.ellipse(trail.points[trail.index].x, trail.points[trail.index].y, 20, 20);
       drawControlPoints();
-
-      trail.index ++;
-      if(trail.points.length <= trail.index) {
-        trail.index = 0;
-      }
     });
     P.stroke(0, 0, 0);
     P.endShape();
 
+    var sliceSize = 20;
+    _.each(trails, function(trail) {
+      //P.ellipse(trail.points[trail.index].x, trail.points[trail.index].y, 20, 20);
+
+      var pointSubset = trail.points.slice(trail.index, trail.index + sliceSize);
+
+      var f = _.first(pointSubset);
+      var l = _.last(pointSubset);
+      P.fill(255, 0, 0);
+      P.curve(f.x, f.y-120, f.x, f.y, l.x, l.y, l.x, l.y-80);
+      P.fill(0, 0, 0);
+      P.curve(f.x, f.y+150, f.x, f.y, l.x, l.y, l.x, l.y+100);
+
+      P.noFill();
+      P.strokeWeight(1);
+
+      trail.index ++;
+      if(trail.points.length <= trail.index + sliceSize) {
+        trail.index = 0;
+      }
+    });
 
   };
 
