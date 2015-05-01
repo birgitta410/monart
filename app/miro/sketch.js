@@ -52,15 +52,19 @@ function Miro(P) {
 
   function drawControlPoints() {
 
+    P.stroke(255, 0, 0);
+    P.line(line1.x, line1.y, line2.x, line2.y);
+    P.line(line2.x, line2.y, line3.x, line3.y);
+
     _.each(trails, function(trail) {
       var redFactor = Math.min(255, (trail.id * 2 + 1) * 50);
       var greenFactor = Math.min(255, (trail.id * 2  + 1) * 60);
       var blueFactor = Math.min(255, (trail.id * 2  + 1) * 100);
 
       P.fill(redFactor, greenFactor, blueFactor);
-      _.each(trail.points, function (point) {
-        P.rect(point.x, point.y, 5, 5);
-      });
+      //_.each(trail.points, function (point) {
+      //  P.rect(point.x, point.y, 5, 5);
+      //});
       function orZero(value) {
         return value > 0 ? value : 0;
       }
@@ -76,17 +80,51 @@ function Miro(P) {
     P.noFill();
   }
 
+  function getPointOnStraightLine(start, end) {
+    var tx = end.x - start.x,
+      ty = end.y - start.y,
+      dist = Math.sqrt(tx*tx+ty*ty);
+
+    var thrust = 100;
+    var velX = (tx/dist)*thrust;
+    var velY = (ty/dist)*thrust;
+    return {
+      x: start.x + velX,
+      y: start.y + velY
+    };
+  }
+
+  var line1, line2, line3;
+
   P.setup = function() {
 
     P.smooth(8);
     P.size(900, 700);
 
+    var start = { x: 50, y: 350 };
+
+    var a = {
+      start: start,
+      cp1: {x: 160, y: 460 },
+      cp2: {x: 290, y: 400 }
+    };
+
+    var b = {
+      cp1: { x: 450, y: 360 },
+      cp2: { x: 490, y: 320 },
+      end: { x: 860, y: 360}
+    };
+
+    // In order to make two curves A and B smoothly continuous, the last control point of A, the last point of A,
+    // and the first control point of B have to be on a straight line.
+    a.end = b.start = getPointOnStraightLine(a.cp2, b.cp1);
+    line1 = a.cp2, line2 = a.end, line3 = b.cp1;
+
     trails = [
-      doBezTrailRandomControls({ x: 200, y: 100 }, { x: 500, y: 400}),
-      doBezTrailRandomControls({ x: 500, y: 400 }, { x: 800, y: 650}),
-      doBezTrail({ x: 60, y: 10 }, { x: 50, y: 50}, { x: 200, y: 100}, { x: 100, y: 200}),
-      doBezTrail({ x: 100, y: 200 }, { x: 40, y: 260}, { x: 150, y: 280}, { x: 240, y: 240})
+      doBezTrail(a.start, a.cp1, a.cp2, a.end),
+      doBezTrail(b.start, b.cp1, b.cp2, b.end)
     ];
+
     _.each(trails, function(trail, i) {
       trail.index = 0;
       trail.id = i;
@@ -97,7 +135,6 @@ function Miro(P) {
   P.draw = function() {
 
     P.background(255);
-    P.stroke(0, 0, 0);
 
     P.beginShape();
     var firstPoint = _.first(trails).start;
@@ -106,14 +143,15 @@ function Miro(P) {
 
       P.bezierVertex(trail.ctrl1.x, trail.ctrl1.y, trail.ctrl2.x, trail.ctrl2.y, trail.end.x, trail.end.y);
 
-      drawControlPoints();
       P.ellipse(trail.points[trail.index].x, trail.points[trail.index].y, 20, 20);
+      drawControlPoints();
 
       trail.index ++;
       if(trail.points.length <= trail.index) {
         trail.index = 0;
       }
     });
+    P.stroke(0, 0, 0);
     P.endShape();
 
 
