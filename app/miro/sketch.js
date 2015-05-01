@@ -84,23 +84,36 @@ function Miro(P) {
     P.smooth(8);
     P.size(900, 700);
 
+    function rand() {
+      return (Math.floor(Math.random() * 8) + 1) / 10 + 1;
+    }
+
+
     var start = { x: 50, y: 350 };
     var end = { x: 890, y: 345 };
+    var xFactor = 90;
+    var yFactor = 50;
+
+    var x = start.x;
+    function incX() {
+      x += xFactor * rand();
+      return x;
+    }
 
     var a = {
       start: start,
-      cp1: {x: 160, y: 460 },
-      cp2: {x: 290, y: 400 }
+      cp1: {x: start.x + incX(), y: start.y + (yFactor*rand()) },
+      cp2: {x: start.x + incX(), y: start.y - (yFactor*rand()) }
     };
 
     var b = {
-      cp1: { x: 450, y: 360 },
-      cp2: { x: 490, y: 330 }
+      cp1: { x: start.x + incX(), y: start.y + (yFactor*rand()) },
+      cp2: { x: start.x + incX(), y: start.y - (yFactor*rand()) }
     };
 
     var c = {
-      cp1: { x: 710, y: 310 },
-      cp2: { x: 800, y: 370 },
+      cp1: { x: start.x + incX(), y: start.y + (yFactor*rand()) },
+      cp2: { x: start.x + incX(), y: start.y - (yFactor*rand()) },
       end: end
     };
 
