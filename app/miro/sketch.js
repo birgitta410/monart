@@ -9,15 +9,7 @@ function Miro(P) {
     return (Math.random()*gBezMaxRand)-gBezMaxRand/2;
   }
 
-  function doBezTrail(startPt, endPt) {
-
-    var ctrl1x = getBezRand();
-    var ctrl1y = getBezRand();
-    var ctrl2x = getBezRand();
-    var ctrl2y = getBezRand();
-
-    var ctrl1 = {x: startPt.x + ctrl1x, y: startPt.y + ctrl1y};
-    var ctrl2 = {x: endPt.x + ctrl2x, y: endPt.y + ctrl2y};
+  function doBezTrail(startPt, ctrl1, ctrl2, endPt) {
 
     var endPt = {x: endPt.x, y: endPt.y};
 
@@ -25,7 +17,7 @@ function Miro(P) {
     bezPlot.setupProps(50);
 
     var plottedPoints = bezPlot.plotPoints();
-    console.log('bezier control points factors', ctrl1x, ctrl1y, ctrl2x, ctrl2y);
+    console.log('bezier control points factors', ctrl1.x, ctrl1.y, ctrl2.x, ctrl2.y);
     console.log('number of points', plottedPoints.length);
 
     return {
@@ -44,6 +36,20 @@ function Miro(P) {
 
   }
 
+  function doBezTrailRandomControls(startPt, endPt) {
+
+    var ctrl1x = getBezRand();
+    var ctrl1y = getBezRand();
+    var ctrl2x = getBezRand();
+    var ctrl2y = getBezRand();
+
+    var ctrl1 = {x: startPt.x + ctrl1x, y: startPt.y + ctrl1y};
+    var ctrl2 = {x: endPt.x + ctrl2x, y: endPt.y + ctrl2y};
+
+    return doBezTrail(startPt, ctrl1, ctrl2, endPt);
+
+  }
+
   function drawControlPoints() {
 
     _.each(trails, function(trail) {
@@ -59,8 +65,12 @@ function Miro(P) {
         return value > 0 ? value : 0;
       }
 
-      P.rect(orZero(trail.ctrl1.x), orZero(trail.ctrl1.y), 5, 5);
-      P.rect(orZero(trail.ctrl2.x), orZero(trail.ctrl2.y), 5, 5);
+      if(trail.ctrl1) {
+        P.rect(orZero(trail.ctrl1.x), orZero(trail.ctrl1.y), 5, 5);
+      }
+      if(trail.ctrl2) {
+        P.rect(orZero(trail.ctrl2.x), orZero(trail.ctrl2.y), 5, 5);
+      }
     });
 
     P.noFill();
@@ -72,8 +82,10 @@ function Miro(P) {
     P.size(900, 700);
 
     trails = [
-      doBezTrail({ x: 200, y: 100 }, { x: 500, y: 400}),
-      doBezTrail({ x: 500, y: 400 }, { x: 800, y: 650})
+      doBezTrailRandomControls({ x: 200, y: 100 }, { x: 500, y: 400}),
+      doBezTrailRandomControls({ x: 500, y: 400 }, { x: 800, y: 650}),
+      doBezTrail({ x: 60, y: 10 }, { x: 50, y: 50}, { x: 200, y: 100}, { x: 100, y: 200}),
+      doBezTrail({ x: 100, y: 200 }, { x: 40, y: 260}, { x: 150, y: 280}, { x: 240, y: 240})
     ];
     _.each(trails, function(trail, i) {
       trail.index = 0;
@@ -87,11 +99,14 @@ function Miro(P) {
     P.background(255);
     P.stroke(0, 0, 0);
 
+    P.beginShape();
+    var firstPoint = _.first(trails).start;
+    P.vertex(firstPoint.x, firstPoint.y);
     _.each(trails, function(trail) {
-      P.bezier(trail.start.x, trail.start.y, trail.ctrl1.x, trail.ctrl1.y, trail.ctrl2.x, trail.ctrl2.y, trail.end.x, trail.end.y);
+
+      P.bezierVertex(trail.ctrl1.x, trail.ctrl1.y, trail.ctrl2.x, trail.ctrl2.y, trail.end.x, trail.end.y);
 
       drawControlPoints();
-
       P.ellipse(trail.points[trail.index].x, trail.points[trail.index].y, 20, 20);
 
       trail.index ++;
@@ -99,6 +114,7 @@ function Miro(P) {
         trail.index = 0;
       }
     });
+    P.endShape();
 
 
   };
