@@ -130,6 +130,7 @@ function Miro(P) {
 
   };
 
+  var index = 0;
   P.draw = function() {
 
     P.background(255);
@@ -145,26 +146,26 @@ function Miro(P) {
     P.endShape();
 
     var sliceSize = 20;
-    _.each(trails, function(trail) {
-      //P.ellipse(trail.points[trail.index].x, trail.points[trail.index].y, 20, 20);
+    var allPoints = _.flatten(_.pluck(trails, 'points'));
 
-      var pointSubset = trail.points.slice(trail.index, trail.index + sliceSize);
+    //P.ellipse(allPoints[index].x, allPoints[index].y, 20, 20);
 
-      var f = _.first(pointSubset);
-      var l = _.last(pointSubset);
-      P.fill(255, 0, 0);
-      P.curve(f.x, f.y-120, f.x, f.y, l.x, l.y, l.x, l.y-80);
-      P.fill(0, 0, 0);
-      P.curve(f.x, f.y+150, f.x, f.y, l.x, l.y, l.x, l.y+100);
+    var pointSubset = allPoints.slice(index, index + sliceSize);
 
-      P.noFill();
-      P.strokeWeight(1);
+    var f = _.first(pointSubset);
+    var l = _.last(pointSubset);
+    P.fill(255, 0, 0);
+    P.curve(f.x, f.y-120, f.x, f.y, l.x, l.y, l.x, l.y-80);
+    P.fill(0, 0, 0);
+    P.curve(f.x, f.y+150, f.x, f.y, l.x, l.y, l.x, l.y+100);
 
-      trail.index ++;
-      if(trail.points.length <= trail.index + sliceSize) {
-        trail.index = 0;
-      }
-    });
+    P.noFill();
+    P.strokeWeight(1);
+
+    index ++;
+    if(allPoints.length <= index + sliceSize) {
+      index = 0;
+    }
 
   };
 
