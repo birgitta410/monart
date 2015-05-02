@@ -1,11 +1,11 @@
 
-function Miro(P) {
-  console.log('drawing Miro');
+function MiroConstellations(P) {
+  console.log('drawing MiroConstellations');
 
   var backgroundImg;
 
-  var trails = [];
-  var tangents = [];
+  var waveTrails = [];
+  var _tangents = [];
 
   var red = {r: 198, g: 45, b: 39 };
   var black = {r: 0, g: 0, b: 0 };
@@ -45,12 +45,12 @@ function Miro(P) {
 
     color(P.stroke, red);
 
-    _.each(tangents, function(tangent) {
+    _.each(_tangents, function(tangent) {
       P.line(tangent.p.x, tangent.p.y, tangent.q.x, tangent.q.y);
       P.line(tangent.q.x, tangent.q.y, tangent.r.x, tangent.r.y);
     });
 
-    _.each(trails, function(trail) {
+    _.each(waveTrails, function(trail) {
       var redFactor = Math.min(255, (trail.id * 2 + 1) * 50);
       var greenFactor = Math.min(255, (trail.id * 2  + 1) * 60);
       var blueFactor = Math.min(255, (trail.id * 2  + 1) * 100);
@@ -119,7 +119,7 @@ function Miro(P) {
     // and the first control point of B have to be on a straight line.
     function connect(trail1, trail2) {
       trail1.end = trail2.start = getPointOnStraightLine(trail1.cp2, trail2.cp1);
-      tangents.push({
+      _tangents.push({
         p: trail1.cp2,
         q: trail1.end,
         r: trail2.cp1
@@ -128,13 +128,13 @@ function Miro(P) {
     connect(b, c);
     connect(a, b);
 
-    trails = [
+    waveTrails = [
       doBezTrail(a.start, a.cp1, a.cp2, a.end),
       doBezTrail(b.start, b.cp1, b.cp2, b.end),
       doBezTrail(c.start, c.cp1, c.cp2, c.end)
     ];
 
-    _.each(trails, function(trail, i) {
+    _.each(waveTrails, function(trail, i) {
       trail.index = 0;
       trail.id = i;
     });
@@ -145,12 +145,12 @@ function Miro(P) {
     pFct(color.r, color.g, color.b);
   }
 
-  function drawSpiral(cx, cy, width, height) {
+  function drawSpiral(cx, cy, size) {
 
     var angle_incr = P.radians(2 + 100/12.0);
     var numPoints = 100;
 
-    var outer_rad = width*.45;
+    var outer_rad = size*.45;
 
     var spiralPoints = [];
 
@@ -231,7 +231,7 @@ function Miro(P) {
     P.image(backgroundImg, 0, 0);
 
     var sliceSize = 20;
-    var allPoints = _.flatten(_.pluck(trails, 'points'));
+    var allPoints = _.flatten(_.pluck(waveTrails, 'points'));
 
     drawPlanet(allPoints.slice(index, index + sliceSize));
     drawPlanet(allPoints.slice(20, 60), {
@@ -243,9 +243,9 @@ function Miro(P) {
     });
 
     P.beginShape();
-    var firstPoint = _.first(trails).start;
+    var firstPoint = _.first(waveTrails).start;
     P.vertex(firstPoint.x, firstPoint.y);
-    _.each(trails, function(trail) {
+    _.each(waveTrails, function(trail) {
       P.bezierVertex(trail.cp1.x, trail.cp1.y, trail.cp2.x, trail.cp2.y, trail.end.x, trail.end.y);
       //drawControlPoints();
     });
@@ -253,7 +253,7 @@ function Miro(P) {
     P.endShape();
 
     var lastPointInWave = _.last(allPoints);
-    drawSpiral(lastPointInWave.x - 10, lastPointInWave.y + 10, 200, 100);
+    drawSpiral(lastPointInWave.x - 10, lastPointInWave.y + 10, 200);
 
     index ++;
     if(allPoints.length <= index + sliceSize) {
@@ -265,9 +265,7 @@ function Miro(P) {
 }
 
 function sketchProc(P) {
-  Miro(P);
+  MiroConstellations(P);
 }
 
-//var canvas = document.getElementById("myCanvas");
-// attaching the sketchProc function to the canvas
-new Processing('myCanvas', sketchProc);
+new Processing('miroCanvas', sketchProc);
