@@ -45,7 +45,7 @@ function MiroConstellations(P, model) {
 
   function drawControlPoints() {
 
-    color(P.stroke, red);
+    color(P.stroke, COLORS.red);
 
     _.each(_tangents, function(tangent) {
       P.line(tangent.p.x, tangent.p.y, tangent.q.x, tangent.q.y);
@@ -76,14 +76,15 @@ function MiroConstellations(P, model) {
     P.noFill();
   }
 
-  function getPointOnStraightLine(start, end) {
+  function getPointOnStraightLine(start, end, positionFactor) {
+    positionFactor = positionFactor || 0.5;
     var tx = end.x - start.x,
       ty = end.y - start.y,
       dist = Math.sqrt(tx*tx+ty*ty);
 
-    var factor = 50;
-    var velX = (tx/dist) * factor;
-    var velY = (ty/dist) * factor;
+    var thrust = Math.abs(tx) * positionFactor;
+    var velX = (tx/dist) * thrust;
+    var velY = (ty/dist) * thrust;
     return {
       x: start.x + velX,
       y: start.y + velY
@@ -120,7 +121,7 @@ function MiroConstellations(P, model) {
     // In order to make two curves A and B smoothly continuous, the last control point of A, the last point of A,
     // and the first control point of B have to be on a straight line.
     function connect(trail1, trail2) {
-      trail1.end = trail2.start = getPointOnStraightLine(trail1.cp2, trail2.cp1);
+      trail1.end = trail2.start = getPointOnStraightLine(trail1.cp2, trail2.cp1, 0.4);
       _tangents.push({
         p: trail1.cp2,
         q: trail1.end,
@@ -197,16 +198,28 @@ function MiroConstellations(P, model) {
     function drawHalfPlanet(yFactor) {
       P.beginShape();
 
+      var cpLeft = getPointOnStraightLine(f, l, 0.1);
+      var cpMiddle = getPointOnStraightLine(f, l, 0.5);
+      var cpRight = getPointOnStraightLine(f, l, 0.9);
+
       P.curveVertex(f.x, f.y);
       _.each(midLinePoints, function(point) {
         P.curveVertex(point.x, point.y);
       });
       P.curveVertex(l.x, l.y);
-      P.curveVertex(l.x, l.y+yFactor);
-      P.curveVertex(f.x, f.y+yFactor);
+      P.curveVertex(cpRight.x, cpRight.y+yFactor);
+
+      P.curveVertex(cpMiddle.x, cpMiddle.y+(yFactor*1.3));
+
+      P.curveVertex(cpLeft.x, cpLeft.y+yFactor);
       P.curveVertex(f.x, f.y);
       P.curveVertex(f.x, f.y);
       P.endShape();
+
+      // control points debugging
+      //P.ellipse(cpLeft.x, cpLeft.y+yFactor, 5, 5);
+      //P.ellipse(cpMiddle.x, cpMiddle.y+(yFactor*1.3), 5, 5);
+      //P.ellipse(cpRight.x, cpRight.y+yFactor, 5, 5);
     }
 
     if(top.color !== 'none') {
@@ -235,18 +248,19 @@ function MiroConstellations(P, model) {
 
     var offset = 100;
     _.each(model.history, function(entry, i) {
-      var endSlice = offset + (i * 10) + (entry.size);
+      var sliceLength = entry.size * 5; // TODO: Account for fact that same number of points does not equal same DISTANCE/size of planet
+      var endSlice = offset + sliceLength;
       if(allPoints.length > endSlice) {
         var halves = [
-          {color: COLORS.black, heightFactor: entry.size / 10 },
-          {color: COLORS[entry.color], heightFactor: entry.size / 10 }
+          {color: COLORS.black, heightFactor: entry.size /4 },
+          {color: COLORS[entry.color], heightFactor: entry.size /4 }
         ];
         if (i % 2 === 0) {
           halves = halves.reverse();
         }
 
-        drawPlanet(allPoints.slice(offset + (i * 10), endSlice), halves[0], halves[1]);
-        offset += entry.size;
+        drawPlanet(allPoints.slice(offset, endSlice), halves[0], halves[1]);
+        offset += sliceLength + 10;
       }
     });
 
