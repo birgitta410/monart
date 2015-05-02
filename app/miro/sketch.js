@@ -91,27 +91,27 @@ function Miro(P) {
   P.setup = function() {
 
     P.smooth(8);
-    P.size(900, 700, P.P2D);
+    P.size(700*1.6, 700, P.P2D);
 
     backgroundImg = P.loadImage('images/background-constellations.png', 'png');
 
-    var start = { x: 50, y: 350 };
-    var end = { x: 890, y: 345 };
+    var start = { x: 50, y: 250 };
+    var end = { x: 890, y: 245 };
 
     var a = {
       start: start,
-      cp1: {x: 160, y: 460 },
-      cp2: {x: 290, y: 400 }
+      cp1: {x: 160, y: 360 },
+      cp2: {x: 290, y: 300 }
     };
 
     var b = {
-      cp1: { x: 450, y: 360 },
-      cp2: { x: 490, y: 330 }
+      cp1: { x: 450, y: 260 },
+      cp2: { x: 490, y: 230 }
     };
 
     var c = {
-      cp1: { x: 710, y: 310 },
-      cp2: { x: 800, y: 370 },
+      cp1: { x: 710, y: 210 },
+      cp2: { x: 800, y: 270 },
       end: end
     };
 
@@ -154,28 +154,30 @@ function Miro(P) {
     var f = _.first(midLinePoints);
     var l = _.last(midLinePoints);
 
+    function drawHalfPlanet(yFactor) {
+      P.beginShape();
+      P.curveVertex(f.x, f.y);
+      P.curveVertex(f.x, f.y);
+      P.curveVertex(f.x, f.y+yFactor);
+      P.curveVertex(l.x, l.y+yFactor);
+      P.curveVertex(l.x, l.y);
+      P.curveVertex(l.x, l.y);
+      P.endShape();
+    }
+
     if(top.color !== 'none') {
       color(P.fill, top.color || black);
     } else {
       P.noFill();
     }
-
-    P.beginShape();
-    P.curveVertex(f.x, f.y);
-    P.curveVertex(f.x, f.y);
-    P.curveVertex(f.x, f.y-(20*top.heightFactor));
-    P.curveVertex(l.x, l.y-(20*top.heightFactor));
-    P.curveVertex(l.x, l.y);
-    P.curveVertex(l.x, l.y);
-    P.endShape();
-    //P.curve(f.x, f.y+(150*top.heightFactor), f.x, f.y, l.x, l.y, l.x, l.y+(100*top.heightFactor));
+    drawHalfPlanet(-20*top.heightFactor);
 
     if(bottom.color !== 'none') {
       color(P.fill, bottom.color || red);
     } else {
       P.noFill();
     }
-    P.curve(f.x, f.y-(120*bottom.heightFactor), f.x, f.y, l.x, l.y, l.x, l.y-(80*bottom.heightFactor));
+    drawHalfPlanet(20*bottom.heightFactor);
 
     P.noFill();
   }
@@ -189,9 +191,14 @@ function Miro(P) {
     var sliceSize = 20;
     var allPoints = _.flatten(_.pluck(trails, 'points'));
 
-    //P.ellipse(allPoints[index].x, allPoints[index].y, 20, 20);
     drawPlanet(allPoints.slice(index, index + sliceSize));
-    drawPlanet(allPoints.slice(20, 40), { heightFactor: 6, color: 'none' }, { heightFactor: 3.5, color: green });
+    drawPlanet(allPoints.slice(20, 60), {
+      heightFactor: 3.5,
+      color: green
+    }, {
+      heightFactor: 9,
+      color: 'none'
+    });
 
     P.beginShape();
     var firstPoint = _.first(trails).start;
