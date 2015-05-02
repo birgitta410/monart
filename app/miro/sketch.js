@@ -1,5 +1,5 @@
 
-function MiroConstellations(P) {
+function MiroConstellations(P, model) {
   console.log('drawing MiroConstellations');
 
   var backgroundImg;
@@ -7,12 +7,14 @@ function MiroConstellations(P) {
   var waveTrails = [];
   var _tangents = [];
 
-  var red = {r: 198, g: 45, b: 39 };
-  var black = {r: 0, g: 0, b: 0 };
-  var white = {r: 255, g: 255, b: 255 };
-  var green = {r: 91, g: 143, b: 68 };
-  var blue = {r: 60, g: 67, b: 137 };
-  var yellow = {r: 244, g: 214, b: 64 };
+  var COLORS = {
+    red: {r: 198, g: 45, b: 39},
+    black: {r: 0, g: 0, b: 0},
+    white: {r: 255, g: 255, b: 255},
+    green: {r: 91, g: 143, b: 68},
+    blue: {r: 60, g: 67, b: 137},
+    yellow: {r: 244, g: 214, b: 64}
+  };
 
   function doBezTrail(startPt, cp1, cp2, endPt) {
 
@@ -208,14 +210,14 @@ function MiroConstellations(P) {
     }
 
     if(top.color !== 'none') {
-      color(P.fill, top.color || black);
+      color(P.fill, top.color || COLORS.black);
     } else {
       P.noFill();
     }
     drawHalfPlanet(-20*top.heightFactor);
 
     if(bottom.color !== 'none') {
-      color(P.fill, bottom.color || red);
+      color(P.fill, bottom.color || COLORS.red);
     } else {
       P.noFill();
     }
@@ -224,19 +226,29 @@ function MiroConstellations(P) {
     P.noFill();
   }
 
-  var index = 0;
   P.draw = function() {
 
     P.background(255);
     P.image(backgroundImg, 0, 0);
 
-    var sliceSize = 20;
     var allPoints = _.flatten(_.pluck(waveTrails, 'points'));
 
-    drawPlanet(allPoints.slice(index, index + sliceSize));
+    var offset = 100;
+    _.each(model.history, function(entry, i) {
+      var halves = [
+        { color: COLORS.black },
+        { color: COLORS[entry.color] }
+      ];
+      if(i % 2 === 0) {
+        halves = halves.reverse();
+      }
+      drawPlanet(allPoints.slice(offset + (i * 10), offset + (i * 10) + (entry.size)), halves[0], halves[1]);
+      offset += entry.size;
+    });
+
     drawPlanet(allPoints.slice(20, 60), {
       heightFactor: 3.5,
-      color: green
+      color: COLORS.blue
     }, {
       heightFactor: 9,
       color: 'none'
@@ -249,23 +261,22 @@ function MiroConstellations(P) {
       P.bezierVertex(trail.cp1.x, trail.cp1.y, trail.cp2.x, trail.cp2.y, trail.end.x, trail.end.y);
       //drawControlPoints();
     });
-    color(P.stroke, black);
+    color(P.stroke, COLORS.black);
     P.endShape();
 
     var lastPointInWave = _.last(allPoints);
     drawSpiral(lastPointInWave.x - 10, lastPointInWave.y + 10, 200);
 
-    index ++;
-    if(allPoints.length <= index + sliceSize) {
-      index = 0;
-    }
-
   };
 
 }
 
+var miroModel = {
+  history: [ {size: 5, color: 'green' }, {size: 20, color: 'red' } ]
+};
+
 function sketchProc(P) {
-  MiroConstellations(P);
+  MiroConstellations(P, miroModel);
 }
 
 new Processing('miroCanvas', sketchProc);
