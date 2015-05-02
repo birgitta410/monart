@@ -145,6 +145,44 @@ function Miro(P) {
     pFct(color.r, color.g, color.b);
   }
 
+  function drawSpiral(cx, cy, width, height) {
+
+    var angle_incr = P.radians(2 + 100/12.0);
+    var numPoints = 100;
+
+    var outer_rad = width*.45;
+
+    var spiralPoints = [];
+
+    for (var i = 1; i <= numPoints; ++i) {
+      var ratio = i/numPoints;
+      var spiral_rad = ratio * outer_rad * -1;
+      var angle = i*angle_incr * -1;
+      var x = cx + P.cos(angle) * spiral_rad;
+      var y = cy + P.sin(angle) * spiral_rad;
+
+      spiralPoints.push({x: x, y: y});
+    }
+    var start = _.last(spiralPoints);
+    var deltaX = cx - start.x;
+    var deltaY = cy - start.y;
+    var translatedPoints = _.map(spiralPoints, function(point) {
+      return {
+        x: point.x + deltaX,
+        y: point.y + deltaY
+      }
+    });
+
+    P.beginShape();
+    _.each(translatedPoints, function(point, i) {
+      P.curveVertex(point.x, point.y);
+      if(i === 1 || i === numPoints) {
+        P.curveVertex(point.x, point.y);
+      }
+    });
+    P.endShape();
+  }
+
   function drawPlanet(midLinePoints, top, bottom) {
     top = top || {};
     top.heightFactor = top.heightFactor || 1;
@@ -213,6 +251,9 @@ function Miro(P) {
     });
     color(P.stroke, black);
     P.endShape();
+
+    var lastPointInWave = _.last(allPoints);
+    drawSpiral(lastPointInWave.x - 10, lastPointInWave.y + 10, 200, 100);
 
     index ++;
     if(allPoints.length <= index + sliceSize) {
