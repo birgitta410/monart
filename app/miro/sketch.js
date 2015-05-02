@@ -156,12 +156,16 @@ function Miro(P) {
 
     function drawHalfPlanet(yFactor) {
       P.beginShape();
+
       P.curveVertex(f.x, f.y);
-      P.curveVertex(f.x, f.y);
-      P.curveVertex(f.x, f.y+yFactor);
+      _.each(midLinePoints, function(point) {
+        P.curveVertex(point.x, point.y);
+      });
+      P.curveVertex(l.x, l.y);
       P.curveVertex(l.x, l.y+yFactor);
-      P.curveVertex(l.x, l.y);
-      P.curveVertex(l.x, l.y);
+      P.curveVertex(f.x, f.y+yFactor);
+      P.curveVertex(f.x, f.y);
+      P.curveVertex(f.x, f.y);
       P.endShape();
     }
 
