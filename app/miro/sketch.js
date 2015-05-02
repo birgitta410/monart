@@ -235,15 +235,19 @@ function MiroConstellations(P, model) {
 
     var offset = 100;
     _.each(model.history, function(entry, i) {
-      var halves = [
-        { color: COLORS.black },
-        { color: COLORS[entry.color] }
-      ];
-      if(i % 2 === 0) {
-        halves = halves.reverse();
+      var endSlice = offset + (i * 10) + (entry.size);
+      if(allPoints.length > endSlice) {
+        var halves = [
+          {color: COLORS.black, heightFactor: entry.size / 10 },
+          {color: COLORS[entry.color], heightFactor: entry.size / 10 }
+        ];
+        if (i % 2 === 0) {
+          halves = halves.reverse();
+        }
+
+        drawPlanet(allPoints.slice(offset + (i * 10), endSlice), halves[0], halves[1]);
+        offset += entry.size;
       }
-      drawPlanet(allPoints.slice(offset + (i * 10), offset + (i * 10) + (entry.size)), halves[0], halves[1]);
-      offset += entry.size;
     });
 
     drawPlanet(allPoints.slice(20, 60), {
@@ -280,3 +284,22 @@ function sketchProc(P) {
 }
 
 new Processing('miroCanvas', sketchProc);
+
+function processNewData(historyData) {
+
+  console.log('historyData', historyData);
+  miroModel.history = _.map(historyData.history, function(entry) {
+    entry.size = entry.size === 'small' ? 5 : 20;
+    return entry;
+  });
+}
+
+var wsHost = 'ws://' + window.location.host;
+var ws = new WebSocket(wsHost + '/miro');
+
+ws.onmessage = function (event) {
+  artwise.processMessage(event, 'miro', processNewData);
+};
+
+// TODO
+artwise.initPing(ws, function() { console.log('no connection!'); });

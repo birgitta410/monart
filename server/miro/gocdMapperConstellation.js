@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var gocdReader = require('../gocdReader');
 
-function miroGocdMapperModule() {
+function miroGocdMapperConstellationModule() {
 
   function mapSize(entry) {
 
@@ -34,13 +34,13 @@ function miroGocdMapperModule() {
         info: lastBuild.info
       };
 
-      finalShapes.stones = _.map(keysDescending.splice(1), function(key) {
+      finalShapes.history = _.map(keysDescending.splice(1), function(key) {
         var entry = history[key];
 
         var size = mapSize(entry);
         return {
           size: size,
-          color: entry.wasSuccessful() ? 'black' : 'red',
+          color: entry.wasSuccessful() ? 'green' : 'red',
           info: entry.info + ' ' + (entry['build_cause'].files ? entry['build_cause'].files.length + ' changes' : 'no changes')
         };
       });
@@ -55,4 +55,4 @@ function miroGocdMapperModule() {
   }
 }
 
-exports.readHistoryAndActivity = miroGocdMapperModule().readHistoryAndActivity;
+exports.readHistoryAndActivity = miroGocdMapperConstellationModule().readHistoryAndActivity;

@@ -7,6 +7,7 @@ var path = require('path');
 var _ = require('lodash');
 var haringGocdMapper = require('./server/haring/gocdMapper');
 var miroGocdMapper = require('./server/miro/gocdMapper');
+var miroGocdMapperConstellation = require('./server/miro/gocdMapperConstellation');
 var gocdReader = require('./server/gocdReader');
 
 function artwiseServer() {
@@ -84,7 +85,7 @@ function artwiseServer() {
       function newClient() {
 
         function getActivityAndUpdateClients() {
-          miroGocdMapper.readHistoryAndActivity().then(function(activityMiro) {
+          miroGocdMapperConstellation.readHistoryAndActivity().then(function(activityMiro) {
             ws.send(JSON.stringify({ miro: activityMiro }), function() {  });
           }).fail(function() {
             console.error('ERROR reading and transforming data', arguments);

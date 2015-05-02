@@ -10,9 +10,23 @@
 </head>
 <body>
 
-<canvas id="miroCanvas" width="900" height="700" style="border: 1px solid #000; -webkit-transform: translate(-289.3125,-336.47751)"></canvas>
+<div class="container">
+    <canvas id="miroCanvas" width="900" height="700" style="border: 1px solid #000; -webkit-transform: translate(-289.3125,-336.47751)"></canvas>
 
+    <div id="status-message">
+        <h3>Cache warming up</h3>
+        <h3 id="status-progress"></h3>
+    </div>
+
+    <div class="long-stroke">
+        <img src="images/stroke_red.png">
+    </div>
+
+</div>
 <script src="../libs/lodash.min.js"></script>
+<script src="../libs/jquery.js"></script>
+<script src="../artwise.js"></script>
+
 <script src="libs/processing.js"></script>
 <script src="bezierPlotter.js"></script>
 <script src="sketch.js"></script>
