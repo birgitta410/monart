@@ -5,6 +5,12 @@ function Miro(P) {
   var trails = [];
   var tangents = [];
 
+  var red = {r: 198, g: 45, b: 39 };
+  var black = {r: 0, g: 0, b: 0 };
+  var white = {r: 255, g: 255, b: 255 };
+  var green = {r: 91, g: 143, b: 68 };
+  var blue = {r: 60, g: 67, b: 137 };
+
   function doBezTrail(startPt, cp1, cp2, endPt) {
 
     var endPt = {x: endPt.x, y: endPt.y};
@@ -34,7 +40,7 @@ function Miro(P) {
 
   function drawControlPoints() {
 
-    P.stroke(255, 0, 0);
+    color(P.stroke, red);
 
     _.each(tangents, function(tangent) {
       P.line(tangent.p.x, tangent.p.y, tangent.q.x, tangent.q.y);
@@ -130,10 +136,37 @@ function Miro(P) {
 
   };
 
+  function color(pFct, color) {
+    pFct(color.r, color.g, color.b);
+  }
+
+  function drawPlanet(midLinePoints, top, bottom) {
+    top = top || {};
+    top.heightFactor = top.heightFactor || 1;
+    bottom = bottom || {};
+    bottom.heightFactor = bottom.heightFactor || 1;
+
+    var f = _.first(midLinePoints);
+    var l = _.last(midLinePoints);
+    color(P.fill, top.color || black);
+    P.curve(f.x, f.y+(150*top.heightFactor), f.x, f.y, l.x, l.y, l.x, l.y+(100*top.heightFactor));
+    color(P.fill, bottom.color || red);
+    P.curve(f.x, f.y-(120*bottom.heightFactor), f.x, f.y, l.x, l.y, l.x, l.y-(80*bottom.heightFactor));
+
+    P.noFill();
+  }
+
   var index = 0;
   P.draw = function() {
 
     P.background(255);
+
+    var sliceSize = 20;
+    var allPoints = _.flatten(_.pluck(trails, 'points'));
+
+    //P.ellipse(allPoints[index].x, allPoints[index].y, 20, 20);
+    drawPlanet(allPoints.slice(index, index + sliceSize));
+    drawPlanet(allPoints.slice(20, 40), { heightFactor: 6, color: white }, { heightFactor: 3.5, color: green });
 
     P.beginShape();
     var firstPoint = _.first(trails).start;
@@ -142,25 +175,8 @@ function Miro(P) {
       P.bezierVertex(trail.cp1.x, trail.cp1.y, trail.cp2.x, trail.cp2.y, trail.end.x, trail.end.y);
       drawControlPoints();
     });
-    P.stroke(0, 0, 0);
+    color(P.stroke, black);
     P.endShape();
-
-    var sliceSize = 20;
-    var allPoints = _.flatten(_.pluck(trails, 'points'));
-
-    //P.ellipse(allPoints[index].x, allPoints[index].y, 20, 20);
-
-    var pointSubset = allPoints.slice(index, index + sliceSize);
-
-    var f = _.first(pointSubset);
-    var l = _.last(pointSubset);
-    P.fill(255, 0, 0);
-    P.curve(f.x, f.y-120, f.x, f.y, l.x, l.y, l.x, l.y-80);
-    P.fill(0, 0, 0);
-    P.curve(f.x, f.y+150, f.x, f.y, l.x, l.y, l.x, l.y+100);
-
-    P.noFill();
-    P.strokeWeight(1);
 
     index ++;
     if(allPoints.length <= index + sliceSize) {
