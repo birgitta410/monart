@@ -1,6 +1,8 @@
 
 function Miro(P) {
-  console.log('drawing Miro')
+  console.log('drawing Miro');
+
+  var backgroundImg;
 
   var trails = [];
   var tangents = [];
@@ -10,6 +12,7 @@ function Miro(P) {
   var white = {r: 255, g: 255, b: 255 };
   var green = {r: 91, g: 143, b: 68 };
   var blue = {r: 60, g: 67, b: 137 };
+  var yellow = {r: 244, g: 214, b: 64 };
 
   function doBezTrail(startPt, cp1, cp2, endPt) {
 
@@ -88,7 +91,9 @@ function Miro(P) {
   P.setup = function() {
 
     P.smooth(8);
-    P.size(900, 700);
+    P.size(900, 700, P.P2D);
+
+    backgroundImg = P.loadImage('images/background-constellations.png', 'png');
 
     var start = { x: 50, y: 350 };
     var end = { x: 890, y: 345 };
@@ -148,9 +153,28 @@ function Miro(P) {
 
     var f = _.first(midLinePoints);
     var l = _.last(midLinePoints);
-    color(P.fill, top.color || black);
-    P.curve(f.x, f.y+(150*top.heightFactor), f.x, f.y, l.x, l.y, l.x, l.y+(100*top.heightFactor));
-    color(P.fill, bottom.color || red);
+
+    if(top.color !== 'none') {
+      color(P.fill, top.color || black);
+    } else {
+      P.noFill();
+    }
+
+    P.beginShape();
+    P.curveVertex(f.x, f.y);
+    P.curveVertex(f.x, f.y);
+    P.curveVertex(f.x, f.y-(20*top.heightFactor));
+    P.curveVertex(l.x, l.y-(20*top.heightFactor));
+    P.curveVertex(l.x, l.y);
+    P.curveVertex(l.x, l.y);
+    P.endShape();
+    //P.curve(f.x, f.y+(150*top.heightFactor), f.x, f.y, l.x, l.y, l.x, l.y+(100*top.heightFactor));
+
+    if(bottom.color !== 'none') {
+      color(P.fill, bottom.color || red);
+    } else {
+      P.noFill();
+    }
     P.curve(f.x, f.y-(120*bottom.heightFactor), f.x, f.y, l.x, l.y, l.x, l.y-(80*bottom.heightFactor));
 
     P.noFill();
@@ -160,20 +184,21 @@ function Miro(P) {
   P.draw = function() {
 
     P.background(255);
+    P.image(backgroundImg, 0, 0);
 
     var sliceSize = 20;
     var allPoints = _.flatten(_.pluck(trails, 'points'));
 
     //P.ellipse(allPoints[index].x, allPoints[index].y, 20, 20);
     drawPlanet(allPoints.slice(index, index + sliceSize));
-    drawPlanet(allPoints.slice(20, 40), { heightFactor: 6, color: white }, { heightFactor: 3.5, color: green });
+    drawPlanet(allPoints.slice(20, 40), { heightFactor: 6, color: 'none' }, { heightFactor: 3.5, color: green });
 
     P.beginShape();
     var firstPoint = _.first(trails).start;
     P.vertex(firstPoint.x, firstPoint.y);
     _.each(trails, function(trail) {
       P.bezierVertex(trail.cp1.x, trail.cp1.y, trail.cp2.x, trail.cp2.y, trail.end.x, trail.end.y);
-      drawControlPoints();
+      //drawControlPoints();
     });
     color(P.stroke, black);
     P.endShape();
@@ -191,6 +216,6 @@ function sketchProc(P) {
   Miro(P);
 }
 
-var canvas = document.getElementById("myCanvas");
+//var canvas = document.getElementById("myCanvas");
 // attaching the sketchProc function to the canvas
-new Processing(canvas, sketchProc);
+new Processing('myCanvas', sketchProc);
