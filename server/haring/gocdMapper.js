@@ -59,7 +59,6 @@ function haringGocdMapperModule() {
       var historyHaring = mapPipelineDataToFigures(onlyHistoryWeNeed);
 
       var historyFigures = historyHaring.figures;
-      mapInitialsFromHistoryToActivity(historyFigures, activityHaring.figures);
 
       var finalData = {  };
       finalData.figures = activityHaring.figures.concat(historyFigures);
@@ -76,18 +75,6 @@ function haringGocdMapperModule() {
     });
 
   };
-
-  function mapInitialsFromHistoryToActivity(historyFigures, activityFigures) {
-    _.each(activityFigures, function(activityFigure) {
-      var historyFigureWithSameKey = _.find(historyFigures, function(historyFigure) {
-        return activityFigure.key === historyFigure.key;
-      });
-      if(historyFigureWithSameKey !== undefined) {
-        activityFigure.initials = historyFigureWithSameKey.initials;
-        activityFigure.info = activityFigure.info + '<br>' + historyFigureWithSameKey.initials.toUpperCase();
-      }
-    });
-  }
 
   function getMinutesSinceBuild(entry) {
     var lastBuildTime = moment(entry.lastBuildTime);
@@ -184,7 +171,7 @@ function haringGocdMapperModule() {
     }
 
     function getInfoShort(entry) {
-      var initials = entry.author && entry.author.initials ? entry.author.initials.toUpperCase() : undefined;
+      var initials = entry.initials ? entry.initials.toUpperCase() : undefined;
       var tooLong = entry.tooLongSinceBuild ? 'It\'s been ' + entry.tooLongSinceBuild + ' minutes!' : undefined;
       var stageInfo = entry.stageName + (initials ? '<br>' + initials : '');
       return tooLong ? tooLong : stageInfo;
@@ -210,7 +197,7 @@ function haringGocdMapperModule() {
         info: getInfoShort(entry),
         info2: getInfoDetailed(entry),
         border: 'dotted',
-        initials: entry.author ? entry.author.initials : undefined,
+        initials: entry.initials,
         time: new Date(entry.lastBuildTime).getTime(),
         key: entry.buildNumber
       }
