@@ -150,40 +150,41 @@ function MiroConstellations(P, model) {
 
   function drawSpiral(cx, cy, size) {
 
-    var angle_incr = P.radians(2 + 100/12.0);
+    var frameCount = 100; // Used to be an animation
+    var angle_incr = P.radians(2 + frameCount/20.0); // the higher the divisor, the fewer turns in spiral
     var numPoints = 100;
 
-    var outer_rad = size*.45;
+    var outer_rad = size * .45;
 
     var spiralPoints = [];
-
     for (var i = 1; i <= numPoints; ++i) {
       var ratio = i/numPoints;
       var spiral_rad = ratio * outer_rad * -1;
       var angle = i*angle_incr * -1;
-      var x = cx + P.cos(angle) * spiral_rad;
-      var y = cy + P.sin(angle) * spiral_rad;
+      var x = 0 + P.cos(angle) * spiral_rad;
+      var y = 0 + P.sin(angle) * spiral_rad;
 
       spiralPoints.push({x: x, y: y});
     }
-    var start = _.last(spiralPoints);
-    var deltaX = cx - start.x;
-    var deltaY = cy - start.y;
-    var translatedPoints = _.map(spiralPoints, function(point) {
-      return {
-        x: point.x + deltaX,
-        y: point.y + deltaY
-      }
-    });
+
+    var spiralCenter = _.last(spiralPoints);
+    var spiralEnd = _.first(spiralPoints);
+    var deltaX = spiralEnd.x - spiralCenter.x;
+    var deltaY = spiralEnd.y - spiralCenter.y;
+    
+    P.pushMatrix();
+    P.translate(cx + deltaX - 24, cy + deltaY + 35);
+    P.rotate(P.radians(30));
 
     P.beginShape();
-    _.each(translatedPoints, function(point, i) {
+    _.each(spiralPoints, function(point, i) {
       P.curveVertex(point.x, point.y);
       if(i === 1 || i === numPoints) {
         P.curveVertex(point.x, point.y);
       }
     });
     P.endShape();
+    P.popMatrix();
   }
 
   function drawPlanet(midLinePoints, top, bottom) {
@@ -285,7 +286,7 @@ function MiroConstellations(P, model) {
     P.endShape();
 
     var lastPointInWave = _.last(allPoints);
-    drawSpiral(lastPointInWave.x - 10, lastPointInWave.y + 10, 200);
+    drawSpiral(lastPointInWave.x - 10, lastPointInWave.y + 9, 200);
 
   };
 
