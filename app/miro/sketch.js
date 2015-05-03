@@ -91,13 +91,7 @@ function MiroConstellations(P, model) {
     };
   }
 
-  P.setup = function() {
-
-    P.smooth(8);
-    P.size(700*1.6, 700, P.P2D);
-
-    backgroundImg = P.loadImage('images/background-constellations.png', 'png');
-
+  function createWaveCurve() {
     var start = { x: 50, y: 250 };
     var end = { x: 890, y: 245 };
 
@@ -131,18 +125,19 @@ function MiroConstellations(P, model) {
     connect(b, c);
     connect(a, b);
 
-    waveTrails = [
+    var trails = [
       doBezTrail(a.start, a.cp1, a.cp2, a.end),
       doBezTrail(b.start, b.cp1, b.cp2, b.end),
       doBezTrail(c.start, c.cp1, c.cp2, c.end)
     ];
 
-    _.each(waveTrails, function(trail, i) {
+    _.each(trails, function(trail, i) {
       trail.index = 0;
       trail.id = i;
     });
 
-  };
+    return trails;
+  }
 
   function color(pFct, color) {
     pFct(color.r, color.g, color.b);
@@ -171,7 +166,7 @@ function MiroConstellations(P, model) {
     var spiralEnd = _.first(spiralPoints);
     var deltaX = spiralEnd.x - spiralCenter.x;
     var deltaY = spiralEnd.y - spiralCenter.y;
-    
+
     P.pushMatrix();
     P.translate(cx + deltaX - 24, cy + deltaY + 35);
     P.rotate(P.radians(30));
@@ -240,12 +235,38 @@ function MiroConstellations(P, model) {
     P.noFill();
   }
 
+  function drawWave() {
+    P.beginShape();
+    var firstPoint = _.first(waveTrails).start;
+    P.vertex(firstPoint.x, firstPoint.y);
+    _.each(waveTrails, function(trail) {
+      P.bezierVertex(trail.cp1.x, trail.cp1.y, trail.cp2.x, trail.cp2.y, trail.end.x, trail.end.y);
+      //drawControlPoints();
+    });
+    color(P.stroke, COLORS.black);
+    P.endShape();
+  }
+
+  P.setup = function() {
+
+    P.smooth(8);
+    P.size(700*1.6, 700, P.P2D);
+
+    backgroundImg = P.loadImage('images/background-constellations.png', 'png');
+    waveTrails = createWaveCurve();
+  };
+
   P.draw = function() {
 
     P.background(255);
     P.image(backgroundImg, 0, 0);
 
     var allPoints = _.flatten(_.pluck(waveTrails, 'points'));
+
+    drawWave();
+
+    var lastPointInWave = _.last(allPoints);
+    drawSpiral(lastPointInWave.x - 10, lastPointInWave.y + 9, 200);
 
     var offset = 100;
     _.each(model.history, function(entry, i) {
@@ -274,19 +295,6 @@ function MiroConstellations(P, model) {
       heightFactor: 9,
       color: 'none'
     });
-
-    P.beginShape();
-    var firstPoint = _.first(waveTrails).start;
-    P.vertex(firstPoint.x, firstPoint.y);
-    _.each(waveTrails, function(trail) {
-      P.bezierVertex(trail.cp1.x, trail.cp1.y, trail.cp2.x, trail.cp2.y, trail.end.x, trail.end.y);
-      //drawControlPoints();
-    });
-    color(P.stroke, COLORS.black);
-    P.endShape();
-
-    var lastPointInWave = _.last(allPoints);
-    drawSpiral(lastPointInWave.x - 10, lastPointInWave.y + 9, 200);
 
   };
 
