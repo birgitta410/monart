@@ -248,12 +248,14 @@ function MiroConstellations(P, model) {
 
     var offset = 100;
     _.each(model.history, function(entry, i) {
-      var sliceLength = entry.size * 5; // TODO: Account for fact that same number of points does not equal same DISTANCE/size of planet
+
+      var size = entry.size === 0 ? 1 : entry.size;
+      var sliceLength = Math.max(5, size); // TODO: Account for fact that same number of points does not equal same DISTANCE/size of planet
       var endSlice = offset + sliceLength;
       if(allPoints.length > endSlice) {
         var halves = [
-          {color: COLORS.black, heightFactor: entry.size /4 },
-          {color: COLORS[entry.color], heightFactor: entry.size /4 }
+          {color: COLORS.black, heightFactor: size /10 },
+          {color: COLORS[entry.color], heightFactor: size /10 }
         ];
         if (i % 2 === 0) {
           halves = halves.reverse();
@@ -301,11 +303,8 @@ new Processing('miroCanvas', sketchProc);
 
 function processNewData(historyData) {
 
-  console.log('historyData', historyData);
-  miroModel.history = _.map(historyData.history, function(entry) {
-    entry.size = entry.size === 'small' ? 5 : 20;
-    return entry;
-  });
+  miroModel.history = historyData.history;
+
 }
 
 var wsHost = 'ws://' + window.location.host;

@@ -3,20 +3,6 @@ var gocdReader = require('../gocdReader');
 
 function miroGocdMapperConstellationModule() {
 
-  function mapSize(entry) {
-
-    if(entry['build_cause']) {
-      var numberOfModifications = entry['build_cause'].files ? entry['build_cause'].files.length : 0;
-      if(numberOfModifications <= 3) {
-        return 'small';
-      } else if(numberOfModifications <= 6) {
-        return 'medium';
-      } else {
-        return 'large';
-      }
-    }
-  }
-
   var readHistoryAndActivity = function() {
     return gocdReader.readData().then(function(data) {
 
@@ -30,14 +16,14 @@ function miroGocdMapperConstellationModule() {
       var finalShapes = {};
 
       finalShapes.stroke = {
-        color: lastBuild.wasSuccessful() ? 'black' : 'red',
+        color: lastBuild.wasSuccessful() ? 'green' : 'red',
         info: lastBuild.info
       };
 
       finalShapes.history = _.map(keysDescending.splice(1), function(key) {
         var entry = history[key];
 
-        var size = mapSize(entry);
+        var size = entry['build_cause'].files ? entry['build_cause'].files.length : 0;
         return {
           size: size,
           color: entry.wasSuccessful() ? 'green' : 'red',
