@@ -173,21 +173,8 @@ function haringGocdMapperModule() {
     function getInfoShort(entry) {
       var initials = entry.initials ? entry.initials.toUpperCase() : undefined;
       var tooLong = entry.tooLongSinceBuild ? 'It\'s been ' + entry.tooLongSinceBuild + ' minutes!' : undefined;
-      var stageInfo = entry.stageName + (initials ? '<br>' + initials : '');
-      return tooLong ? tooLong : stageInfo;
-    }
-
-    function getInfoDetailed(entry) {
-      var entryTitle = '[' + entry.buildNumber + '] ' + entry.name;
-      if(entry.activity === 'Building') {
-        return entryTitle + ' is building';
-      } else {
-        var info = entryTitle + ' | ' + entry.lastBuildStatus;
-        if(!entry.wasSuccessful() && entry.author) {
-          info += ' | changes by ' + entry.author.name;
-        }
-        return info;
-      }
+      var info = entry.info + (initials ? '<br>' + initials : '');
+      return tooLong ? tooLong : info;
     }
 
     var figures = _.map(activity.jobs, function(entry) {
@@ -195,7 +182,7 @@ function haringGocdMapperModule() {
         type: getFigureTypeForActivity(entry),
         color: getColor(entry),
         info: getInfoShort(entry),
-        info2: getInfoDetailed(entry),
+        info2: entry.info2,
         border: 'dotted',
         initials: entry.initials,
         time: new Date(entry.lastBuildTime).getTime(),
