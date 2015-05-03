@@ -19,103 +19,73 @@ function artwiseServer() {
   app.use(express.static(rootDir + '/app/'));
   var server = http.createServer(app);
 
+  var CACHE_INITIALISED = false;
+  var UPDATE_INTERVAL = 10000;
+
+  function createListener(identifier, dataReader) {
+    return function() {
+
+      var wss = new WebSocketServer({server: server, path: '/' + identifier});
+      console.log(identifier +' websocket server created');
+
+      dataReader().then(function() {
+        console.log('INITIALISED DATA');
+        CACHE_INITIALISED = true;
+      });
+
+      wss.on('connection', function(ws) {
+        console.log('connected to /' + identifier);
+
+        function newClient() {
+
+          function getActivityAndUpdateClients() {
+            dataReader().then(function(data) {
+              var result = {};
+              result[identifier] = data;
+              ws.send(JSON.stringify(result), function() {  });
+            }).fail(function() {
+              console.error('ERROR reading and transforming data', arguments);
+            });
+          }
+
+          getActivityAndUpdateClients();
+          var clientId = setInterval(getActivityAndUpdateClients, UPDATE_INTERVAL);
+          return clientId;
+        }
+
+        var clientId = newClient();
+
+        console.log('websocket connection open on /' + identifier);
+
+        ws.on('message', function(msg) {
+          if(msg === 'ping') {
+            console.log('PING');
+            ws.send(JSON.stringify({ping: 'success'}));
+          }
+        });
+
+        ws.on('close', function() {
+          console.log('websocket connection close on /' + identifier);
+          clearInterval(clientId);
+        });
+      });
+    }
+  }
+
   /** HARING ************************/
-  var UPDATE_INTERVAL_HARING = 10000;
+
   var CACHE_INITIALISED = false;
 
-  function listenToHaring() {
-    var wssHaring = new WebSocketServer({server: server, path: '/haring'});
-    console.log('haring websocket server created');
-
-    haringGocdMapper.readHistoryAndActivity().then(function(activityHaring) {
-      console.log('INITIALISED DATA');
-      CACHE_INITIALISED = true;
-    });
-
-    wssHaring.on('connection', function(ws) {
-      console.log('connected to /haring');
-
-      function newClient() {
-
-        function getActivityAndUpdateClients() {
-          if(CACHE_INITIALISED) {
-            haringGocdMapper.readHistoryAndActivity().then(function (activityHaring) {
-              ws.send(JSON.stringify({haring: activityHaring}), function () {
-              });
-            });
-          } else {
-            ws.send(JSON.stringify({ loading: true }));
-          }
-        }
-
-        getActivityAndUpdateClients();
-        var clientId = setInterval(getActivityAndUpdateClients, UPDATE_INTERVAL_HARING);
-        return clientId;
-      }
-
-      var clientId = newClient();
-
-      console.log('websocket connection open on /haring');
-
-      ws.on('message', function(msg) {
-        if(msg === 'ping') {
-          console.log('PING');
-          ws.send(JSON.stringify({ping: 'success'}));
-        }
-      });
-
-      ws.on('close', function() {
-        console.log('websocket connection close on /haring');
-        clearInterval(clientId);
-      });
-    });
-  }
-
+  var listenToHaring = createListener('haring', haringGocdMapper.readHistoryAndActivity);
   listenToHaring();
 
-  /** MIRO ************************/
+  /** MIRO BLUE ************************/
 
-  function listenToMiro() {
-    var wssMiro = new WebSocketServer({server: server, path: '/miro'});
-    console.log('miro websocket server created');
-
-    wssMiro.on('connection', function(ws) {
-      console.log('connected to /miro');
-
-      function newClient() {
-
-        function getActivityAndUpdateClients() {
-          miroGocdMapperConstellation.readHistoryAndActivity().then(function(activityMiro) {
-            ws.send(JSON.stringify({ miro: activityMiro }), function() {  });
-          }).fail(function() {
-            console.error('ERROR reading and transforming data', arguments);
-          });
-        }
-
-        getActivityAndUpdateClients();
-        var clientId = setInterval(getActivityAndUpdateClients, 5000);
-        return clientId;
-      }
-
-      var clientId = newClient();
-
-      console.log('websocket connection open on /miro');
-
-      ws.on('message', function(msg) {
-        if(msg === 'ping') {
-          console.log('PING');
-          ws.send(JSON.stringify({ping: 'success'}));
-        }
-      });
-
-      ws.on('close', function() {
-        console.log('websocket connection close on /miro');
-        clearInterval(clientId);
-      });
-    });
-  }
-
+  var listenToMiro = createListener('miro', miroGocdMapperConstellation.readHistoryAndActivity);
   listenToMiro();
+
+  var listenToMiroBlue = createListener('miroBlue', miroGocdMapper.readHistoryAndActivity);
+  listenToMiroBlue();
 
   /** ENDPOINTS ************************/
 
@@ -158,11 +128,11 @@ function artwiseServer() {
     readAndRespond(gocdReader.readActivity, res);
   });
 
-  var port = process.env.PORT || 5000
+  var port = process.env.PORT || 5000;
   server.listen(port);
 
   console.log('http server listening on %d', port);
 
-};
+}
 
 artwiseServer();

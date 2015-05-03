@@ -61,10 +61,10 @@ function processNewData(historyData) {
 }
 
 var wsHost = 'ws://' + window.location.host;
-var ws = new WebSocket(wsHost + '/miro');
+var ws = new WebSocket(wsHost + '/miroBlue');
 
 ws.onmessage = function (event) {
-  artwise.processMessage(event, 'miro', processNewData);
+  artwise.processMessage(event, 'miroBlue', processNewData);
 };
 
 // TODO
