@@ -124,10 +124,6 @@ function artwiseServer() {
     readAndRespond(miroGocdMapper.readHistoryAndActivity, res);
   });
 
-  app.get('/data/cctray', function(req, res) {
-    readAndRespond(gocdReader.readActivity, res);
-  });
-
   var port = process.env.PORT || 5000;
   server.listen(port);
 
