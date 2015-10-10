@@ -1,10 +1,9 @@
 var goCd = require('gocd-api');
-var config = require('./ymlHerokuConfig');
 
-function gocdReader() {
-  return goCd.getInstance(config.create('gocd').get()).then(function(instance) {
+function gocdCreator(config) {
+  return goCd.getInstance(config).then(function(instance) {
     return instance;
   });
 }
 
-module.exports = gocdReader();
+module.exports = gocdCreator;

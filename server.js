@@ -2,12 +2,12 @@
 var ws = require('ws');
 var http = require('http');
 var express = require('express');
-//var module = require('module');
 var path = require('path');
 var _ = require('lodash');
 var haringGocdMapper = require('./server/haring/gocdMapper');
 var miroGocdMapper = require('./server/miro/gocdMapper');
 var miroGocdMapperConstellation = require('./server/miro/gocdMapperConstellation');
+var configReader = require('./server/ymlHerokuConfig');
 var gocdCreator = require('./server/gocdReader');
 
 function artwiseServer() {
@@ -21,9 +21,10 @@ function artwiseServer() {
 
   var CACHE_INITIALISED = false;
   var UPDATE_INTERVAL = 10000;
-  var gocd;
+  var config = configReader.create('gocd').get();
 
-  gocdCreator.then(function(instance) {
+  var gocd;
+  gocdCreator(config).then(function(instance) {
     console.log("GO CD DATA CACHE INITIALISED");
     CACHE_INITIALISED = true;
     gocd = instance;
@@ -46,7 +47,7 @@ function artwiseServer() {
               result[identifier] = { warmingUp: true };
               ws.send(JSON.stringify(result));
             } else {
-              gocd.readData().then(function(gocdData) {
+              gocd.readData(config.pipeline).then(function(gocdData) {
                 var visualisationData = dataTransformer(gocdData);
                 result[identifier] = visualisationData;
                 ws.send(JSON.stringify(result), function() {  });
