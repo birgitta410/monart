@@ -6,7 +6,7 @@ var _ = require('lodash');
 function ymlHerokuConfigModule() {
 
   var HEROKU_VARS_SUPPORT = [
-    'user', 'password', 'url', 'pipeline', 'jobs', 'key', 'secret', 'account', 'debug', 'dangerZones', 'acceptableTimeFailed', 'timeDiff'
+    'user', 'password', 'url', 'pipeline', 'stages', 'key', 'secret', 'account', 'debug', 'dangerZones', 'acceptableTimeFailed', 'timeDiff'
   ];
 
   var create = function (configKey) {
@@ -33,8 +33,8 @@ function ymlHerokuConfigModule() {
           config[id][varName] = process.env[id.toUpperCase() + '_' + varName.toUpperCase()];
         });
 
-        if(config[id].jobs) {
-          config[id].jobs = config[id].jobs.split(',');
+        if(config[id].stages) {
+          config[id].stages = config[id].stages.split(',');
         }
 
         if (!config[id].user || !config[id].password || !config[id].url) {

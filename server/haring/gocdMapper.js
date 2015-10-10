@@ -174,7 +174,7 @@ function haringGocdMapperModule() {
       return tooLong ? tooLong : info;
     }
 
-    var figures = _.map(activity.jobs, function(entry) {
+    var figures = _.map(activity.stages, function(entry) {
       return {
         type: getFigureTypeForActivity(entry),
         color: getColor(entry),
@@ -187,7 +187,7 @@ function haringGocdMapperModule() {
       }
     });
 
-    var isBuilding = _.any(activity.jobs, function(entry) {
+    var isBuilding = _.any(activity.stages, function(entry) {
       return entry.activity === 'Building';
     });
 
