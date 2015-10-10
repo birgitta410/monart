@@ -249,6 +249,13 @@ var HaringVisualisation = function() {
   }
 
   function processNewData(haringDescription) {
+    if(haringDescription.warmingUp) {
+      $("#status-message").show();
+      console.log("WARMING UP!");
+      return;
+    } else {
+      $("#status-message").hide();
+    }
 
     setBackgroundStyle(haringDescription.background);
     setDangerZone(haringDescription.dangerZones);

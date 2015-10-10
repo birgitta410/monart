@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var gocdReader = require('../gocdReader');
 
 function miroGocdMapperModule() {
 
@@ -17,37 +16,35 @@ function miroGocdMapperModule() {
     }
   }
 
-  var readHistoryAndActivity = function() {
-    return gocdReader.readData().then(function(data) {
+  var readHistoryAndActivity = function(data) {
 
-      var history = data.history;
+    var history = data.history;
 
-      var keysDescending = _.keys(history).sort(function(a, b) {
-        return a - b; // JS does lexicographical sorting by default, need to sort by number
-      }).reverse();
-      var lastBuild = history[keysDescending[0]];
+    var keysDescending = _.keys(history).sort(function(a, b) {
+      return a - b; // JS does lexicographical sorting by default, need to sort by number
+    }).reverse();
+    var lastBuild = history[keysDescending[0]];
 
-      var finalShapes = {};
+    var finalShapes = {};
 
-      finalShapes.stroke = {
-        color: lastBuild.wasSuccessful() ? 'black' : 'red',
-        info: lastBuild.info
+    finalShapes.stroke = {
+      color: lastBuild.wasSuccessful() ? 'black' : 'red',
+      info: lastBuild.info
+    };
+
+    finalShapes.stones = _.map(keysDescending.splice(1), function(key) {
+      var entry = history[key];
+
+      var size = mapSize(entry);
+      return {
+        size: size,
+        color: entry.wasSuccessful() ? 'black' : 'red',
+        info: entry.info + ' ' + (entry['build_cause'] && entry['build_cause'].files ? entry['build_cause'].files.length + ' changes' : 'no changes')
       };
-
-      finalShapes.stones = _.map(keysDescending.splice(1), function(key) {
-        var entry = history[key];
-
-        var size = mapSize(entry);
-        return {
-          size: size,
-          color: entry.wasSuccessful() ? 'black' : 'red',
-          info: entry.info + ' ' + (entry['build_cause'].files ? entry['build_cause'].files.length + ' changes' : 'no changes')
-        };
-      });
-
-      return finalShapes;
-
     });
+
+    return finalShapes;
+
   };
 
   return {

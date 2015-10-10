@@ -2,7 +2,6 @@
 var _ = require('lodash');
 var moment = require('moment');
 var vierGewinnt = require('./vierGewinnt');
-var gocdReader = require('../gocdReader');
 var config = require('../ymlHerokuConfig');
 
 function haringGocdMapperModule() {
@@ -12,7 +11,11 @@ function haringGocdMapperModule() {
   var IS_BUILDING_BACKGROUND = 'blue';
 
   var haringConfig = config.create('haring').get();
-  var gocdConfig = config.create('gocd').get();
+  var gocdConfig = config.create('gocd');
+
+  function getGocdTimeDiff() {
+    return gocdConfig.get().timeDiff;
+  }
 
   function compareNumbers(a, b) {
     // JS does lexicographical sorting by default, need to sort by number
@@ -50,40 +53,34 @@ function haringGocdMapperModule() {
     }
   }
 
-  var readHistoryAndActivity = function() {
-    return gocdReader.readData().then(function(data) {
-      var activityHaring = mapActivityDataToFigures(data.activity);
+  var readHistoryAndActivity = function(data) {
+    var activityHaring = mapActivityDataToFigures(data.activity);
 
-      var numberOfHistoryFigures = NUM_FIGURES_IN_VIS - activityHaring.figures.length;
-      var onlyHistoryWeNeed = sortAndStripDownHistory(data.history, numberOfHistoryFigures);
-      var historyHaring = mapPipelineDataToFigures(onlyHistoryWeNeed);
+    var numberOfHistoryFigures = NUM_FIGURES_IN_VIS - activityHaring.figures.length;
+    var onlyHistoryWeNeed = sortAndStripDownHistory(data.history, numberOfHistoryFigures);
+    var historyHaring = mapPipelineDataToFigures(onlyHistoryWeNeed);
 
-      var historyFigures = historyHaring.figures;
+    var historyFigures = historyHaring.figures;
 
-      var finalData = {  };
-      finalData.figures = activityHaring.figures.concat(historyFigures);
-      finalData.background = activityHaring.background || historyHaring.background;
-      finalData.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
-      finalData.dangerZones = haringConfig.dangerZones;
+    var finalData = {  };
+    finalData.figures = activityHaring.figures.concat(historyFigures);
+    finalData.background = activityHaring.background || historyHaring.background;
+    finalData.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
+    finalData.dangerZones = haringConfig.dangerZones;
 
-      vierGewinnt.apply(finalData.figures);
+    vierGewinnt.apply(finalData.figures);
 
-      return finalData;
-
-    }).fail(function() {
-      console.error('ERROR transforming data', arguments);
-    });
+    return finalData;
 
   };
 
   function getMinutesSinceBuild(entry) {
     var lastBuildTime = moment(entry.lastBuildTime);
-    if(gocdConfig.timeDiff) {
-      lastBuildTime.add(gocdConfig.timeDiff, 'minutes');
+    if(getGocdTimeDiff()) {
+      lastBuildTime.add(getGocdTimeDiff(), 'minutes');
     }
 
     var millisSinceBuild = moment(new Date()).diff(lastBuildTime);
-    console.log('minutes since', millisSinceBuild / 1000 / 60, 'timeDiff', gocdConfig.timeDiff, 'lastBuildTime', entry.lastBuildTime);
     return Math.floor(millisSinceBuild / 1000 / 60);
   }
 

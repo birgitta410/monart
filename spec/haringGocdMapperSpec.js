@@ -8,7 +8,6 @@ describe('Haring Go CD Mapper', function () {
   var NUM_FIGURES_IN_VIS = 24;
 
   var mockTime = { format: function () { } };
-  var fakePipelineHistory, fakeActivity;
   var haringGocdMapper;
   var configData = {};
 
@@ -21,27 +20,11 @@ describe('Haring Go CD Mapper', function () {
 
   beforeEach(function() {
     var mockery = require('mockery');
-    var mockGocdApi = {
-      readData: function () {
-        var defer = Q.defer();
-        defer.resolve({
-          activity: {jobs: fakeActivity},
-          history: fakePipelineHistory
-        });
-        return defer.promise;
-      },
-      readActivity: function () {
-        var defer = Q.defer();
-        defer.resolve({jobs: fakeActivity});
-        return defer.promise;
-      }
-    };
     var mockConfig = {
-      //config.create('haring').get()
       create: function() {
         return {
           get: function() {
-            return configData
+            return configData;
           }
         };
       }
@@ -51,97 +34,69 @@ describe('Haring Go CD Mapper', function () {
       warnOnUnregistered: false,
       warnOnReplace: false
     });
-    mockery.registerMock('gocd-api', { getInstance: function() { return mockGocdApi; }});
     mockery.registerMock('../ymlHerokuConfig', mockConfig);
 
     haringGocdMapper = require('../server/haring/gocdMapper');
 
   });
 
-  afterEach(function() {
+  beforeEach(function() {
     configData = {};
   });
 
   describe('readHistoryAndActivity()', function() {
 
-    beforeEach(function() {
-      fakeActivity = [];
-      fakePipelineHistory = {};
-    });
-
-    it('should set the background colour to green if successful', function(done) {
-      fakePipelineHistory = {
-        '125': { wasSuccessful: successfulFn, time: mockTime }
-      };
-      fakeActivity = [
-        { name: 'NAME',
-          wasSuccessful: successfulFn
-        }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function(result) {
-        expect(result.background).toBe('green');
-        done();
-      }, function() {
-        console.log('error', arguments);
-      });
-    });
-
-    it('should set the background colour to orange if unsuccessful', function(done) {
-      fakePipelineHistory = {
-        '125': { wasSuccessful: notSuccessfulFn, time: mockTime }
-      };
-      fakeActivity = [
-        { name: 'NAME',
-          wasSuccessful: notSuccessfulFn
-        }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function(result) {
-        expect(result.background).toBe('orange');
-        done();
-      });
-    });
-
-    it('should set the background colour to blue if building', function(done) {
-      fakePipelineHistory = {
-        '125': { wasSuccessful: successfulFn, time: mockTime }
-      };
-      fakeActivity = [
-        { name: 'NAME',
-          activity: 'Building',
-          wasSuccessful: notSuccessfulFn
-        }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function(result) {
-        expect(result.background).toBe('blue');
-        done();
-      });
-    });
-
-    it('should add info about author to activity from history, even if history failed', function (done) {
-      fakePipelineHistory = {
-        '125': {
-          wasSuccessful: successfulFn,
-          time: mockTime,
-          author: {
-            initials: 'MMU'
+    it('should set the background colour to green if successful', function() {
+      var data = {
+        activity: {jobs: [
+          { name: 'NAME',
+            wasSuccessful: successfulFn
           }
+        ]},
+        history: {
+          '125': { wasSuccessful: successfulFn, time: mockTime }
         }
       };
-      fakeActivity = [
-        {
-          buildNumber: '125',
-          wasSuccessful: notSuccessfulFn
+      var result = haringGocdMapper.readHistoryAndActivity(data)
+      expect(result.background).toBe('green');
+
+    });
+
+    it('should set the background colour to orange if unsuccessful', function() {
+      var data = {
+        history: {
+          '125': { wasSuccessful: notSuccessfulFn, time: mockTime }
+        },
+        activity: {
+          jobs: [
+            { name: 'NAME',
+              wasSuccessful: notSuccessfulFn
+            }
+          ]
         }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function(result) {
-        expect(result.figures[0].initials).toBe('MMU');
-        expect(result.figures[1].initials).toBe('MMU');
-        done();
-      });
+      };
+
+      var result = haringGocdMapper.readHistoryAndActivity(data)
+      expect(result.background).toBe('orange');
+    });
+
+    it('should set the background colour to blue if building', function() {
+      var data = {
+        history: { '125': { wasSuccessful: successfulFn, time: mockTime } },
+        activity: { jobs: [
+          { name: 'NAME',
+            activity: 'Building',
+            wasSuccessful: notSuccessfulFn
+          }
+        ]}
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data)
+      expect(result.background).toBe('blue');
+
     });
 
     function preparePipelineAndActivity(numFailingHistory, numSuccessfulHistory, numSuccessfulActivity, numFailingActivity) {
-      fakePipelineHistory = {};
+      var fakePipelineHistory = {};
       _.times(numFailingHistory, function(n) {
         fakePipelineHistory[n + 1] = { wasSuccessful: notSuccessfulFn, 'test': 'not successful', key: n+1 };
       });
@@ -150,7 +105,7 @@ describe('Haring Go CD Mapper', function () {
         fakePipelineHistory[offset + n + 1] = { wasSuccessful: successfulFn, 'test': 'successful', key:  offset + n + 1};
       });
 
-      fakeActivity = [];
+      var fakeActivity = [];
       _.times(numSuccessfulActivity, function(n) {
         fakeActivity.push({ buildNumber: n, wasSuccessful: successfulFn, 'test': 'successful' });
       });
@@ -158,248 +113,296 @@ describe('Haring Go CD Mapper', function () {
       _.times(numFailingActivity, function() {
         fakeActivity.push({ buildNumber: activityOffset, wasSuccessful: notSuccessfulFn, 'test': 'not successful' });
       });
+
+      return {
+        history: fakePipelineHistory,
+        activity: { jobs: fakeActivity }
+      };
     }
 
-    it('should return all activity figures and fill up to the maximum number of figures with history', function (done) {
+    it('should return all activity figures and fill up to the maximum number of figures with history', function () {
       var NUM_FIGURES_IN_VIS = 24;
 
-      preparePipelineAndActivity(NUM_FIGURES_IN_VIS, 0, 8, 0);
+      var data = preparePipelineAndActivity(NUM_FIGURES_IN_VIS, 0, 8, 0);
 
-      haringGocdMapper.readHistoryAndActivity().then(function(result) {
-        expect(result.figures.length).toBe(NUM_FIGURES_IN_VIS);
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+      expect(result.figures.length).toBe(NUM_FIGURES_IN_VIS);
 
-        var firstHistoryFigure = result.figures[fakeActivity.length];
-        expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
+      var firstHistoryFigure = result.figures[data.activity.jobs.length];
+      expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
 
-        var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
-        expect(activityFigures.length).toBe(8);
-        done();
-      });
+      var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
+      expect(activityFigures.length).toBe(8);
+
     });
 
-    it('should make a "great success" announcement if all visible history is successful', function (done) {
+    it('should make a "great success" announcement if all visible history is successful', function () {
       var numActivity = 8;
       var numSuccessfulVisibleHistory = NUM_FIGURES_IN_VIS - numActivity; // 16
       var numFailingInvisibleHistory = 5;
 
-      preparePipelineAndActivity(numFailingInvisibleHistory, numSuccessfulVisibleHistory, numActivity, 0);
+      var data = preparePipelineAndActivity(numFailingInvisibleHistory, numSuccessfulVisibleHistory, numActivity, 0);
 
-      haringGocdMapper.readHistoryAndActivity().then(function(result) {
-        expect(result.announcementFigure).toBeDefined();
-        expect(result.announcementFigure.word1).toBe('great');
-        expect(result.announcementFigure.word2).toBe('success');
-        expect(result.announcementFigure.type).toContain('great_success');
-        expect(result.announcementFigure.color).toBe('blue');
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+      expect(result.announcementFigure).toBeDefined();
+      expect(result.announcementFigure.word1).toBe('great');
+      expect(result.announcementFigure.word2).toBe('success');
+      expect(result.announcementFigure.type).toContain('great_success');
+      expect(result.announcementFigure.color).toBe('blue');
+
     });
 
-    it('should not make a "great success" announcement if there are failing entries in history', function (done) {
+    it('should not make a "great success" announcement if there are failing entries in history', function () {
 
-      preparePipelineAndActivity(2, 8, 3, 0);
+      var data = preparePipelineAndActivity(2, 8, 3, 0);
 
-      haringGocdMapper.readHistoryAndActivity().then(function(result) {
-        expect(result.announcementFigure).toBeUndefined();
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+      expect(result.announcementFigure).toBeUndefined();
     });
 
   });
 
   describe('mapPipelineDataToFigures()', function () {
 
-    beforeEach(function () {
-      fakeActivity = [];
-      fakePipelineHistory = {};
-    });
-
-    it('should set fail_repeated type if failed and previous one was failure as well', function (done) {
-      fakePipelineHistory = {
-        '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
-        '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
+    it('should set fail_repeated type if failed and previous one was failure as well', function () {
+      var data = {
+        history: {
+          '125': { wasSuccessful: notSuccessfulFn, time: mockTime },
+          '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
+        },
+        activity: {
+          jobs: []
+        }
       };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(_.keys(result.figures).length).toBe(2);
-        expect(result.figures[0].type).toBe('fail_repeated');
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+      expect(_.keys(result.figures).length).toBe(2);
+      expect(result.figures[0].type).toBe('fail_repeated');
 
     });
 
-    it('should set passed_after_fail type if previous failed, current is success', function (done) {
+    it('should set passed_after_fail type if previous failed, current is success', function () {
       // descending order, newest first
-      fakePipelineHistory = {
-        '124': { wasSuccessful: successfulFn, time: mockTime },
-        '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
+      var data = {
+        history: {
+          '124': { wasSuccessful: successfulFn, time: mockTime },
+          '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
+        },
+        activity: {
+          jobs: []
+        }
       };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(_.keys(result.figures).length).toBe(2);
-        expect(result.figures[0].type).toBe('passed_after_fail');
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+      expect(_.keys(result.figures).length).toBe(2);
+      expect(result.figures[0].type).toBe('passed_after_fail');
 
     });
 
-    it('should set fail type if previous was successful', function (done) {
+    it('should set fail type if previous was successful', function () {
       // descending order, newest first
-      fakePipelineHistory = {
-        '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
-        '123': { wasSuccessful: successfulFn, time: mockTime }
+      var data = {
+        history: {
+          '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
+          '123': { wasSuccessful: successfulFn, time: mockTime }
+        },
+        activity: {
+          jobs: []
+        }
       };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(_.keys(result.figures).length).toBe(2);
-        expect(result.figures[0].type).toBe('fail');
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+      expect(_.keys(result.figures).length).toBe(2);
+      expect(result.figures[0].type).toBe('fail');
 
     });
 
-    it('should set color to WARM if failed, COLD if successful', function (done) {
-      fakePipelineHistory = {
-        '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
-        '123': { wasSuccessful: successfulFn, time: mockTime }
+    it('should set color to WARM if failed, COLD if successful', function () {
+      var data = {
+        history: {
+          '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
+          '123': { wasSuccessful: successfulFn, time: mockTime }
+        },
+        activity: {
+          jobs: []
+        }
       };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].color).toBe('WARM');
-        expect(result.figures[1].color).toBe('COLD');
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures[0].color).toBe('WARM');
+      expect(result.figures[1].color).toBe('COLD');
 
     });
 
-    it('should set orange background colour if latest build failed', function (done) {
-      fakePipelineHistory = {
-        '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
-        '123': { wasSuccessful: successfulFn, time: mockTime }
+    it('should set orange background colour if latest build failed', function () {
+      var data = {
+        history: {
+          '124': { wasSuccessful: notSuccessfulFn, time: mockTime },
+          '123': { wasSuccessful: successfulFn, time: mockTime }
+        },
+        activity: {
+          jobs: []
+        }
       };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.background).toBe('orange');
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.background).toBe('orange');
+
     });
 
-    it('should set green background colour if latest build successful', function (done) {
-      fakePipelineHistory = {
-        '124': { wasSuccessful: successfulFn, time: mockTime },
-        '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
+    it('should set green background colour if latest build successful', function () {
+      var data = {
+        history: {
+          '124': { wasSuccessful: successfulFn, time: mockTime },
+          '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
+        },
+        activity: {
+          jobs: []
+        }
       };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.background).toBe('green');
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.background).toBe('green');
     });
 
-    it('should not add initials of authors of both passed and failed jobs', function (done) {
-      fakePipelineHistory = {
-        '124': {
-          wasSuccessful: successfulFn,
-          author: {
-            initials: 'MMU'
+    it('should not add initials of authors of both passed and failed jobs', function () {
+      var data = {
+        history: {
+          '124': {
+            wasSuccessful: successfulFn,
+            author: {
+              initials: 'MMU'
+            }
+          },
+          '123': {
+            wasSuccessful: notSuccessfulFn,
+            author: {
+              initials: 'MMU'
+            }
           }
         },
-        '123': {
-          wasSuccessful: notSuccessfulFn,
-          author: {
-            initials: 'MMU'
+        activity: {
+          jobs: []
+        }
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures[0].initials).toBe('MMU');
+      expect(result.figures[1].initials).toBe('MMU');
+
+    });
+
+    it('should set info texts', function() {
+      var data = {
+        history: {
+          '124': {
+            wasSuccessful: successfulFn,
+            label: '124',
+            info: 'a text'
           }
+        },
+        activity: {
+          jobs: []
         }
       };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].initials).toBe('MMU');
-        expect(result.figures[1].initials).toBe('MMU');
-        done();
-      });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures[0].info).toBe('124');
+      expect(result.figures[0].info2).toBe('a text');
+
     });
 
-    it('should set info texts', function(done) {
-      fakePipelineHistory = {
-        '124': {
-          wasSuccessful: successfulFn,
-          label: '124',
-          info: 'a text'
+    it('should set the time', function() {
+      var data = {
+        history: {
+          '124': {
+            wasSuccessful: successfulFn,
+            last_scheduled: '1419000842499'
+          }
+        },
+        activity: {
+          jobs: []
         }
       };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].info).toBe('124');
-        expect(result.figures[0].info2).toBe('a text');
-        done();
-      });
-    });
+      var result = haringGocdMapper.readHistoryAndActivity(data);
 
-    it('should set the time', function(done) {
-      fakePipelineHistory = {
-        '124': {
-          wasSuccessful: successfulFn,
-          last_scheduled: '1419000842499'
-        }
-      };
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].time).toBe(1419000842499);
-        done();
-      });
+      expect(result.figures[0].time).toBe(1419000842499);
+
     });
 
   });
 
   describe('mapActivityDataToFigures()', function () {
 
-    beforeEach(function () {
-      fakeActivity = [];
-      fakePipelineHistory = {};
-    });
-
-    it('should set dotted border for all activity entries', function (done) {
-      fakeActivity = [
-        { name: 'A-PIPELINE :: integration-test :: backend-integration',
-          activity: 'Building',
-          wasSuccessful: successfulFn
+    it('should set dotted border for all activity entries', function () {
+      var data = {
+        history: { },
+        activity: {
+          jobs: [
+            { name: 'A-PIPELINE :: integration-test :: backend-integration',
+              activity: 'Building',
+              wasSuccessful: successfulFn
+            }
+          ]
         }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].border).toBe('dotted');
-        done();
-      });
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures[0].border).toBe('dotted');
+
     });
 
-    it('should set building type if currently building', function (done) {
-      fakeActivity = [
-        { name: 'A-PIPELINE :: integration-test :: backend-integration',
-          activity: 'Building',
-          wasSuccessful: successfulFn
+    it('should set building type if currently building', function () {
+      var data = {
+        history: { },
+        activity: {
+          jobs: [
+            { name: 'A-PIPELINE :: integration-test :: backend-integration',
+              activity: 'Building',
+              wasSuccessful: successfulFn
+            }
+          ]
         }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures.length).toBe(1);
-        expect(result.figures[0].type).toBe('building');
-        done();
-      });
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures.length).toBe(1);
+      expect(result.figures[0].type).toBe('building');
+
     });
 
-    it('should set type according to last build status if sleeping', function (done) {
-      fakeActivity = [
-        { name: 'A-PIPELINE :: integration-test :: backend-integration', wasSuccessful: successfulFn, activity: 'Sleeping' },
-        { name: 'A-PIPELINE :: deploy-dev :: backend', wasSuccessful: notSuccessfulFn, activity: 'Sleeping' }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures.length).toBe(2);
-        expect(result.figures[0].type).toBe('passed');
-        expect(result.figures[1].type).toBe('fail');
-        done();
-      });
-    });
-
-    it('should set the time', function (done) {
-      fakeActivity = [
-        { name: 'A-PIPELINE :: integration-test :: backend-integration',
-          activity: 'Building',
-          wasSuccessful: successfulFn,
-          lastBuildTime: '2014-07-24T09:14:02'
+    it('should set type according to last build status if sleeping', function () {
+      var data = {
+        history: { },
+        activity: {
+          jobs: [
+            { name: 'A-PIPELINE :: integration-test :: backend-integration', wasSuccessful: successfulFn, activity: 'Sleeping' },
+            { name: 'A-PIPELINE :: deploy-dev :: backend', wasSuccessful: notSuccessfulFn, activity: 'Sleeping' }
+          ]
         }
-      ];
-      haringGocdMapper.readHistoryAndActivity().then(function (result) {
-        expect(result.figures[0].time).toEqual(1406193242000);
-        done();
-      });
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures.length).toBe(2);
+      expect(result.figures[0].type).toBe('passed');
+      expect(result.figures[1].type).toBe('fail');
+
+    });
+
+    it('should set the time', function () {
+      var data = {
+        history: { },
+        activity: {
+          jobs: [
+            { name: 'A-PIPELINE :: integration-test :: backend-integration',
+              activity: 'Building',
+              wasSuccessful: successfulFn,
+              lastBuildTime: '2014-07-24T09:14:02'
+            }
+          ]
+        }
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures[0].time).toEqual(1406193242000);
+
     });
 
     describe('fail_too_long', function() {
@@ -410,47 +413,63 @@ describe('Haring Go CD Mapper', function () {
 
       afterEach(tk.reset);
 
-      it('should be the type when build was more than 30 minutes ago', function(done) {
-        fakeActivity = [
-          { name: 'A-PIPELINE :: integration-test :: backend-integration',
-            wasSuccessful: notSuccessfulFn,
-            lastBuildTime: '2014-01-01T09:00:00'
+      it('should be the type when build was more than 30 minutes ago', function() {
+        var data = {
+          history: { },
+          activity: {
+            jobs: [
+              { name: 'A-PIPELINE :: integration-test :: backend-integration',
+                wasSuccessful: notSuccessfulFn,
+                lastBuildTime: '2014-01-01T09:00:00'
+              }
+            ]
           }
-        ];
-        haringGocdMapper.readHistoryAndActivity().then(function (result) {
-          expect(result.figures[0].type).toEqual('fail_too_long');
-          expect(result.figures[0].info).toContain('45 minutes');
-          done();
-        });
+        };
+        var result = haringGocdMapper.readHistoryAndActivity(data);
+
+        expect(result.figures[0].type).toEqual('fail_too_long');
+        expect(result.figures[0].info).toContain('45 minutes');
+
       });
 
-      it('should not be the type when failed build was less than 30 minutes ago', function(done) {
-        fakeActivity = [
-          { name: 'A-PIPELINE :: integration-test :: backend-integration',
-            wasSuccessful: notSuccessfulFn,
-            lastBuildTime: '2014-01-01T09:40:00'
+      it('should not be the type when failed build was less than 30 minutes ago', function() {
+        var data = {
+          history: { },
+          activity: {
+            jobs: [
+              { name: 'A-PIPELINE :: integration-test :: backend-integration',
+                wasSuccessful: notSuccessfulFn,
+                lastBuildTime: '2014-01-01T09:40:00'
+              }
+            ]
           }
-        ];
-        haringGocdMapper.readHistoryAndActivity().then(function (result) {
-          expect(result.figures[0].type).toEqual('fail');
-          done();
-        });
+        };
+
+        var result = haringGocdMapper.readHistoryAndActivity(data);
+
+        expect(result.figures[0].type).toEqual('fail');
+
       });
 
-      iit('should take into account a time difference to the server', function(done) {
+      it('should take into account a time difference to the server', function() {
         configData.timeDiff = -60;
         var goServerTimeLastBuild = '2014-01-01T10:00:00';
-        fakeActivity = [
-          { name: 'A-PIPELINE :: integration-test :: backend-integration',
-            wasSuccessful: notSuccessfulFn,
-            lastBuildTime: goServerTimeLastBuild
+        var data = {
+          history: { },
+          activity: {
+            jobs: [
+              { name: 'A-PIPELINE :: integration-test :: backend-integration',
+                wasSuccessful: notSuccessfulFn,
+                lastBuildTime: goServerTimeLastBuild
+              }
+            ]
           }
-        ];
-        haringGocdMapper.readHistoryAndActivity().then(function (result) {
-          expect(result.figures[0].type).toEqual('fail_too_long');
-          expect(result.figures[0].info).toContain('45 minutes');
-          done();
-        });
+        };
+
+        var result = haringGocdMapper.readHistoryAndActivity(data);
+        expect(result.figures[0].type).toEqual('fail_too_long');
+        expect(result.figures[0].info).toContain('45 minutes');
+
       });
     });
 

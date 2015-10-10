@@ -13,6 +13,8 @@
     background-color: grey;
     height: 14%;
     width: 30%;
+    min-height: 100px;
+    min-width: 250px;
     text-align: center;
 }
 

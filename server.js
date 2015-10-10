@@ -8,7 +8,7 @@ var _ = require('lodash');
 var haringGocdMapper = require('./server/haring/gocdMapper');
 var miroGocdMapper = require('./server/miro/gocdMapper');
 var miroGocdMapperConstellation = require('./server/miro/gocdMapperConstellation');
-var gocdReader = require('./server/gocdReader');
+var gocdCreator = require('./server/gocdReader');
 
 function artwiseServer() {
 
@@ -21,17 +21,19 @@ function artwiseServer() {
 
   var CACHE_INITIALISED = false;
   var UPDATE_INTERVAL = 10000;
+  var gocd;
 
-  function createListener(identifier, dataReader) {
+  gocdCreator.then(function(instance) {
+    console.log("GO CD DATA CACHE INITIALISED");
+    CACHE_INITIALISED = true;
+    gocd = instance;
+  });
+
+  function createListener(identifier, dataTransformer) {
     return function() {
 
       var wss = new WebSocketServer({server: server, path: '/' + identifier});
       console.log(identifier +' websocket server created');
-
-      dataReader().then(function() {
-        console.log('INITIALISED DATA');
-        CACHE_INITIALISED = true;
-      });
 
       wss.on('connection', function(ws) {
         console.log('connected to /' + identifier);
@@ -39,13 +41,19 @@ function artwiseServer() {
         function newClient() {
 
           function getActivityAndUpdateClients() {
-            dataReader().then(function(data) {
-              var result = {};
-              result[identifier] = data;
-              ws.send(JSON.stringify(result), function() {  });
-            }).fail(function() {
-              console.error('ERROR reading and transforming data', arguments);
-            });
+            var result = {};
+            if(CACHE_INITIALISED !== true) {
+              result[identifier] = { warmingUp: true };
+              ws.send(JSON.stringify(result));
+            } else {
+              gocd.readData().then(function(gocdData) {
+                var visualisationData = dataTransformer(gocdData);
+                result[identifier] = visualisationData;
+                ws.send(JSON.stringify(result), function() {  });
+              }).fail(function(e) {
+                console.error('ERROR reading and transforming data', e, e.stack);
+              });
+            }
           }
 
           getActivityAndUpdateClients();
@@ -89,9 +97,9 @@ function artwiseServer() {
 
   /** ENDPOINTS ************************/
 
-  function readAndRespond(promiseFunction, res) {
+  function readAndRespondWithPromisedData(promise, res) {
     if(CACHE_INITIALISED) {
-      promiseFunction().then(function (data) {
+      promise.then(function (data) {
         respondWithJson(res, data);
       });
     } else {
@@ -113,15 +121,25 @@ function artwiseServer() {
     });
 
   app.get('/data/gocd', function(req, res) {
-    readAndRespond(gocdReader.readData, res);
+    readAndRespondWithPromisedData(gocd.readData(), res);
   });
 
   app.get('/data/gocd/haring', function(req, res) {
-    readAndRespond(haringGocdMapper.readHistoryAndActivity, res);
+    readAndRespondWithPromisedData(gocd.readData().then(function(data) {
+      return haringGocdMapper.readHistoryAndActivity(data);
+    }), res);
   });
 
   app.get('/data/gocd/miro', function(req, res) {
-    readAndRespond(miroGocdMapper.readHistoryAndActivity, res);
+    readAndRespondWithPromisedData(gocd.readData().then(function(data) {
+      return miroGocdMapperConstellation.readHistoryAndActivity(data);
+    }), res);
+  });
+
+  app.get('/data/gocd/miroBlue', function(req, res) {
+    readAndRespondWithPromisedData(gocd.readData().then(function(data) {
+      return miroGocdMapper.readHistoryAndActivity(data);
+    }), res);
   });
 
   var port = process.env.PORT || 5000;
