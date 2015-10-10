@@ -317,16 +317,30 @@ var InfoToggler = function (body) {
 
 var haringVisualisation = new HaringVisualisation();
 
+function getPipeline() {
+  var match = window.location.search.match(/pipeline=([^&]+)/);
+  if(match) {
+    return match[1];
+  } else {
+    throw new Error('Please provide pipeline name ?pipeline=...');
+  }
+}
+
 var wsHost = 'ws://' + window.location.host;
-var ws = new WebSocket(wsHost + '/haring');
-artwise.initPing(ws, function() {
-  haringVisualisation.setBackgroundStyle('grey');
-});
 
-ws.onmessage = function (event) {
-  artwise.processMessage(event, 'haring', haringVisualisation.processNewData);
-};
+try {
+  var ws = new WebSocket(wsHost + '/haring?pipeline=' + getPipeline());
+  artwise.initPing(ws, function () {
+    haringVisualisation.setBackgroundStyle('grey');
+  });
 
+  ws.onmessage = function (event) {
+    artwise.processMessage(event, 'haring', haringVisualisation.processNewData);
+  };
+} catch(noPipelineSpecified) {
+  $('#error-message').text(noPipelineSpecified);
+  $('#error-message').show();
+}
 var body = $('body');
 var toggler = InfoToggler(body);
 

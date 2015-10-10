@@ -39,8 +39,8 @@ function haringGocdMapperModule() {
   }
 
   function getSpecialAnnouncementFigure(historyData) {
-    var greatSuccess = ! _.any(_.keys(historyData), function(key) {
-      return historyData[key].wasSuccessful() === false;
+    var greatSuccess = !_.isEmpty(_.keys(historyData)) && _.every(_.keys(historyData), function(key) {
+      return historyData[key].wasSuccessful() === true;
     });
     if(greatSuccess) {
       return {

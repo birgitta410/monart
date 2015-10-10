@@ -18,6 +18,22 @@
     text-align: center;
 }
 
+#error-message {
+    display: none;
+    position: absolute;
+    top: 20%;
+    left: 35%;
+    padding: 15px;
+    z-index: 50;
+    background-color: red;
+    color: white;
+    height: 14%;
+    width: 30%;
+    min-height: 100px;
+    min-width: 250px;
+    text-align: center;
+}
+
 /**********************************************/
 .browsehappy {
     margin: 0.2em 0;

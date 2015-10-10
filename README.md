@@ -48,7 +48,7 @@ node server
 
 Local application URL
 ```
-http://localhost:5000
+http://localhost:5000/haring/?pipeline=name-of-pipeline-to-display
 ```
 
 ##Configure and run locally
@@ -59,7 +59,6 @@ Create file `config.yml` in the root of the project and configure as described b
 default:
   gocd:
     url: the-go-host:8153
-    pipeline: XXX    # name of the pipeline you want to visualise>
     user: xxx
     password: xxxx
     timeDiff: -60    # (in minutes) if the Go server is in a different time zone than where artwise server is running
@@ -105,7 +104,6 @@ git remote add heroku git@heroku.com:your-repo-name.git
 
 # Configure access
 heroku config:set GOCD_URL=the-go-host:8153
-heroku config:set GOCD_PIPELINE=my-pipeline
 heroku config:set GOCD_USER=xxx
 heroku config:set GOCD_PASSWORD=xxx
 heroku config:set GOCD_JOBS="my-pipeline :: build,my-pipeline :: integration-test,my-pipeline :: deploy"

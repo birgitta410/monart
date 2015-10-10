@@ -37,9 +37,17 @@ function artwiseServer() {
       console.log(identifier +' websocket server created');
 
       wss.on('connection', function(ws) {
-        console.log('connected to /' + identifier);
+        console.log('connected to /' + ws.upgradeReq.url);
 
         function newClient() {
+
+          function getPipelineParameter() {
+            var requestedUrl = ws.upgradeReq.url;
+            var match = requestedUrl.match(/pipeline=([^&]+)/);
+            return match ? match[1] : undefined;
+          }
+
+          var pipeline = getPipelineParameter();
 
           function getActivityAndUpdateClients() {
             var result = {};
@@ -47,7 +55,7 @@ function artwiseServer() {
               result[identifier] = { warmingUp: true };
               ws.send(JSON.stringify(result));
             } else {
-              gocd.readData(config.pipeline).then(function(gocdData) {
+              gocd.readData(pipeline).then(function(gocdData) {
                 var visualisationData = dataTransformer(gocdData);
                 result[identifier] = visualisationData;
                 ws.send(JSON.stringify(result), function() {  });
