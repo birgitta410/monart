@@ -130,7 +130,11 @@ function artwiseServer() {
     });
 
   app.get('/data/gocd', function(req, res) {
-    readAndRespondWithPromisedData(gocd.readData(), res);
+    if(!req.query.pipeline) {
+      res.send('ERROR - Please provide pipeline');
+    } else {
+      readAndRespondWithPromisedData(gocd.readData(req.query.pipeline), res);
+    }
   });
 
   app.get('/data/gocd/haring', function(req, res) {
