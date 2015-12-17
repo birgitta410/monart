@@ -19,6 +19,9 @@ function artwiseServer() {
 
   var CACHE_INITIALISED = false;
   var UPDATE_INTERVAL = 10000;
+  var USES_SSL = false;
+  var port = process.env.PORT || 5000;
+
   var config = configReader.create('gocd').get();
   var artwiseConfig = configReader.create('artwise').get();
 
@@ -26,17 +29,16 @@ function artwiseServer() {
     var rootDir = path.resolve(path.dirname(module.uri));
     app.use(express.static(rootDir + '/app/'));
 
-    var isHeroku = artwiseConfig.env === 'HEROKU';
-    if(isHeroku) {
-      console.log("On Heroku, use HTTP");
-      return http.createServer(app);
-    } else {
-      console.log("On Heroku, use HTTPS");
+    try {
       var credentials = {
         key: fs.readFileSync('artwise-key.pem'),
         cert: fs.readFileSync('artwise-cert.pem')
       };
+      USES_SSL = true;
       return https.createServer(credentials, app);
+    } catch(couldNotReadKeyAndCert) {
+      console.log("WARNING - could not use SSL, provide artwise-key.pem and artwise-cert.pem");
+      return http.createServer(app);
     }
 
   }
@@ -47,6 +49,8 @@ function artwiseServer() {
   var gocd;
   gocdCreator(config).then(function(instance) {
     console.log("GO CD DATA CACHE INITIALISED");
+    console.log((USES_SSL ? 'https' : 'http') + ' server listening on %d', port);
+
     CACHE_INITIALISED = true;
     gocd = instance;
   });
@@ -54,7 +58,7 @@ function artwiseServer() {
   function createListener(identifier, dataTransformer) {
     return function() {
 
-      var wss = new WebSocketServer({server: server, path: '/' + identifier, secure: true });
+      var wss = new WebSocketServer({server: server, path: '/' + identifier });
       console.log(identifier +' websocket server created');
 
       wss.on('connection', function(ws) {
@@ -176,10 +180,7 @@ function artwiseServer() {
     }), res);
   });
 
-  var port = process.env.PORT || 5000;
   server.listen(port);
-
-  console.log('http server listening on %d', port);
 
 }
 

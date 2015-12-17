@@ -326,7 +326,8 @@ function getPipeline() {
   }
 }
 
-var wsHost = 'wss://' + window.location.host;
+var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+var wsHost = wsProtocol + '//' + window.location.host;
 
 try {
   var ws = new WebSocket(wsHost + '/haring?pipeline=' + getPipeline());
