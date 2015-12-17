@@ -1,6 +1,7 @@
 
 var ws = require('ws');
 var https = require('https');
+var http = require('http');
 var express = require('express');
 var fs = require('fs');
 var path = require('path');
@@ -19,17 +20,25 @@ function artwiseServer() {
   var CACHE_INITIALISED = false;
   var UPDATE_INTERVAL = 10000;
   var config = configReader.create('gocd').get();
-  var sslConfig = configReader.create('ssl').get();
+  var artwiseConfig = configReader.create('artwise').get();
 
   function createServer() {
     var rootDir = path.resolve(path.dirname(module.uri));
     app.use(express.static(rootDir + '/app/'));
 
-    var credentials = {
-      key: sslConfig.key || fs.readFileSync('artwise-key.pem'),
-      cert: sslConfig.cert || fs.readFileSync('artwise-cert.pem')
-    };
-    return https.createServer(credentials, app);
+    var isHeroku = artwiseConfig.env === 'HEROKU';
+    if(isHeroku) {
+      console.log("On Heroku, use HTTP");
+      return http.createServer(app);
+    } else {
+      console.log("On Heroku, use HTTPS");
+      var credentials = {
+        key: fs.readFileSync('artwise-key.pem'),
+        cert: fs.readFileSync('artwise-cert.pem')
+      };
+      return https.createServer(credentials, app);
+    }
+
   }
 
   var server = createServer();
