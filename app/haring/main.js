@@ -326,7 +326,7 @@ function getPipeline() {
   }
 }
 
-var wsHost = 'ws://' + window.location.host;
+var wsHost = 'wss://' + window.location.host;
 
 try {
   var ws = new WebSocket(wsHost + '/haring?pipeline=' + getPipeline());

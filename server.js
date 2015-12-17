@@ -1,7 +1,8 @@
 
 var ws = require('ws');
-var http = require('http');
+var https = require('https');
 var express = require('express');
+var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
 var haringGocdMapper = require('./server/haring/gocdMapper');
@@ -17,7 +18,9 @@ function artwiseServer() {
 
   var rootDir = path.resolve(path.dirname(module.uri));
   app.use(express.static(rootDir + '/app/'));
-  var server = http.createServer(app);
+
+  var credentials = {key: fs.readFileSync('artwise-key.pem'), cert: fs.readFileSync('artwise-cert.pem')};
+  var server = https.createServer(credentials, app);
 
   var CACHE_INITIALISED = false;
   var UPDATE_INTERVAL = 10000;
@@ -33,7 +36,7 @@ function artwiseServer() {
   function createListener(identifier, dataTransformer) {
     return function() {
 
-      var wss = new WebSocketServer({server: server, path: '/' + identifier});
+      var wss = new WebSocketServer({server: server, path: '/' + identifier, secure: true });
       console.log(identifier +' websocket server created');
 
       wss.on('connection', function(ws) {
