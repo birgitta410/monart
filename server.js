@@ -16,15 +16,24 @@ function artwiseServer() {
   var WebSocketServer = ws.Server
     , app = express();
 
-  var rootDir = path.resolve(path.dirname(module.uri));
-  app.use(express.static(rootDir + '/app/'));
-
-  var credentials = {key: fs.readFileSync('artwise-key.pem'), cert: fs.readFileSync('artwise-cert.pem')};
-  var server = https.createServer(credentials, app);
-
   var CACHE_INITIALISED = false;
   var UPDATE_INTERVAL = 10000;
   var config = configReader.create('gocd').get();
+  var sslConfig = configReader.create('ssl').get();
+
+  function createServer() {
+    var rootDir = path.resolve(path.dirname(module.uri));
+    app.use(express.static(rootDir + '/app/'));
+
+    var credentials = {
+      key: sslConfig.key || fs.readFileSync('artwise-key.pem'),
+      cert: sslConfig.cert || fs.readFileSync('artwise-cert.pem')
+    };
+    return https.createServer(credentials, app);
+  }
+
+  var server = createServer();
+
 
   var gocd;
   gocdCreator(config).then(function(instance) {
