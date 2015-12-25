@@ -117,14 +117,14 @@ function haringGocdMapperModule() {
       var entry = history[key];
       var previous = index < keysDescending.length ? history[keysDescending[index + 1]] : undefined;
 
-      var initials = entry.author ? entry.author.initials.toUpperCase() : undefined;
+      var initials = entry.summary.author ? entry.summary.author.initials.toUpperCase() : undefined;
       return {
         color: getColor(entry),
         info: entry.label + (initials ? '<br>' + initials : ''),
-        info2: entry.info,
+        info2: entry.summary.text,
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
         initials: initials,
-        time: parseInt(entry.last_scheduled),
+        time: parseInt(entry.summary.lastScheduled),
         key: key
       };
     });
