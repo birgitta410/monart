@@ -51,14 +51,14 @@ Local application URL
 http://localhost:5000/haring/?pipeline=name-of-pipeline-to-display
 ```
 
-##Configure and run locally
+##Configure and host yourself
 Create file `config.yml` in the root of the project and configure as described below.
 
 ###Access to Go CD
 ```
 default:
   gocd:
-    url: the-go-host:8153
+    url: https://the-go-host:8154
     user: xxx
     password: xxxx
     timeDiff: -60    # (in minutes) if the Go server is in a different time zone than where artwise server is running
@@ -87,8 +87,21 @@ default:
 
 'acceptableTimeFailed' (optional, default is 30) is the number of minutes that is acceptable for a build to stay red. When that period is up, there will be a visual indicator that it is.
 
+### Run with SSL
+You can run the artwise server with SSL support. The server will look for these two files and use them if they exist:
+```
+artwise-csr.pem
+artwise-key.pem
+```
+Here is one resource to help you get started with a self-signed certificate:
+[https://nodejs.org/api/tls.html#tls_tls_ssl](https://nodejs.org/api/tls.html#tls_tls_ssl)
+
+...and then check it out at `https://localhost:5000/haring/`.
+
 ##Configure and run on Heroku
 For each value in the config file, you can create a respective Heroku variable so you won't have to push config.yml to the git repository.
+
+Please note that you can access the deployed Heroku instance via HTTPS out of the box, you will not have to create your own certificate etc.
 
 ### Step by step
 - Create a new application in Heroku and make a note of its Git repository address.
