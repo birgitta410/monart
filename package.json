@@ -11,6 +11,9 @@
     "request": "^2.55.0",
     "ws": "^0.7.1"
   },
+  "engines" : {
+    "node": "0.10.35"
+  },
   "devDependencies": {
     "jasmine-node": "~1.14.5",
     "mockery": "~1.4.0",
