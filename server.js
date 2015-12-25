@@ -53,7 +53,7 @@ function artwiseServer() {
 
     CACHE_INITIALISED = true;
     gocd = instance;
-  });
+  }).done();
 
   function createListener(identifier, dataTransformer) {
     return function() {
@@ -84,9 +84,7 @@ function artwiseServer() {
                 var visualisationData = dataTransformer(gocdData);
                 result[identifier] = visualisationData;
                 ws.send(JSON.stringify(result), function() {  });
-              }).fail(function(e) {
-                console.error('ERROR reading and transforming data', e, e.stack);
-              });
+              }).done();
             }
           }
 
@@ -135,7 +133,7 @@ function artwiseServer() {
     if(CACHE_INITIALISED) {
       promise.then(function (data) {
         respondWithJson(res, data);
-      });
+      }).done();
     } else {
       res.send('warming up');
     }
@@ -165,19 +163,19 @@ function artwiseServer() {
   app.get('/data/gocd/haring', function(req, res) {
     readAndRespondWithPromisedData(gocd.readData().then(function(data) {
       return haringGocdMapper.readHistoryAndActivity(data);
-    }), res);
+    }), res).done();
   });
 
   app.get('/data/gocd/miro', function(req, res) {
     readAndRespondWithPromisedData(gocd.readData().then(function(data) {
       return miroGocdMapperConstellation.readHistoryAndActivity(data);
-    }), res);
+    }), res).done();
   });
 
   app.get('/data/gocd/miroBlue', function(req, res) {
     readAndRespondWithPromisedData(gocd.readData().then(function(data) {
       return miroGocdMapper.readHistoryAndActivity(data);
-    }), res);
+    }), res).done();
   });
 
   server.listen(port);
