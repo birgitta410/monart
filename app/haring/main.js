@@ -1,7 +1,7 @@
 
 var HaringVisualisation = function() {
   var NUM_ROWS = 4;
-  var COLS_PER_ROW = 6;
+  var COLS_PER_ROW = 5;
 
   var ROW_HEIGHT_PERCENT = 100 / NUM_ROWS;
   var COL_WIDTH_PERCENT = 100 / COLS_PER_ROW;
