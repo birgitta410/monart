@@ -46,6 +46,10 @@
 body {
     padding-top: 20px;
     padding-bottom: 20px;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    align-items: center;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
