@@ -86,7 +86,9 @@ function haringGocdMapperModule() {
 
   function getFigureType(entry, lastEntryWasSuccessful) {
 
-    if(entry.wasSuccessful() && !lastEntryWasSuccessful) {
+    if(entry.wasCancelled && entry.wasCancelled()) {
+      return 'cancelled';
+    } else if(entry.wasSuccessful() && !lastEntryWasSuccessful) {
       return 'passed_after_fail';
     } else if (entry.wasSuccessful()) {
       return 'passed';
