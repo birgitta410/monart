@@ -10,7 +10,7 @@ var BoxesVisualisation = function() {
   }
 
   var WARM_COLORS = ['red', 'yellow', 'pink', 'orange'];
-  var COLD_COLORS = ['blue', 'dark-blue', 'green', 'dark-green'];
+  var COLD_COLORS = ['blue', 'dark-blue', 'purple'];
   function randomWarmColor() {
     return WARM_COLORS[Math.floor(Math.random() * WARM_COLORS.length)];
   }
