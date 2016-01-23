@@ -1,5 +1,6 @@
 artwise
 =======
+[![Build Status](https://snap-ci.com/artwise/artwise/branch/master/build_image)](https://snap-ci.com/artwise/artwise/branch/master)
 
 Build Monitor for [Go CD](http://go.cd).
 
