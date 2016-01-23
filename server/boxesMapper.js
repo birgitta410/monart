@@ -32,20 +32,31 @@ function boxesMapperModule() {
     var keysDescending = _.keys(history).sort(compareNumbers).reverse();
     var lastBuildSuccessful = keysDescending.length > 0 ? history[keysDescending[0]].wasSuccessful() : true;
 
-    var nonPassingRuns = _.where(keysDescending, function(key, index) {
+    if (! history[keysDescending[0]].wasSuccessful()) {
+      return {
+        background: lastBuildSuccessful ? 'green' : 'orange',
+        boxes: [history[keysDescending[0]]]
+      };
+    } else {
+      return {
+        boxes: []
+      };
+    }
+    //
+    //var nonPassingRuns = _.where(keysDescending, function(key, index) {
+    //
+    //  var entry = history[key];
+    //  return entry.summary.result !== 'Passed';
+    //});
+    //
+    //var boxes = _.map(nonPassingRuns, function(key) {
+    //  return history[key];
+    //});
 
-      var entry = history[key];
-      return entry.summary.result !== 'Passed';
-    });
-
-    var boxes = _.map(nonPassingRuns, function(key) {
-      return history[key];
-    });
-
-    return {
-      background: lastBuildSuccessful ? 'green' : 'orange',
-      boxes: boxes
-    };
+    //return {
+    //  background: lastBuildSuccessful ? 'green' : 'orange',
+    //  boxes: boxes
+    //};
 
   }
 
