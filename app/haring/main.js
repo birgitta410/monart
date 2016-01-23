@@ -125,7 +125,8 @@ var HaringVisualisation = function() {
     infoDiv.find('.level-1').html(entry.info);
     infoDiv.find('.level-2').text(entry.info2);
 
-    var imgExtension = entry.type === 'building' || entry.type === 'fail_too_long' ? '.gif' : '.png';
+    var animated_types = ['building', 'fail_too_long', 'scheduled'];
+    var imgExtension = _.contains(animated_types, entry.type) ? '.gif' : '.png';
     var imgFileName = entry.type === 'building' && currentlyInDanger ? 'danger' : entry.type;
     if(!entry.four) {
       imgTag.attr('src', 'images/' + imgFileName + imgExtension);

@@ -5,7 +5,7 @@ function vierGewinntModule() {
 
   var NUM_TO_WIN = 4;
   var NUM_ROWS = 4;
-  var COLS_PER_ROW = 6;
+  var COLS_PER_ROW = 5;
 
 
   function isFigureSuccessful(figure) {

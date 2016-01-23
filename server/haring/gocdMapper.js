@@ -145,8 +145,10 @@ function haringGocdMapperModule() {
     function getFigureTypeForActivity(entry) {
 
       var type = getFigureType(entry, true);
-      if(entry.activity === 'Building') {
+      if(entry.isBuilding && entry.isBuilding()) {
         type = 'building';
+      } else if(entry.isScheduled && entry.isScheduled()) {
+        type = 'scheduled';
       } else if(type === 'fail') {
         var sinceLast = getMinutesSinceBuild(entry);
         var acceptableTimeValue = haringConfig.acceptableTimeFailed || '30';
@@ -190,7 +192,9 @@ function haringGocdMapperModule() {
     });
 
     var isBuilding = _.any(activity.stages, function(entry) {
-      return entry.activity === 'Building';
+      return entry.isBuilding && entry.isBuilding()
+        || entry.isScheduled && entry.isScheduled()
+        || entry.activity === 'Building';
     });
 
     return {
