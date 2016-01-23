@@ -36,7 +36,7 @@ npm install
 
 Run tests
 ```
-sh ./run_spec.sh
+npm test
 ```
 
 Configure access to your Go CD server (see below)

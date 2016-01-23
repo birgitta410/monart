@@ -1,6 +1,9 @@
 {
   "name": "artwise",
   "version": "0.0.2",
+  "scripts": {
+    "test": "./node_modules/jasmine/bin/jasmine.js"
+  },
   "dependencies": {
     "express": "^4.12.3",
     "gocd-api": "git://github.com/birgitta410/gocd-api.git#WIP",
@@ -11,11 +14,11 @@
     "request": "^2.55.0",
     "ws": "^0.7.1"
   },
-  "engines" : {
+  "engines": {
     "node": "0.10.35"
   },
   "devDependencies": {
-    "jasmine-node": "~1.14.5",
+    "jasmine": "^2.4.1",
     "mockery": "~1.4.0",
     "timekeeper": "0.0.5"
   }
