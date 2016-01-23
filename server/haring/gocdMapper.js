@@ -145,7 +145,7 @@ function haringGocdMapperModule() {
     function getFigureTypeForActivity(entry) {
 
       var type = getFigureType(entry, true);
-      if(entry.isBuilding && entry.isBuilding()) {
+      if(entry.isBuilding && entry.isBuilding() || entry.activity === 'Building') {
         type = 'building';
       } else if(entry.isScheduled && entry.isScheduled()) {
         type = 'scheduled';

@@ -163,6 +163,20 @@ describe('Haring Go CD Mapper', function () {
 
   describe('mapPipelineDataToFigures()', function () {
 
+    it('should set cancelled type if a stage got cancelled', function () {
+      var data = {
+        history: {
+          '125': { wasSuccessful: notSuccessfulFn, time: mockTime, wasCancelled: function() { return true; } }
+        },
+        activity: {
+          stages: []
+        }
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+      expect(result.figures[0].type).toBe('cancelled');
+
+    });
+
     it('should set fail_repeated type if failed and previous one was failure as well', function () {
       var data = {
         history: {
@@ -356,7 +370,9 @@ describe('Haring Go CD Mapper', function () {
         activity: {
           stages: [
             { name: 'A-PIPELINE :: integration-test :: backend-integration',
-              activity: 'Building',
+              isBuilding: function() {
+                return true;
+              },
               wasSuccessful: successfulFn
             }
           ]
@@ -366,6 +382,49 @@ describe('Haring Go CD Mapper', function () {
 
       expect(result.figures.length).toBe(1);
       expect(result.figures[0].type).toBe('building');
+
+    });
+
+    it('should set scheduled type if currently scheduled', function () {
+      var data = {
+        history: { },
+        activity: {
+          stages: [
+            { name: 'A-PIPELINE :: integration-test :: backend-integration',
+              isScheduled: function() {
+                return true;
+              },
+              wasSuccessful: successfulFn
+            }
+          ]
+        }
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures.length).toBe(1);
+      expect(result.figures[0].type).toBe('scheduled');
+
+    });
+
+    it('should set cancelled type if stage was cancelled', function () {
+      var data = {
+        history: { },
+        activity: {
+          stages: [
+            { name: 'A-PIPELINE :: integration-test :: backend-integration',
+              activity: 'Sleeping',
+              wasCancelled: function() {
+                return true;
+              },
+              wasSuccessful: successfulFn
+            }
+          ]
+        }
+      };
+      var result = haringGocdMapper.readHistoryAndActivity(data);
+
+      expect(result.figures.length).toBe(1);
+      expect(result.figures[0].type).toBe('cancelled');
 
     });
 
