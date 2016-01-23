@@ -9,8 +9,10 @@ var ArtwiseDataSource = function(identifier, onData, onConnectionLost, onError) 
     var match = window.location.search.match(/pipeline=([^&]+)/);
     if(match) {
       return match[1];
-    } else {
+    } else if (identifier !== 'boxes') {
       onError('Please provide pipeline name ?pipeline=...');
+    } else {
+      return '';
     }
   }
 
@@ -60,7 +62,7 @@ var ArtwiseDataSource = function(identifier, onData, onConnectionLost, onError) 
   }
 
   var pipeline = getPipeline();
-  if(pipeline !== undefined) {
+  if(pipeline !== undefined || identifier === 'boxes') {
 
     var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     var wsHost = wsProtocol + '//' + window.location.host;

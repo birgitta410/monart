@@ -6,7 +6,10 @@ var express = require('express');
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
+var Q = require('q');
+
 var haringGocdMapper = require('./server/haring/gocdMapper');
+var boxesGocdMapper = require('./server/boxesMapper');
 var miroGocdMapper = require('./server/miro/gocdMapper');
 var miroGocdMapperConstellation = require('./server/miro/gocdMapperConstellation');
 var configReader = require('./server/ymlHerokuConfig');
@@ -23,7 +26,6 @@ function artwiseServer() {
   var port = process.env.PORT || 5000;
 
   var config = configReader.create('gocd').get();
-  var artwiseConfig = configReader.create('artwise').get();
 
   function createServer() {
     var rootDir = path.resolve(path.dirname(module.uri));
@@ -72,7 +74,8 @@ function artwiseServer() {
             return match ? match[1] : undefined;
           }
 
-          var pipeline = getPipelineParameter();
+          var pipelineParameter = getPipelineParameter();
+          var pipelines = pipelineParameter ? [pipelineParameter] : gocd.pipelineNames;
 
           function getActivityAndUpdateClients() {
             var result = {};
@@ -80,11 +83,23 @@ function artwiseServer() {
               result[identifier] = {warmingUp: true};
               ws.send(JSON.stringify(result));
             } else {
-              gocd.readData(pipeline).then(function (gocdData) {
-                var visualisationData = dataTransformer(gocdData);
-                result[identifier] = visualisationData;
-                ws.send(JSON.stringify(result), function () {
-                });
+
+              var all = _.map(pipelines, function(pipeline) {
+                return gocd.readData(pipeline);
+              });
+
+              Q.all(all).then(function (gocdData) {
+
+                if(pipelineParameter) {
+                  var visualisationData = dataTransformer(gocdData[0]);
+                  result[identifier] = visualisationData;
+                  ws.send(JSON.stringify(result), function () {});
+                } else {
+                  result[identifier] = _.map(gocdData, dataTransformer);
+                  ws.send(JSON.stringify(result), function () {});
+                }
+
+
               }).fail(function(error) {
                 console.log("COULD NOT READ DATA!", error);
                 ws.send(JSON.stringify({error: error}));
@@ -122,6 +137,11 @@ function artwiseServer() {
 
   var listenToHaring = createListener('haring', haringGocdMapper.readHistoryAndActivity);
   listenToHaring();
+
+  /** BOXES ************************/
+
+  var listenToBoxes = createListener('boxes', boxesGocdMapper.readHistoryAndActivity);
+  listenToBoxes();
 
   /** MIRO BLUE ************************/
 
