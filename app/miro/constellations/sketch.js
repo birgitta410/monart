@@ -310,18 +310,14 @@ function sketchProc(P) {
 
 new Processing('miroCanvas', sketchProc);
 
-function processNewData(historyData) {
+function processNewDataMiroConstellations(historyData) {
 
   miroModel.history = historyData.history;
 
 }
 
-var wsHost = 'ws://' + window.location.host;
-var ws = new WebSocket(wsHost + '/miro');
-
-ws.onmessage = function (event) {
-  artwise.processMessage(event, 'miro', processNewData);
-};
-
-// TODO
-artwise.initPing(ws, function() { console.log('no connection!'); });
+new ArtwiseDataSource('miro',
+  processNewDataMiroConstellations,
+  function() { console.log('no connection!'); },
+  function(error) { console.log('TODO: show error in UI', error); }
+);

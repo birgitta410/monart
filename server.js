@@ -76,15 +76,19 @@ function artwiseServer() {
 
           function getActivityAndUpdateClients() {
             var result = {};
-            if(CACHE_INITIALISED !== true) {
-              result[identifier] = { warmingUp: true };
+            if (CACHE_INITIALISED !== true) {
+              result[identifier] = {warmingUp: true};
               ws.send(JSON.stringify(result));
             } else {
-              gocd.readData(pipeline).then(function(gocdData) {
+              gocd.readData(pipeline).then(function (gocdData) {
                 var visualisationData = dataTransformer(gocdData);
                 result[identifier] = visualisationData;
-                ws.send(JSON.stringify(result), function() {  });
-              }).done();
+                ws.send(JSON.stringify(result), function () {
+                });
+              }).fail(function(error) {
+                console.log("COULD NOT READ DATA!", error);
+                ws.send(JSON.stringify({error: error}));
+              });
             }
           }
 

@@ -47,7 +47,7 @@ function processStone(index, entry) {
 }
 
 
-function processNewData(historyData) {
+function processNewDataMiroBlue(historyData) {
 
   var strokeImgTag = $('.long-stroke > img');
   strokeImgTag.attr('src', 'images/stroke_' + historyData.stroke.color + '.png');
@@ -60,12 +60,4 @@ function processNewData(historyData) {
   DATA = historyData;
 }
 
-var wsHost = 'ws://' + window.location.host;
-var ws = new WebSocket(wsHost + '/miroBlue');
-
-ws.onmessage = function (event) {
-  artwise.processMessage(event, 'miroBlue', processNewData);
-};
-
-// TODO
-artwise.initPing(ws, function() { console.log('no connection!'); });
+new ArtwiseDataSource('miroBlue', processNewDataMiroBlue, function() { console.log('no connection!'); });

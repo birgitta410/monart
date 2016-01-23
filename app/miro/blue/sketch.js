@@ -81,15 +81,12 @@ function sketchProc(P) {
 
 new Processing('miroCanvas', sketchProc);
 
-function processNewData(historyData) {
+function processNewDataMiroBlue(historyData) {
   miroModel.history = historyData.history;
 }
 
-var wsHost = 'ws://' + window.location.host;
-var ws = new WebSocket(wsHost + '/miroBlue');
-
-ws.onmessage = function (event) {
-  artwise.processMessage(event, 'miroBlue', processNewData);
-};
-
-artwise.initPing(ws, function() { console.log('no connection!'); });
+new ArtwiseDataSource('miroBlue',
+  processNewDataMiroBlue,
+  function() { console.log('no connection!'); },
+  function(error) { console.log('TODO: show error in UI', error); }
+);
