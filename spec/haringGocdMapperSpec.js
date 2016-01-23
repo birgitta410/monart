@@ -1,5 +1,4 @@
 
-var Q = require('q');
 var _ = require('lodash');
 var tk = require('timekeeper');
 
@@ -48,13 +47,13 @@ describe('Haring Go CD Mapper', function () {
 
     it('should set the background colour to green if successful', function() {
       var data = {
-        activity: {jobs: [
+        activity: {stages: [
           { name: 'NAME',
             wasSuccessful: successfulFn
           }
         ]},
         history: {
-          '125': { wasSuccessful: successfulFn, time: mockTime }
+          '125': { wasSuccessful: successfulFn, time: mockTime, summary: {} }
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data)
@@ -65,10 +64,10 @@ describe('Haring Go CD Mapper', function () {
     it('should set the background colour to orange if unsuccessful', function() {
       var data = {
         history: {
-          '125': { wasSuccessful: notSuccessfulFn, time: mockTime }
+          '125': { wasSuccessful: notSuccessfulFn, time: mockTime, summary: {} }
         },
         activity: {
-          jobs: [
+          stages: [
             { name: 'NAME',
               wasSuccessful: notSuccessfulFn
             }
@@ -82,8 +81,8 @@ describe('Haring Go CD Mapper', function () {
 
     it('should set the background colour to blue if building', function() {
       var data = {
-        history: { '125': { wasSuccessful: successfulFn, time: mockTime } },
-        activity: { jobs: [
+        history: { '125': { wasSuccessful: successfulFn, time: mockTime, summary: {} } },
+        activity: { stages: [
           { name: 'NAME',
             activity: 'Building',
             wasSuccessful: notSuccessfulFn
@@ -98,11 +97,11 @@ describe('Haring Go CD Mapper', function () {
     function preparePipelineAndActivity(numFailingHistory, numSuccessfulHistory, numSuccessfulActivity, numFailingActivity) {
       var fakePipelineHistory = {};
       _.times(numFailingHistory, function(n) {
-        fakePipelineHistory[n + 1] = { wasSuccessful: notSuccessfulFn, 'test': 'not successful', key: n+1 };
+        fakePipelineHistory[n + 1] = { wasSuccessful: notSuccessfulFn, 'test': 'not successful', key: n+1, summary: {} };
       });
       var offset = parseInt(_.findLastKey(fakePipelineHistory)) || 0;
       _.times(numSuccessfulHistory, function(n) {
-        fakePipelineHistory[offset + n + 1] = { wasSuccessful: successfulFn, 'test': 'successful', key:  offset + n + 1};
+        fakePipelineHistory[offset + n + 1] = { wasSuccessful: successfulFn, 'test': 'successful', key:  offset + n + 1, summary: {}};
       });
 
       var fakeActivity = [];
@@ -116,20 +115,20 @@ describe('Haring Go CD Mapper', function () {
 
       return {
         history: fakePipelineHistory,
-        activity: { jobs: fakeActivity }
+        activity: { stages: fakeActivity }
       };
     }
 
     it('should return all activity figures and fill up to the maximum number of figures with history', function () {
-      var NUM_FIGURES_IN_VIS = 24;
+      var NUM_FIGURES_IN_VIS = 20;
 
       var data = preparePipelineAndActivity(NUM_FIGURES_IN_VIS, 0, 8, 0);
 
       var result = haringGocdMapper.readHistoryAndActivity(data);
       expect(result.figures.length).toBe(NUM_FIGURES_IN_VIS);
 
-      var firstHistoryFigure = result.figures[data.activity.jobs.length];
-      expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
+      var firstHistoryFigure = result.figures[data.activity.stages.length];
+      expect(firstHistoryFigure.key).toBe('20'); // still sorted descending by key
 
       var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
       expect(activityFigures.length).toBe(8);
@@ -171,7 +170,7 @@ describe('Haring Go CD Mapper', function () {
           '124': { wasSuccessful: notSuccessfulFn, time: mockTime }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -188,7 +187,7 @@ describe('Haring Go CD Mapper', function () {
           '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -205,7 +204,7 @@ describe('Haring Go CD Mapper', function () {
           '123': { wasSuccessful: successfulFn, time: mockTime }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -221,7 +220,7 @@ describe('Haring Go CD Mapper', function () {
           '123': { wasSuccessful: successfulFn, time: mockTime }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -238,7 +237,7 @@ describe('Haring Go CD Mapper', function () {
           '123': { wasSuccessful: successfulFn, time: mockTime }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -254,7 +253,7 @@ describe('Haring Go CD Mapper', function () {
           '123': { wasSuccessful: notSuccessfulFn, time: mockTime }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -267,19 +266,19 @@ describe('Haring Go CD Mapper', function () {
         history: {
           '124': {
             wasSuccessful: successfulFn,
-            author: {
+            summary: { author: {
               initials: 'MMU'
-            }
+            }}
           },
           '123': {
             wasSuccessful: notSuccessfulFn,
-            author: {
+            summary: { author: {
               initials: 'MMU'
-            }
+            }}
           }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -294,12 +293,12 @@ describe('Haring Go CD Mapper', function () {
         history: {
           '124': {
             wasSuccessful: successfulFn,
-            label: '124',
-            info: 'a text'
+            summary: { text: 'a text' },
+            label: '124'
           }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -314,11 +313,13 @@ describe('Haring Go CD Mapper', function () {
         history: {
           '124': {
             wasSuccessful: successfulFn,
-            last_scheduled: '1419000842499'
+            summary: {
+              lastScheduled: '1419000842499'
+            }
           }
         },
         activity: {
-          jobs: []
+          stages: []
         }
       };
       var result = haringGocdMapper.readHistoryAndActivity(data);
@@ -335,7 +336,7 @@ describe('Haring Go CD Mapper', function () {
       var data = {
         history: { },
         activity: {
-          jobs: [
+          stages: [
             { name: 'A-PIPELINE :: integration-test :: backend-integration',
               activity: 'Building',
               wasSuccessful: successfulFn
@@ -353,7 +354,7 @@ describe('Haring Go CD Mapper', function () {
       var data = {
         history: { },
         activity: {
-          jobs: [
+          stages: [
             { name: 'A-PIPELINE :: integration-test :: backend-integration',
               activity: 'Building',
               wasSuccessful: successfulFn
@@ -372,7 +373,7 @@ describe('Haring Go CD Mapper', function () {
       var data = {
         history: { },
         activity: {
-          jobs: [
+          stages: [
             { name: 'A-PIPELINE :: integration-test :: backend-integration', wasSuccessful: successfulFn, activity: 'Sleeping' },
             { name: 'A-PIPELINE :: deploy-dev :: backend', wasSuccessful: notSuccessfulFn, activity: 'Sleeping' }
           ]
@@ -390,7 +391,7 @@ describe('Haring Go CD Mapper', function () {
       var data = {
         history: { },
         activity: {
-          jobs: [
+          stages: [
             { name: 'A-PIPELINE :: integration-test :: backend-integration',
               activity: 'Building',
               wasSuccessful: successfulFn,
@@ -417,7 +418,7 @@ describe('Haring Go CD Mapper', function () {
         var data = {
           history: { },
           activity: {
-            jobs: [
+            stages: [
               { name: 'A-PIPELINE :: integration-test :: backend-integration',
                 wasSuccessful: notSuccessfulFn,
                 lastBuildTime: '2014-01-01T09:00:00'
@@ -436,7 +437,7 @@ describe('Haring Go CD Mapper', function () {
         var data = {
           history: { },
           activity: {
-            jobs: [
+            stages: [
               { name: 'A-PIPELINE :: integration-test :: backend-integration',
                 wasSuccessful: notSuccessfulFn,
                 lastBuildTime: '2014-01-01T09:40:00'
@@ -457,7 +458,7 @@ describe('Haring Go CD Mapper', function () {
         var data = {
           history: { },
           activity: {
-            jobs: [
+            stages: [
               { name: 'A-PIPELINE :: integration-test :: backend-integration',
                 wasSuccessful: notSuccessfulFn,
                 lastBuildTime: goServerTimeLastBuild

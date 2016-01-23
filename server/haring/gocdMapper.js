@@ -6,7 +6,7 @@ var config = require('../ymlHerokuConfig');
 
 function haringGocdMapperModule() {
 
-  var NUM_FIGURES_IN_VIS = 24;
+  var NUM_FIGURES_IN_VIS = 20;
 
   var IS_BUILDING_BACKGROUND = 'blue';
 
@@ -119,14 +119,14 @@ function haringGocdMapperModule() {
       var entry = history[key];
       var previous = index < keysDescending.length ? history[keysDescending[index + 1]] : undefined;
 
-      var initials = entry.summary.author ? entry.summary.author.initials.toUpperCase() : undefined;
+      var initials = entry.summary && entry.summary.author ? entry.summary.author.initials.toUpperCase() : undefined;
       return {
         color: getColor(entry),
         info: entry.label + (initials ? '<br>' + initials : ''),
-        info2: entry.summary.text,
+        info2: entry.summary ? entry.summary.text : '',
         type: getFigureType(entry, previous ? previous.wasSuccessful() : true),
         initials: initials,
-        time: parseInt(entry.summary.lastScheduled),
+        time: entry.summary ? parseInt(entry.summary.lastScheduled) : 0,
         key: key
       };
     });
