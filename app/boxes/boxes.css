@@ -33,6 +33,12 @@ body {
   flex-direction: row;
   flex-wrap: nowrap;
   height: 200px;
+
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
 }
 
 .box-wrapper {
@@ -63,6 +69,7 @@ body {
   word-break: break-word;
   font-weight: bold;
   text-align: center;
+  font-size: 3.5vw;
 }
 
 .green {
