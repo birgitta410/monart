@@ -1,7 +1,15 @@
 
 var HaringVisualisation = function() {
   var NUM_ROWS = 4;
-  var COLS_PER_ROW = 5;
+  function getNumColumns() {
+    var match = window.location.search.match(/columns=([^&]+)/);
+    if(match) {
+      return match[1];
+    } else {
+      return 5;
+    }
+  }
+  var COLS_PER_ROW=getNumColumns();
 
   var ROW_HEIGHT_PERCENT = 100 / NUM_ROWS;
   var COL_WIDTH_PERCENT = 100 / COLS_PER_ROW;
@@ -14,6 +22,8 @@ var HaringVisualisation = function() {
   var FIGURE_BACKGROUND_MODE;
 
   var currentlyInDanger = undefined;
+
+
 
   function isWinter() {
     var now = new Date();
