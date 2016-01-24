@@ -7,7 +7,7 @@ var config = require('../ymlHerokuConfig');
 function haringGocdMapperModule() {
 
   var NUM_ROWS = 4;
-  var DEFAULT_NUM_COLS = 5;
+  var DEFAULT_NUM_COLS = 6;
 
   var IS_BUILDING_BACKGROUND = 'blue';
 

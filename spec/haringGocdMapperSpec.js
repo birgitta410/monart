@@ -120,7 +120,7 @@ describe('Haring Go CD Mapper', function () {
     }
 
     it('should return all activity figures and fill up to the maximum number of figures with history', function () {
-      var NUM_FIGURES_IN_VIS = 20;
+      var NUM_FIGURES_IN_VIS = 24;
 
       var data = preparePipelineAndActivity(NUM_FIGURES_IN_VIS, 0, 8, 0);
 
@@ -128,7 +128,7 @@ describe('Haring Go CD Mapper', function () {
       expect(result.figures.length).toBe(NUM_FIGURES_IN_VIS);
 
       var firstHistoryFigure = result.figures[data.activity.stages.length];
-      expect(firstHistoryFigure.key).toBe('20'); // still sorted descending by key
+      expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
 
       var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
       expect(activityFigures.length).toBe(8);

@@ -6,7 +6,7 @@ var HaringVisualisation = function() {
     if(match) {
       return match[1];
     } else {
-      return 5;
+      return 6;
     }
   }
   var COLS_PER_ROW=getNumColumns();

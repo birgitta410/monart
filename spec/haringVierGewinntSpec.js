@@ -25,7 +25,7 @@ describe('Haring Vier Gewinnt', function () {
   it('should mark first diagonal quadruple', function() {
 
     var figures = prepareFigures(NUM_FIGURES_IN_VIS, 0);
-    vierGewinnt.apply(figures);
+    vierGewinnt.apply(figures, NUM_COLS);
     var index = 0;
     expect(figures[index].four).toEqual({ direction: 'diagonal-lr', starter: true });
     index += NUM_COLS + 1;
@@ -41,7 +41,7 @@ describe('Haring Vier Gewinnt', function () {
 
     var figures = prepareFigures(NUM_FIGURES_IN_VIS, 0);
     figures[NUM_COLS + 1].type = 'fail';
-    vierGewinnt.apply(figures);
+    vierGewinnt.apply(figures, NUM_COLS);
 
     var index = 0;
     expect(figures[index].four).toEqual({ direction: 'vertical', starter: true });
@@ -62,7 +62,7 @@ describe('Haring Vier Gewinnt', function () {
       figures[(startFailingSolids + time)].type = 'fail';
     });
 
-    vierGewinnt.apply(figures);
+    vierGewinnt.apply(figures, NUM_COLS);
 
     expect(figures[0].four).toEqual({ direction: 'horizontal', starter: true });
     expect(figures[1].four).toEqual({ direction: 'horizontal' });
@@ -80,7 +80,7 @@ describe('Haring Vier Gewinnt', function () {
       figures[(startFailingSolids + time)].type = 'fail';
     });
 
-    vierGewinnt.apply(figures);
+    vierGewinnt.apply(figures, NUM_COLS);
 
     expect(figures[0].four).toBeUndefined();
 
@@ -102,7 +102,7 @@ describe('Haring Vier Gewinnt', function () {
     figures[0].time = 1419000842499;
     figures[1].time = 1419000842500;
 
-    vierGewinnt.apply(figures);
+    vierGewinnt.apply(figures, NUM_COLS);
 
     var index = 1;
     expect(figures[index].four).toEqual({ direction: 'diagonal-lr', starter: true });

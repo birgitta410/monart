@@ -5,7 +5,6 @@ function vierGewinntModule() {
 
   var NUM_TO_WIN = 4;
   var NUM_ROWS = 4;
-  var DEFAULT_COLS_PER_ROW = 5;
 
 
   function isFigureSuccessful(figure) {
@@ -51,9 +50,7 @@ function vierGewinntModule() {
   }
 
 
-  function apply(figures, numColumns) {
-
-    var colsPerRow = numColumns || DEFAULT_COLS_PER_ROW;
+  function apply(figures, colsPerRow) {
 
     function checkHorizontal(index) {
       var colIndex = index % colsPerRow;
