@@ -14,6 +14,7 @@ var miroGocdMapper = require('./server/miro/gocdMapper');
 var miroGocdMapperConstellation = require('./server/miro/gocdMapperConstellation');
 var configReader = require('./server/ymlHerokuConfig');
 var gocdCreator = require('./server/gocdReader');
+var environmentReader = require('./server/environmentReader');
 
 function artwiseServer() {
 
@@ -141,8 +142,8 @@ function artwiseServer() {
 
     /** HARING ************************/
 
-    var listenToHaring = createListener('haring', haringGocdMapper.readHistoryAndActivity);
-    listenToHaring();
+    //var listenToHaring = createListener('haring', haringGocdMapper.readHistoryAndActivity);
+    //listenToHaring();
 
     /** BOXES ************************/
 
@@ -151,11 +152,11 @@ function artwiseServer() {
 
     /** MIRO BLUE ************************/
 
-    var listenToMiro = createListener('miro', miroGocdMapperConstellation.readHistoryAndActivity);
-    listenToMiro();
-
-    var listenToMiroBlue = createListener('miroBlue', miroGocdMapper.readHistoryAndActivity);
-    listenToMiroBlue();
+    //var listenToMiro = createListener('miro', miroGocdMapperConstellation.readHistoryAndActivity);
+    //listenToMiro();
+    //
+    //var listenToMiroBlue = createListener('miroBlue', miroGocdMapper.readHistoryAndActivity);
+    //listenToMiroBlue();
 
   }).done();
 
@@ -230,6 +231,8 @@ function artwiseServer() {
       return miroGocdMapper.readHistoryAndActivity(data);
     });
   });
+
+  environmentReader.extendServer(app);
 
   server.listen(port);
 

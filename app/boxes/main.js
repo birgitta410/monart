@@ -23,8 +23,8 @@ var BoxesVisualisation = function() {
     console.log("data", data);
 
     var container = $('.container');
-
-    container.empty();
+    $('#row1').empty();
+    $('#row2').empty();
     var cell = 0;
     var maxColumns = 3;
     var row = 0;
@@ -34,7 +34,6 @@ var BoxesVisualisation = function() {
 
         if(cell % maxColumns === 0) {
           row++;
-          $('<div class="box-row flexbox" id="row' + row + '"></div>').appendTo(container);
         }
         var rowDiv = $('#row' + row);
         var boxWrapperTemplate = '<div class="box-wrapper ' + randomColdColor() + '">' +
@@ -52,9 +51,9 @@ var BoxesVisualisation = function() {
 
         if(cell % maxColumns === 0) {
           row++;
-          $('<div class="box-row flexbox" id="row' + row + '"></div>').appendTo(container);
         }
         var rowDiv = $('#row' + row);
+
         var boxWrapperTemplate = '<div class="box-wrapper ' + randomWarmColor() + '">' +
           '<div class="info"><div class="level-1">' +
             pipelineState.pipeline + '</br>' +
@@ -71,8 +70,46 @@ var BoxesVisualisation = function() {
 
   }
 
+  function buildEnvironmentsBoxes() {
+    var environments = ["gce-dev", "mcloud-dev", "mcloud-pp", "prod", "mcc2-pp"];
+
+    var container = $('.container');
+
+    var cell = 0;
+    _.each(environments, function(envIdentifier) {
+
+      var rowDiv = $('#row-environments');
+      var boxWrapperTemplate = '<div class="box-wrapper default-color" id="' +envIdentifier+ '">' +
+        '<div class="info"><div class="level-1">' +
+        envIdentifier + '</br>' +
+      '</div></div>' +
+      '</div>';
+      $(boxWrapperTemplate).appendTo(rowDiv);
+      cell ++;
+
+      var onOk = function() {
+        $('#' + envIdentifier).removeClass('red');
+        $('#' + envIdentifier).removeClass('default-color');
+        $('#' + envIdentifier).addClass('green');
+      };
+      var onNotOk = function() {
+        // NOT OK
+        $('#' + envIdentifier).removeClass('default-color');
+        $('#' + envIdentifier).removeClass('green');
+        $('#' + envIdentifier).addClass('red');
+      };
+
+      urlMonitor(envIdentifier, onOk, onNotOk, function() {
+        // error
+      });
+
+    });
+
+  }
+
   return {
     processNewData: processNewData,
+    buildEnvironmentsBoxes: buildEnvironmentsBoxes,
     setBackgroundStyle: setBackgroundStyle
   };
 
@@ -92,4 +129,6 @@ function onConnectionLostHaring() {
   boxes.setBackgroundStyle('grey');
 }
 
+boxes.buildEnvironmentsBoxes();
 new ArtwiseDataSource('boxes', boxes.processNewData, onConnectionLostHaring, onDataErrorHaring);
+

@@ -18,8 +18,6 @@ function boxesMapperModule() {
       activity: activities,
       history: history
     };
-    //finalData.figures = activities.figures.concat(historyFigures);
-    //finalData.background = activities.background || history.background;
 
     return finalData;
 
@@ -28,13 +26,12 @@ function boxesMapperModule() {
 
   function mapPipelineDataToFigures(history) {
 
-    // TODO: Only use the results of the LATEST run in each pipeline
     var keysDescending = _.keys(history).sort(compareNumbers).reverse();
-    var lastBuildSuccessful = keysDescending.length > 0 ? history[keysDescending[0]].wasSuccessful() : true;
+    var latestRun = keysDescending.length > 0 ? history[keysDescending[0]] : undefined;
 
-    if (! history[keysDescending[0]].wasSuccessful()) {
+    var ignoreLatestRun = latestRun.wasSuccessful() || latestRun.summary.result === 'unknown';
+    if (! ignoreLatestRun) {
       return {
-        background: lastBuildSuccessful ? 'green' : 'orange',
         boxes: [history[keysDescending[0]]]
       };
     } else {
@@ -42,21 +39,6 @@ function boxesMapperModule() {
         boxes: []
       };
     }
-    //
-    //var nonPassingRuns = _.where(keysDescending, function(key, index) {
-    //
-    //  var entry = history[key];
-    //  return entry.summary.result !== 'Passed';
-    //});
-    //
-    //var boxes = _.map(nonPassingRuns, function(key) {
-    //  return history[key];
-    //});
-
-    //return {
-    //  background: lastBuildSuccessful ? 'green' : 'orange',
-    //  boxes: boxes
-    //};
 
   }
 
