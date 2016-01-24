@@ -5,7 +5,7 @@ function vierGewinntModule() {
 
   var NUM_TO_WIN = 4;
   var NUM_ROWS = 4;
-  var COLS_PER_ROW = 5;
+  var DEFAULT_COLS_PER_ROW = 5;
 
 
   function isFigureSuccessful(figure) {
@@ -51,39 +51,41 @@ function vierGewinntModule() {
   }
 
 
-  function apply(figures) {
+  function apply(figures, numColumns) {
+
+    var colsPerRow = numColumns || DEFAULT_COLS_PER_ROW;
 
     function checkHorizontal(index) {
-      var colIndex = index % COLS_PER_ROW;
-      if(colIndex + NUM_TO_WIN <= COLS_PER_ROW) {
+      var colIndex = index % colsPerRow;
+      if(colIndex + NUM_TO_WIN <= colsPerRow) {
         return checkGroup(figures, _.range(index, index + NUM_TO_WIN), 'horizontal');
       }
     }
 
     function checkVertical(index) {
-      var rowIndex = Math.floor(index / COLS_PER_ROW);
+      var rowIndex = Math.floor(index / colsPerRow);
       if(rowIndex + NUM_TO_WIN <= NUM_ROWS) {
         var indices = [];
-        _.times(NUM_TO_WIN, function(time) { indices.push(index + (time * COLS_PER_ROW)); })
+        _.times(NUM_TO_WIN, function(time) { indices.push(index + (time * colsPerRow)); })
         return checkGroup(figures, indices, 'vertical');
       }
     }
 
     function checkDiagonal(index) {
-      var rowIndex = Math.floor(index / COLS_PER_ROW);
-      var colIndex = index % COLS_PER_ROW;
+      var rowIndex = Math.floor(index / colsPerRow);
+      var colIndex = index % colsPerRow;
       if(NUM_ROWS - NUM_TO_WIN >= rowIndex) {
 
         var leftToRight = 1,
           rightToLeft = -1,
           orientation = rightToLeft;
-        if(COLS_PER_ROW - NUM_TO_WIN >= colIndex) {
+        if(colsPerRow - NUM_TO_WIN >= colIndex) {
           orientation = leftToRight;
         }
 
         var indices = [  ];
         _.times(NUM_TO_WIN, function(time) {
-          indices.push(index + ((time * COLS_PER_ROW) + (orientation * time)));
+          indices.push(index + ((time * colsPerRow) + (orientation * time)));
         });
         return checkGroup(figures, indices, 'diagonal-' + (orientation > 0 ? 'lr' : 'rl'));
       }

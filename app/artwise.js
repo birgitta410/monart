@@ -16,6 +16,15 @@ var ArtwiseDataSource = function(identifier, onData, onConnectionLost, onError) 
     }
   }
 
+  function getNumColumns() {
+    var match = window.location.search.match(/columns=([^&]+)/);
+    if(match) {
+      return match[1];
+    } else {
+      return 5;
+    }
+  }
+
   function processMessage(event) {
     var data = JSON.parse(event.data);
     var statusMessage = $('#status-message');
@@ -66,10 +75,12 @@ var ArtwiseDataSource = function(identifier, onData, onConnectionLost, onError) 
 
     var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     var wsHost = wsProtocol + '//' + window.location.host;
-    var ws = new WebSocket(wsHost + '/' + identifier + '?pipeline=' + pipeline);
+    var ws = new WebSocket(wsHost + '/' + identifier + '?pipeline=' + pipeline + '&columns=' + getNumColumns());
     ws.onmessage = function (event) {
       processMessage(event);
     };
   }
+
+  initPing();
 
 };

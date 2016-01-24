@@ -6,7 +6,8 @@ var config = require('../ymlHerokuConfig');
 
 function haringGocdMapperModule() {
 
-  var NUM_FIGURES_IN_VIS = 20;
+  var NUM_ROWS = 4;
+  var DEFAULT_NUM_COLS = 5;
 
   var IS_BUILDING_BACKGROUND = 'blue';
 
@@ -53,10 +54,12 @@ function haringGocdMapperModule() {
     }
   }
 
-  var readHistoryAndActivity = function(data) {
+  var readHistoryAndActivity = function(data, numColumns) {
+    numColumns = numColumns || DEFAULT_NUM_COLS;
+
     var activityHaring = mapActivityDataToFigures(data.activity);
 
-    var numberOfHistoryFigures = NUM_FIGURES_IN_VIS - activityHaring.figures.length;
+    var numberOfHistoryFigures = (NUM_ROWS * numColumns) - activityHaring.figures.length;
     var onlyHistoryWeNeed = sortAndStripDownHistory(data.history, numberOfHistoryFigures);
     var historyHaring = mapPipelineDataToFigures(onlyHistoryWeNeed);
 
@@ -68,7 +71,7 @@ function haringGocdMapperModule() {
     finalData.announcementFigure = getSpecialAnnouncementFigure(onlyHistoryWeNeed);
     finalData.dangerZones = haringConfig.dangerZones;
 
-    vierGewinnt.apply(finalData.figures);
+    vierGewinnt.apply(finalData.figures, numColumns);
 
     return finalData;
 

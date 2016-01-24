@@ -72,6 +72,12 @@ function artwiseServer() {
               return match ? match[1] : undefined;
             }
 
+            function getColumnsParameter() {
+              var requestedUrl = ws.upgradeReq.url;
+              var match = requestedUrl.match(/columns=([^&]+)/);
+              return match ? match[1] : undefined;
+            }
+
             var pipelineParameter = getPipelineParameter();
             var pipelines = pipelineParameter ? [pipelineParameter] : gocd.pipelineNames;
 
@@ -89,12 +95,12 @@ function artwiseServer() {
                 Q.all(all).then(function (gocdData) {
 
                   if(pipelineParameter) {
-                    var visualisationData = dataTransformer(gocdData[0]);
+                    var visualisationData = dataTransformer(gocdData[0], getColumnsParameter());
                     result[identifier] = visualisationData;
                     ws.send(JSON.stringify(result), function () {});
                   } else {
                     result[identifier] = _.map(gocdData, function(data) {
-                      var transformedPipelineData = dataTransformer(data);
+                      var transformedPipelineData = dataTransformer(data, getColumnsParameter());
                       transformedPipelineData.pipeline = data.pipeline;
                       return transformedPipelineData;
                     });
