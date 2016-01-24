@@ -19,7 +19,6 @@ var BoxesVisualisation = function() {
   }
 
   function processNewData(data) {
-    //setBackgroundStyle(haringDescription.background);
     console.log("data", data);
 
     var container = $('.container');
@@ -68,17 +67,40 @@ var BoxesVisualisation = function() {
 
     });
 
+    if (row === 0) {
+      var rowDiv = $('#row1');
+      var boxWrapperTemplate = '<div class="box-wrapper ' + randomColdColor() + '">' +
+        '<div class="info"><div class="level-1">' +
+        'ALL GOOD' + '</br>' +
+        '</div></div>' +
+        '</div>';
+      $(boxWrapperTemplate).appendTo(rowDiv);
+    }
+
+  }
+
+  function getEnvironments() {
+    var match = window.location.search.match(/environments=([^&]+)/);
+    if(match) {
+      return match[1].split(",");
+    } else {
+      return [];
+    }
   }
 
   function buildEnvironmentsBoxes() {
-    var environments = ["gce-dev", "mcloud-dev", "mcloud-pp", "prod", "mcc2-pp"];
+    var environments = getEnvironments();
 
     var container = $('.container');
+    var rowDiv = $('#row-environments');
+    if(_.isEmpty(environments)) {
+      rowDiv.remove();
+    }
 
     var cell = 0;
     _.each(environments, function(envIdentifier) {
 
-      var rowDiv = $('#row-environments');
+
       var boxWrapperTemplate = '<div class="box-wrapper default-color" id="' +envIdentifier+ '">' +
         '<div class="info"><div class="level-1">' +
         envIdentifier + '</br>' +

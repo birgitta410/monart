@@ -142,8 +142,8 @@ function artwiseServer() {
 
     /** HARING ************************/
 
-    //var listenToHaring = createListener('haring', haringGocdMapper.readHistoryAndActivity);
-    //listenToHaring();
+    var listenToHaring = createListener('haring', haringGocdMapper.readHistoryAndActivity);
+    listenToHaring();
 
     /** BOXES ************************/
 
@@ -152,11 +152,11 @@ function artwiseServer() {
 
     /** MIRO BLUE ************************/
 
-    //var listenToMiro = createListener('miro', miroGocdMapperConstellation.readHistoryAndActivity);
-    //listenToMiro();
-    //
-    //var listenToMiroBlue = createListener('miroBlue', miroGocdMapper.readHistoryAndActivity);
-    //listenToMiroBlue();
+    var listenToMiro = createListener('miro', miroGocdMapperConstellation.readHistoryAndActivity);
+    listenToMiro();
+
+    var listenToMiroBlue = createListener('miroBlue', miroGocdMapper.readHistoryAndActivity);
+    listenToMiroBlue();
 
   }).done();
 
