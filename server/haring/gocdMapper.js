@@ -54,7 +54,7 @@ function haringGocdMapperModule() {
     }
   }
 
-  var readHistoryAndActivity = function(data, numColumns) {
+  var transformHistoryAndActivity = function(data, numColumns) {
     numColumns = numColumns || DEFAULT_NUM_COLS;
 
     var activityHaring = mapActivityDataToFigures(data.activity);
@@ -208,7 +208,7 @@ function haringGocdMapperModule() {
   }
 
   return {
-    readHistoryAndActivity: readHistoryAndActivity
+    readHistoryAndActivity: transformHistoryAndActivity
   }
 }
 

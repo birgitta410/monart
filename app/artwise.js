@@ -21,7 +21,7 @@ var ArtwiseDataSource = function(identifier, onData, onConnectionLost, onError) 
     if(match) {
       return match[1];
     } else {
-      return 5;
+      return 6;
     }
   }
 
