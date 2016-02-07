@@ -1,6 +1,6 @@
-artwise
+monart
 =======
-[![Build Status](https://snap-ci.com/artwise/artwise/branch/master/build_image)](https://snap-ci.com/artwise/artwise/branch/master)
+[![Build Status](https://snap-ci.com/birgitta410/monart/branch/master/build_image)](https://snap-ci.com/birgitta410/monartartw/branch/master)
 
 Build Monitor for [Go CD](http://go.cd).
 
@@ -62,7 +62,7 @@ default:
     url: https://the-go-host:8154
     user: xxx
     password: xxxx
-    timeDiff: -60    # (in minutes) if the Go server is in a different time zone than where artwise server is running
+    timeDiff: -60    # (in minutes) if the Go server is in a different time zone than where monart server is running
 ```
 
 ###Filter the jobs to show from CC Tray activity
@@ -89,10 +89,10 @@ default:
 'acceptableTimeFailed' (optional, default is 30) is the number of minutes that is acceptable for a build to stay red. When that period is up, there will be a visual indicator that it is.
 
 ### Run with SSL
-You can run the artwise server with SSL support. The server will look for these two files and use them if they exist:
+You can run the monart server with SSL support. The server will look for these two files and use them if they exist:
 ```
-artwise-csr.pem
-artwise-key.pem
+monart-csr.pem
+monart-key.pem
 ```
 Here is one resource to help you get started with a self-signed certificate:
 [https://nodejs.org/api/tls.html#tls_tls_ssl](https://nodejs.org/api/tls.html#tls_tls_ssl)
@@ -109,11 +109,11 @@ Please note that you can access the deployed Heroku instance via HTTPS out of th
 - Install the [Heroku Toolbelt](https://toolbelt.heroku.com).
 
 ```
-# Clone artwise
-git clone https://github.com/artwise/artwise.git
+# Clone monart
+git clone https://github.com/birgitta410/monart.git
 
 # Add your Heroku repository as a remote
-cd artwise
+cd monart
 git remote add heroku git@heroku.com:your-repo-name.git
 
 # Configure access
