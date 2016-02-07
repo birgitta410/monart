@@ -60,4 +60,4 @@ function processNewDataMiroBlue(historyData) {
   DATA = historyData;
 }
 
-new ArtwiseDataSource('miroBlue', processNewDataMiroBlue, function() { console.log('no connection!'); });
+new MonartDataSource('miroBlue', processNewDataMiroBlue, function() { console.log('no connection!'); });

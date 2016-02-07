@@ -85,7 +85,7 @@ function processNewDataMiroBlue(historyData) {
   miroModel.history = historyData.history;
 }
 
-new ArtwiseDataSource('miroBlue',
+new MonartDataSource('miroBlue',
   processNewDataMiroBlue,
   function() { console.log('no connection!'); },
   function(error) { console.log('TODO: show error in UI', error); }

@@ -311,7 +311,7 @@ function onConnectionLostHaring() {
   haringVisualisation.setBackgroundStyle('grey');
 }
 
-new ArtwiseDataSource('haring', haringVisualisation.processNewData, onConnectionLostHaring, onDataErrorHaring);
+new MonartDataSource('haring', haringVisualisation.processNewData, onConnectionLostHaring, onDataErrorHaring);
 
 /***********************/
 var InfoToggler = function (body) {

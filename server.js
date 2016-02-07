@@ -9,14 +9,13 @@ var _ = require('lodash');
 var Q = require('q');
 
 var haringGocdMapper = require('./server/haring/gocdMapper');
-var boxesGocdMapper = require('./server/boxesMapper');
 var miroGocdMapper = require('./server/miro/gocdMapper');
 var miroGocdMapperConstellation = require('./server/miro/gocdMapperConstellation');
 var configReader = require('./server/ymlHerokuConfig');
 var gocdCreator = require('./server/gocdReader');
 var environmentReader = require('./server/environmentReader');
 
-function artwiseServer() {
+function monartServer() {
 
   var WebSocketServer = ws.Server
     , app = express();
@@ -33,13 +32,13 @@ function artwiseServer() {
 
     try {
       var credentials = {
-        key: fs.readFileSync('artwise-key.pem'),
-        cert: fs.readFileSync('artwise-cert.pem')
+        key: fs.readFileSync('monart-key.pem'),
+        cert: fs.readFileSync('monart-cert.pem')
       };
       USES_SSL = true;
       return https.createServer(credentials, app);
     } catch(couldNotReadKeyAndCert) {
-      console.log("WARNING - could not use SSL, provide artwise-key.pem and artwise-cert.pem");
+      console.log("WARNING - could not use SSL, provide monart-key.pem and monart-cert.pem");
       return http.createServer(app);
     }
 
@@ -145,11 +144,6 @@ function artwiseServer() {
     var listenToHaring = createListener('haring', haringGocdMapper.readHistoryAndActivity);
     listenToHaring();
 
-    /** BOXES ************************/
-
-    var listenToBoxes = createListener('boxes', boxesGocdMapper.readHistoryAndActivity);
-    listenToBoxes();
-
     /** MIRO BLUE ************************/
 
     var listenToMiro = createListener('miro', miroGocdMapperConstellation.readHistoryAndActivity);
@@ -207,19 +201,6 @@ function artwiseServer() {
     });
   });
 
-  app.get('/data/gocd/boxes', function(req, res) {
-    var all = _.map(gocd.pipelineNames, function(pipeline) {
-      return gocd.readData(pipeline).then(function(data) {
-        return boxesGocdMapper.readHistoryAndActivity(data);
-      });
-    });
-
-    Q.all(all).then(function (boxesData) {
-      respondWithJson(res, boxesData);
-    });
-
-  });
-
   app.get('/data/gocd/miro', function(req, res) {
     readDataBasedOnPipeline(req, res, function(data) {
       return miroGocdMapperConstellation.readHistoryAndActivity(data);
@@ -238,4 +219,4 @@ function artwiseServer() {
 
 }
 
-artwiseServer();
+monartServer();

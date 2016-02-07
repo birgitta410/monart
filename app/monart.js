@@ -1,6 +1,6 @@
 
 
-var ArtwiseDataSource = function(identifier, onData, onConnectionLost, onError) {
+var MonartDataSource = function(identifier, onData, onConnectionLost, onError) {
 
   var LAST_PING = new Date();
   var PING_INTERVAL = 5 * 60 * 1000;
@@ -9,10 +9,8 @@ var ArtwiseDataSource = function(identifier, onData, onConnectionLost, onError) 
     var match = window.location.search.match(/pipeline=([^&]+)/);
     if(match) {
       return match[1];
-    } else if (identifier !== 'boxes') {
-      onError('Please provide pipeline name ?pipeline=...');
     } else {
-      return '';
+      onError('Please provide pipeline name ?pipeline=...');
     }
   }
 
@@ -71,7 +69,7 @@ var ArtwiseDataSource = function(identifier, onData, onConnectionLost, onError) 
   }
 
   var pipeline = getPipeline();
-  if(pipeline !== undefined || identifier === 'boxes') {
+  if(pipeline !== undefined) {
 
     var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     var wsHost = wsProtocol + '//' + window.location.host;

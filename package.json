@@ -1,5 +1,5 @@
 {
-  "name": "artwise",
+  "name": "monart",
   "version": "0.0.2",
   "scripts": {
     "test": "./node_modules/jasmine/bin/jasmine.js"

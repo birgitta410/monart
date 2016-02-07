@@ -316,7 +316,7 @@ function processNewDataMiroConstellations(historyData) {
 
 }
 
-new ArtwiseDataSource('miro',
+new MonartDataSource('miro',
   processNewDataMiroConstellations,
   function() { console.log('no connection!'); },
   function(error) { console.log('TODO: show error in UI', error); }
