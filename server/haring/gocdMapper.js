@@ -59,8 +59,9 @@ function haringGocdMapperModule() {
 
     var activityHaring = mapActivityDataToFigures(data.activity);
 
+    var pipelineRuns = data.history.pipelineRuns ? data.history.pipelineRuns : data.history;
     var numberOfHistoryFigures = (NUM_ROWS * numColumns) - activityHaring.figures.length;
-    var onlyHistoryWeNeed = sortAndStripDownHistory(data.history, numberOfHistoryFigures);
+    var onlyHistoryWeNeed = sortAndStripDownHistory(pipelineRuns, numberOfHistoryFigures);
     var historyHaring = mapPipelineDataToFigures(onlyHistoryWeNeed);
 
     var historyFigures = historyHaring.figures;
