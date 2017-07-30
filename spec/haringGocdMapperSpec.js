@@ -130,7 +130,7 @@ describe('Haring Go CD Mapper', function () {
       var firstHistoryFigure = result.figures[data.activity.stages.length];
       expect(firstHistoryFigure.key).toBe('24'); // still sorted descending by key
 
-      var activityFigures = _.where(result.figures, function(figure) { return figure.border === 'dotted'; });
+      var activityFigures = _.filter(result.figures, function(figure) { return figure.border === 'dotted'; });
       expect(activityFigures.length).toBe(8);
 
     });

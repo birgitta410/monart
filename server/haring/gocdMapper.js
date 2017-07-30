@@ -195,7 +195,7 @@ function haringGocdMapperModule() {
       }
     });
 
-    var isBuilding = _.any(activity.stages, function(entry) {
+    var isBuilding = _.some(activity.stages, function(entry) {
       return entry.isBuilding && entry.isBuilding()
         || entry.isScheduled && entry.isScheduled()
         || entry.activity === 'Building';

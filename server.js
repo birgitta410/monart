@@ -27,7 +27,7 @@ function monartServer() {
   var config = configReader.create('gocd').get();
 
   function createServer() {
-    var rootDir = path.resolve(path.dirname(module.uri));
+    var rootDir = path.resolve(path.dirname(module.uri || "."));
     app.use(express.static(rootDir + '/app/'));
 
     try {
@@ -62,7 +62,7 @@ function monartServer() {
         console.log(identifier +' websocket server created');
 
         wss.on('connection', function(ws) {
-          console.log('connected to /' + ws.upgradeReq.url);
+          console.log('connecting to /' + ws.upgradeReq.url);
 
           function newClient() {
 
