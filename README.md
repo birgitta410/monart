@@ -1,6 +1,6 @@
 monart
 =======
-[![Build Status](https://snap-ci.com/birgitta410/monart/branch/master/build_image)](https://snap-ci.com/birgitta410/monartartw/branch/master)
+[![Build Status CircleCI](https://circleci.com/gh/birgitta410/monart.png?circle-token=bb39349ba9139a191948745e7adeb73a41c0eca1)](https://circleci.com/gh/birgitta410/monart/)
 
 Build Monitor for [Go CD](http://go.cd).
 
