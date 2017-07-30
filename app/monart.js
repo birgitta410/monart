@@ -24,6 +24,7 @@ var MonartDataSource = function(identifier, onData, onConnectionLost, onError) {
   }
 
   function processMessage(event) {
+    console.log("RECEIVED DATA", event.data);
     var data = JSON.parse(event.data);
     var statusMessage = $('#status-message');
     var statusProgress = $('#status-progress');
@@ -73,7 +74,9 @@ var MonartDataSource = function(identifier, onData, onConnectionLost, onError) {
 
     var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     var wsHost = wsProtocol + '//' + window.location.host;
-    var ws = new WebSocket(wsHost + '/' + identifier + '?pipeline=' + pipeline + '&columns=' + getNumColumns());
+    var wsUrl = wsHost + '/' + identifier + '?pipeline=' + pipeline + '&columns=' + getNumColumns();
+    console.log("Connecting to Websocket: " + wsUrl);
+    var ws = new WebSocket(wsUrl);
     ws.onmessage = function (event) {
       processMessage(event);
     };

@@ -7,6 +7,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
 var Q = require('q');
+var url = require('url');
 
 var haringGocdMapper = require('./server/haring/gocdMapper');
 var miroGocdMapper = require('./server/miro/gocdMapper');
@@ -30,21 +31,22 @@ function monartServer() {
     var rootDir = path.resolve(path.dirname(module.uri || "."));
     app.use(express.static(rootDir + '/app/'));
 
-    try {
-      var credentials = {
-        key: fs.readFileSync('monart-key.pem'),
-        cert: fs.readFileSync('monart-cert.pem')
-      };
-      USES_SSL = true;
-      return https.createServer(credentials, app);
-    } catch(couldNotReadKeyAndCert) {
-      console.log("WARNING - could not use SSL, provide monart-key.pem and monart-cert.pem");
+    // try {
+    //   var credentials = {
+    //     key: fs.readFileSync('monart-key.pem'),
+    //     cert: fs.readFileSync('monart-cert.pem')
+    //   };
+    //   USES_SSL = true;
+    //   return https.createServer(credentials, app);
+    // } catch(couldNotReadKeyAndCert) {
+    //   console.log("WARNING - could not use SSL, provide monart-key.pem and monart-cert.pem");
       return http.createServer(app);
-    }
+    // }
 
   }
 
   var server = createServer();
+  var servers = {};
 
   var CACHE_INITIALISED = false;
   var gocd;
@@ -54,38 +56,43 @@ function monartServer() {
 
     CACHE_INITIALISED = true;
     gocd = instance;
-
+    
     function createListener(identifier, dataTransformer) {
       return function() {
 
         var wss = new WebSocketServer({server: server, path: '/' + identifier });
+        servers["/" + identifier] = wss;
         console.log(identifier +' websocket server created');
 
-        wss.on('connection', function(ws) {
-          console.log('connecting to /' + ws.upgradeReq.url);
+        wss.on('connection', function(ws, req) {
+          wsUrl = req.url;
+          console.log('connecting to ' + wsUrl);
 
           function newClient() {
 
             function getPipelineParameter() {
-              var requestedUrl = ws.upgradeReq.url;
+              var requestedUrl = wsUrl;
               var match = requestedUrl.match(/pipeline=([^&]+)/);
               return match ? match[1] : undefined;
             }
 
             function getColumnsParameter() {
-              var requestedUrl = ws.upgradeReq.url;
+              var requestedUrl = wsUrl;
               var match = requestedUrl.match(/columns=([^&]+)/);
               return match ? match[1] : undefined;
             }
 
             var pipelineParameter = getPipelineParameter();
             var pipelines = pipelineParameter ? [pipelineParameter] : gocd.pipelineNames;
+            console.log("Checking data for pipeline: " + pipelineParameter);
 
             function getActivityAndUpdateClients() {
               var result = {};
               if (CACHE_INITIALISED !== true) {
                 result[identifier] = {warmingUp: true};
-                ws.send(JSON.stringify(result));
+                ws.send(JSON.stringify(result), function(error) {
+                  console.log("Could not notify client of cache status:", error);
+                });
               } else {
 
                 var all = _.map(pipelines, function(pipeline) {
@@ -93,18 +100,18 @@ function monartServer() {
                 });
 
                 Q.all(all).then(function (gocdData) {
-
                   if(pipelineParameter) {
                     var visualisationData = dataTransformer(gocdData[0], getColumnsParameter());
                     result[identifier] = visualisationData;
-                    ws.send(JSON.stringify(result), function () {});
+                    console.log("sending data", JSON.stringify(result));
+                    ws.send(JSON.stringify(result));
                   } else {
                     result[identifier] = _.map(gocdData, function(data) {
                       var transformedPipelineData = dataTransformer(data, getColumnsParameter());
                       transformedPipelineData.pipeline = data.pipeline;
                       return transformedPipelineData;
                     });
-                    ws.send(JSON.stringify(result), function () {});
+                    ws.send(JSON.stringify(result));
                   }
 
 
@@ -138,6 +145,19 @@ function monartServer() {
         });
       }
     }
+
+    server.on('upgrade', (request, socket, head) => {
+      const pathname = url.parse(request.url).pathname;
+      const wsServer = servers[pathname];
+      if(wsServer) {
+        wsServer.handleUpgrade(request, socket, head, (ws) => {
+          wsServer.emit('connection', ws, request);
+        });
+      } else {
+        socket.close();
+      }
+
+    });
 
     /** HARING ************************/
 
